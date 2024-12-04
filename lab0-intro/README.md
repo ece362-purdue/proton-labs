@@ -8,8 +8,8 @@
 |------|-------------|--------|
 | 0 | Initialize your git repository | 0 |
 | 1 | Place the Development Board on a Breadboard | 10 |
-| 2 | Install VScode and PlatformIO | 10 |
-| 3 | Configure PlatformIO for your board | 20 |
+| 2 | Install VScode and the Pico Extension | 10 |
+| 3 | Configure the Pico Extension for your board | 20 |
 | 4 | Writing microcontroller code in C | 20 |
 | 5 | Build and Debug a Project | 20 |
 | 6 | Set up and interact with a Serial Port | 10 |
@@ -22,7 +22,7 @@
 ## Instructional Objectives
 - To become familiar with the BHEE 162 laboratory, policies, lab stations, and equipment.
 - To configure your GitHub account for use with GitHub Classroom and add SSH keys for easy access.
-- To get hands-on experience with the Pico 2 microcontroller, its accompanying components, and the PlatformIO IDE in VScode that you will use all semester.
+- To get hands-on experience with the Pico 2 microcontroller, its accompanying components, and the Pico Extension IDE in VScode that you will use all semester.
 
 > [!CAUTION]
 > HALT!  
@@ -112,13 +112,13 @@ Open your ECE 362 lab kit and find the Pico 2 development board. It should look 
     <img src="pico-side.webp" style="margin: 1em 0; width: 40vw; max-width: 400px">
 </div>
 
-Your ECE Mini kit from prior courses has a large, four-panel breadboard similar to the one pictured below.  Place the devboard so that it is on the bottom of the second panel, shown below.
+Your ECE Mini kit from prior courses has a large, four-panel breadboard similar to the one pictured below.  Place the devboard so that it is on the bottom of the second panel with the USB receptacle facing outward, shown below.
 
 <div class="center">
-    <img src="img2.jpeg" style="width: 90vw; max-width: 800px">
+    <img src="insert-pico.jpg" style="width: 90vw; max-width: 800px">
 </div>
 
-Typically, a microcontroller will be a little hard to get in there, but you should not have to remove it once it’s in there. To prevent damage to the board, press down on both ends of the board at once. Do not apply force to anything else, as parts of the board are delicate and may become damaged. When inserting, make sure there are two columns on either side of the development board to leave room to plug in wires. 
+Typically, a microcontroller will be a little hard to get into the holes, but you should not have to remove it once it’s in there. To prevent damage to the board, press down on both ends of the board at once. Do not apply force to anything else, as parts of the board are delicate and may become damaged. When inserting, make sure there are two columns on either side of the development board to leave room to plug in wires. 
 
 Next, connect two wires: one from the 3V3(OUT) pin to the power rails, and one from the GND pins to the ground rails of your breadboard.  You can find the pinout for the Pico 2 here: https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf.  We'll use these in a second.
 
@@ -126,39 +126,40 @@ Connect your Pico 2 to your computer using the USB cable provided in your lab ki
 
 > [!IMPORTANT]
 > In ECE 36200, you will build upon the existing circuit on the breadboard for each lab, so **do not take parts off your breadboard when you are done with a lab** - including this one!
+> 
+> Show a TA your setup before moving on to the next step.  **Do not proceed until you have shown a TA your setup.**
+> 
+> For every lab, ensure that you have received your checkoffs by checking this page: https://engineering.purdue.edu/ece362/checkoff/
 
-## Step 2: Install VScode and PlatformIO
+## Step 2: Install VScode and the Pico Extension
 
 As mentioned above, these labs are entirely doable at home as they are in lab.  For applications that require looking at an oscilloscope, you may want to use an AD2 from the ECE shop in its place at home.  Make it a habit to look ahead at labs so that you know when you may need one.  
 
-**In this lab**, we'll teach you how to install PlatformIO, an extension for Visual Studio Code (VScode) that will allow you to write, compile, and debug code for your microcontroller.  We'll cover how to create a project from scratch, although in subsequent labs we'll provide you with the project.  We'll also show you how to use the debugger to step through your code, and how to use the serial monitor to interact with your microcontroller.
+**In this lab**, we'll teach you how to install the Pico Extension for Visual Studio Code (VScode) that will allow you to write, compile, and debug code for your microcontroller.  We'll cover how to create a project from scratch, although in subsequent labs we'll provide you with the project.  We'll also show you how to use the debugger to step through your code, and how to use the serial monitor to interact with your microcontroller.
 
 If you haven't already used it for a prior class, download Visual Studio Code (commonly referred to as VScode) from https://code.visualstudio.com/.  
 
-Once you have downloaded and installed VScode, open it up and click on the Extensions icon on the left side of the window.  Search for PlatformIO and install the PlatformIO IDE extension.  This will allow you to use PlatformIO from within VScode.  Once you have installed the extension, reload the VScode window so that the extension starts setting itself up.  Once it's done, click the newly added PlatformIO logo in the left sidebar.
+Once you have downloaded and installed VScode, open it up and click on the Extensions icon on the left side of the window.  Search for the Pico Extension and install the Raspberry Pi Pico Extension.  Once you have installed the extension, reload the VScode window so that the extension starts setting itself up.  Once it's done, click the newly added the Pico Extension logo in the left sidebar.
 
-https://github.com/ece362-purdue/labs/assets/12859429/bc0f16c2-6bfb-4db2-a0a5-1b66a774d552
+![pico-ext-install](pico-ext-install.gif)
 
-If it shows the sidebar, it should be good to go.  Click on PIO Home > Open in the left sidebar to show the main window.
+If it shows the sidebar, it should be good to go!  If it doesn't, you may need to restart VScode.  If you still have issues, please ask a TA for help.
 
-> [!IMPORTANT]
-> If you are on Windows, you will need one more thing to get PlatformIO to work.  Download and install Zadig from https://zadig.akeo.ie/.  Use it to convert the STLink driver to WinUSB.  See this [forum post](https://community.platformio.org/t/esp32-pio-unified-debugger/4541/20) to figure this out - not all steps may apply since this is for an ESP32.
+## Step 3: Configure the Pico Extension for your board
 
-## Step 3: Configure PlatformIO for your board
+In the Pico Extension sidebar that appears, click New C/C++ Project.  In the window that appears, do the following:
 
-In the PlatformIO IDE window that appears, click New Project.  In the window that appears, type:
-
-- lab0 as the project name;
-- ST Nucleo F091RC as the board, and;
-- CMSIS as the framework.
+- Specify `lab0` as the name.
+- Select `Pico 2` as the board.
+- Tick the box for RISC-V architecture.
 
 Set the project location to be `lab0` in your respective `lab-0-intro-username` repository.
 
 Remember to add, commit and push your code to your `lab-0` repository.  Click Finish.
 
-It will take a while to download all the tools for you to use.  Once it is complete, it will ask you to restart VScode.  When you do so, the window will refresh, and you'll see whatever file you had open, along with the PlatformIO Home page.  Close the home page tab.
+It will take a while to download all the tools for you to use.  Once it is complete, it will ask you to restart VScode.  When you do so, the window will refresh, and you'll see whatever file you had open, along with the Pico Extension Home page.  Close the home page tab.
 
-The `platformio.ini` configuration file specifies how your code should be compiled, with any optional code libraries that you'd like to add, and how to take the resulting binary and flash it to your microcontroller, which typically involves writing that binary file to a specific portion of your microcontroller's flash memory.  When your microcontroller turns on, it reads the program from that part of memory, and starts executing it.  
+The `the Pico Extension.ini` configuration file specifies how your code should be compiled, with any optional code libraries that you'd like to add, and how to take the resulting binary and flash it to your microcontroller, which typically involves writing that binary file to a specific portion of your microcontroller's flash memory.  When your microcontroller turns on, it reads the program from that part of memory, and starts executing it.  
 
 We'll change this configuration file to include some course-specific settings that we've worked out for you already.  Change the contents as follows (leave the comment block as-is - you may find it helpful when you're adding your own settings):
 
@@ -167,9 +168,9 @@ We'll change this configuration file to include some course-specific settings th
 platform = ststm32
 board = nucleo_f091rc
 framework = cmsis
-upload_command = ${platformio.packages_dir}/tool-openocd/bin/openocd -f openocd.cfg -c "program .pio/build/nucleo_f091rc/firmware.elf verify reset exit"
+upload_command = ${the Pico Extension.packages_dir}/tool-openocd/bin/openocd -f openocd.cfg -c "program .pio/build/nucleo_f091rc/firmware.elf verify reset exit"
 debug_server = 
-    ${platformio.packages_dir}/tool-openocd/bin/openocd
+    ${the Pico Extension.packages_dir}/tool-openocd/bin/openocd
     -f
     openocd.cfg
 build_src_flags = -DSTM32F091 -O0
@@ -179,7 +180,7 @@ monitor_speed = 115200
 monitor_eol = LF
 ```
 
-<!--  "${platformio.workspace_dir}/../lib/autotest.o" -->
+<!--  "${the Pico Extension.workspace_dir}/../lib/autotest.o" -->
 
 Next, open your Explorer (it's the top icon with a picture of files on it, or you can press Ctrl-Shift-E), and create a new file called openocd.cfg.  
 
@@ -239,7 +240,7 @@ void internal_clock()
 }
 ```
 
-This code initializes an internal PLL, or phase-locked loop, to make use of the external crystal on our custom STM32 boards to generate a 48MHz clock.  This is the maximum clock speed of the STM32F0 series, and we'll use it for our labs.  We'll also use this code to initialize the clock in our labs, so it's good to have it in a separate file.  PlatformIO will automatically include all your source code for you, as long as it is in the `src` folder.
+This code initializes an internal PLL, or phase-locked loop, to make use of the external crystal on our custom STM32 boards to generate a 48MHz clock.  This is the maximum clock speed of the STM32F0 series, and we'll use it for our labs.  We'll also use this code to initialize the clock in our labs, so it's good to have it in a separate file.  the Pico Extension will automatically include all your source code for you, as long as it is in the `src` folder.
 
 Next, we'll add a `syscalls.c` file to the `src` directory.  This file defines important functions that connect the standard library functions like `printf` and `scanf` to the UART communication peripheral on your STM32, allowing you to use those functions to communicate with your computer, and ideally debug your code.  Find the file `syscalls.c` and add it to your `src` directory.
 
@@ -260,7 +261,7 @@ Under the `src` folder, create a new file called `main.c`.  In it, write a `main
 
 ## Step 5: Build and Debug a Project
 
-Once saved, go back to the PlatformIO tab, and click the Upload option under `nucleo_f091rc` > General.  This will automatically build your code for you, and flash it to your microcontroller.  If you see a textbox appear asking about CMakeLists.txt, you can hit Escape to get rid of it. 
+Once saved, go back to the Pico Extension tab, and click the Upload option under `nucleo_f091rc` > General.  This will automatically build your code for you, and flash it to your microcontroller.  If you see a textbox appear asking about CMakeLists.txt, you can hit Escape to get rid of it. 
 
 
 If you see the following in your terminal:
@@ -285,7 +286,7 @@ Here's the debugging process:
 
 [debugging.webm](https://github.com/ece362-purdue/labs/assets/12859429/a8b9293d-83c2-4697-abbc-7b39a4dfaf06)
 
-To start debugging, press F5 (or Fn+F5, depending on your keyboard Fn lock), or click Debug > Start Debugging under the Quick Access sidebar on the PlatformIO tab.  You'll see the microcontroller be flashed again, but this time, a Debug Console will appear, and VScode will first take you to the Reset_Handler, before taking you to the first line of your `main` function.  By default, your debugger will pause here.
+To start debugging, press F5 (or Fn+F5, depending on your keyboard Fn lock), or click Debug > Start Debugging under the Quick Access sidebar on the Pico Extension tab.  You'll see the microcontroller be flashed again, but this time, a Debug Console will appear, and VScode will first take you to the Reset_Handler, before taking you to the first line of your `main` function.  By default, your debugger will pause here.
 
 Look for the (very small) new panel that has been added to the top-center of your VScode window: 
 
@@ -382,7 +383,7 @@ int main(void)
 
 Make sure to replace your `main` function from earlier.
 
-Go to the PlatformIO tab again, and this time, click 'Upload and Monitor' instead of 'Upload'.  This time, your code will flash, and a serial console will appear in the same output tab.  Try typing characters into this console - you should see the characters appear one after the other.  That indicates your STM32 and its UART are working and communicating as expected!
+Go to the Pico Extension tab again, and this time, click 'Upload and Monitor' instead of 'Upload'.  This time, your code will flash, and a serial console will appear in the same output tab.  Try typing characters into this console - you should see the characters appear one after the other.  That indicates your STM32 and its UART are working and communicating as expected!
 
 If you have more than one serial device connected, you may be asked to pick which one to use.  Pick the one that has "FTDI USB to UART" or similar in its name.
 
@@ -394,7 +395,7 @@ If you have more than one serial device connected, you may be asked to pick whic
 
 In your upcoming labs, you will include a code object that gets built along with your C code, typically called "autotest.o".  This provides (in other labs) an autotester that you can use to test individual functions and generate a confirmation code that you will submit with your code.  In this lab, it's simply a shell that executes some functions - just to get you familiar with how it works so you know how to use it for the following labs.  
 
-In this step, we will have you add the autotest file to your PlatformIO project.  In the other labs, we will provide you with the PlatformIO project with the autotester included.
+In this step, we will have you add the autotest file to your the Pico Extension project.  In the other labs, we will provide you with the Pico Extension project with the autotester included.
 
 Download the `autotest.o` file [here](../../../raw/main/lab0-intro/autotest.o) and place it in the `src` directory of your project.
 
@@ -403,13 +404,13 @@ Download the `autotest.o` file [here](../../../raw/main/lab0-intro/autotest.o) a
 > 
 > Credit for this lab is granted by showing your TA that you have completed all steps in lab or office hours, by pushing your code to the GitHub repository, and submitting your GitHub repository to Gradescope.  **You must submit your work to Gradescope before the beginning of your lab section next week.**
 
-In your `platformio.ini` file, edit the line starting with `build_src_flags` to include the path to the `autotest.o` file.  It should look like this:
+In your `the Pico Extension.ini` file, edit the line starting with `build_src_flags` to include the path to the `autotest.o` file.  It should look like this:
 
 ```ini
-build_src_flags = -DSTM32F091 "${platformio.src_dir}/autotest.o"
+build_src_flags = -DSTM32F091 "${the Pico Extension.src_dir}/autotest.o"
 ```
 
-This tells PlatformIO that when it compiles your code into object form, it should link that object file with your code.  The resulting binary will then include the code from `autotest.o` as well as your own.
+This tells the Pico Extension that when it compiles your code into object form, it should link that object file with your code.  The resulting binary will then include the code from `autotest.o` as well as your own.
 
 Back in `main.c`, replace all contents with the following.  Take note of the added `autotest` function call.
 
@@ -461,7 +462,7 @@ If you haven't done so already, your TA will hand you a silver sharpie that so t
 
 ## Submit your work to Gradescope
 
-Submit your work to the Lab 0 assignment on Gradescope **before the beginning of your lab section next week**.  Ensure that your PlatformIO code has been added and pushed in your GitHub repository.  
+Submit your work to the Lab 0 assignment on Gradescope **before the beginning of your lab section next week**.  Ensure that your the Pico Extension code has been added and pushed in your GitHub repository.  
 
 ## Lab Station Clean-up
 
