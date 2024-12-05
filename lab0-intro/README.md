@@ -109,7 +109,7 @@ If you are on Windows, it is possible to use PowerShell to do this.  If you are 
 Open your ECE 362 lab kit and find the Pico 2 development board. It should look like the one in the image below.
 
 <div class="center">
-    <img src="pico-side.webp" style="margin: 1em 0; width: 40vw; max-width: 400px">
+    <img src="pico-side.webp" style="margin: 1em 0; width: 20vw; max-width: 400px">
 </div>
 
 Your ECE Mini kit from prior courses has a large, four-panel breadboard similar to the one pictured below.  Place the devboard so that it is on the bottom of the second panel with the USB receptacle facing outward, shown below.
