@@ -10,8 +10,8 @@
 | 1 | Place the Development Board on a Breadboard | 10 |
 | 2 | Install VScode and the Pico Extension | 10 |
 | 3 | Configure the Pico Extension for your board | 20 |
-| 4 | Writing microcontroller code in C | 20 |
-| 5 | Build and Debug a Project | 20 |
+| 4 | First Flashes | 20 |
+| 5 | Debugging and Printing | 20 |
 | 6 | Set up and interact with a Serial Port | 10 |
 | 7 | Run a command shell | 10 |
 | &nbsp; | Total: | 100* |
@@ -122,6 +122,8 @@ Typically, a microcontroller will be a little hard to get into the holes, but yo
 
 Next, connect two wires: one from the 3V3(OUT) pin to the power rails, and one from the GND pins to the ground rails of your breadboard.  You can find the pinout for the Pico 2 here: https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf.  We'll use these in a second.
 
+Take a pushbutton and place it at the end of the board.  Connect the bottom left pin to ground, and the bottom right pin to GPIO15.  This will be your reset button, and you can use it to reset your Pico 2 to the start of a program without having to unplug and replug it.
+
 Connect your Pico 2 to your computer using the USB cable provided in your lab kit.  The Pico 2 will power on, and you should see a green LED blink on the board.  This indicates that the board is powered on and ready to go.  (If you borrowed it from another student, it may have another program on it, so don't worry if you see something else happening.)
 
 > [!IMPORTANT]
@@ -145,251 +147,146 @@ Once you have downloaded and installed VScode, open it up and click on the Exten
 
 If it shows the sidebar, it should be good to go!  If it doesn't, you may need to restart VScode.  If you still have issues, please ask a TA for help.
 
+> [!IMPORTANT]
+> Show your newly installed VScode and Pico Extension to a TA.  
+
 ## Step 3: Configure the Pico Extension for your board
 
 In the Pico Extension sidebar that appears, click New C/C++ Project.  In the window that appears, do the following:
 
 - Specify `lab0` as the name.
 - Select `Pico 2` as the board.
+- Set the project location to be `lab0` in your respective `lab-0-intro-username` repository.
+    - This will allow you to commit and push your newly created project to be submitted.
 - Tick the box for RISC-V architecture.
+    - Feel free to try out assembly code from your lectures (when you get to it) on this board!
+- Set the Pico SDK version to the highest value.
+    - As of 2025, the extension is being constantly updated, so the highest version will change constantly.  v2 or higher supports the Pico 2.
+- Under Stdio (standard I/O) support, tick `Console over UART`.
+    - You should always select this feature when creating a new project, as it will allow you to use the serial monitor to interact with your microcontroller.
+- Leave all the other options at their defaults.
 
-Set the project location to be `lab0` in your respective `lab-0-intro-username` repository.
+Finally, click `Create`.  The extension will close, and you'll see a new window appear.  
 
-Remember to add, commit and push your code to your `lab-0` repository.  Click Finish.
+The first time you create a project, it may take a while to set up the project, so **be patient**.  If it's slow, you can ensure it's working by watching the progress at the bottom of the VScode window where you created the project.  Once the new window appears, you can close the old window.  
 
-It will take a while to download all the tools for you to use.  Once it is complete, it will ask you to restart VScode.  When you do so, the window will refresh, and you'll see whatever file you had open, along with the Pico Extension Home page.  Close the home page tab.
-
-The `the Pico Extension.ini` configuration file specifies how your code should be compiled, with any optional code libraries that you'd like to add, and how to take the resulting binary and flash it to your microcontroller, which typically involves writing that binary file to a specific portion of your microcontroller's flash memory.  When your microcontroller turns on, it reads the program from that part of memory, and starts executing it.  
-
-We'll change this configuration file to include some course-specific settings that we've worked out for you already.  Change the contents as follows (leave the comment block as-is - you may find it helpful when you're adding your own settings):
-
-```ini
-[env:nucleo_f091rc]
-platform = ststm32
-board = nucleo_f091rc
-framework = cmsis
-upload_command = ${the Pico Extension.packages_dir}/tool-openocd/bin/openocd -f openocd.cfg -c "program .pio/build/nucleo_f091rc/firmware.elf verify reset exit"
-debug_server = 
-    ${the Pico Extension.packages_dir}/tool-openocd/bin/openocd
-    -f
-    openocd.cfg
-build_src_flags = -DSTM32F091 -O0
-upload_protocol = stlink
-debug_init_break = tbreak main
-monitor_speed = 115200
-monitor_eol = LF
-```
-
-<!--  "${the Pico Extension.workspace_dir}/../lib/autotest.o" -->
-
-Next, open your Explorer (it's the top icon with a picture of files on it, or you can press Ctrl-Shift-E), and create a new file called openocd.cfg.  
-
-https://github.com/ece362-purdue/labs/assets/12859429/cdc8c3a1-4b02-41db-a8c4-401222358f8f
-
-In this file, type the following:
-
-```bash
-source [find interface/stlink.cfg]
-set WORKAREASIZE 0x8000
-transport select "hla_swd"
-set CHIPNAME STM32F091RCTx
-set BOARDNAME genericBoard
-# CHIPNAMES state
-set CHIPNAME_CPU0_ACTIVATED 1
-# Enable debug when in low power modes
-set ENABLE_LOW_POWER 1
-# Stop Watchdog counters when halt
-set STOP_WATCHDOG 1
-# STlink Debug clock frequency
-set CLOCK_FREQ 8000
-# use software system reset
-reset_config none
-set CONNECT_UNDER_RESET 0
-# BCTM CPU variables
-source [find target/stm32f0x.cfg]
-```
-
-This sets up the OpenOCD debugger to work with your microcontroller.
-
-Next, we'll create a support file called `clock.c` under the `src` folder.  In it, put the following code:  
-
-```c
-#include "stm32f0xx.h"
-void internal_clock()
-{
-    /* Disable HSE to allow use of the GPIOs */
-    RCC->CR &= ~RCC_CR_HSEON;
-    /* Enable Prefetch Buffer and set Flash Latency */
-    FLASH->ACR = FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY;
-    /* HCLK = SYSCLK */
-    RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
-    /* PCLK = HCLK */
-    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE_DIV1;
-    /* PLL configuration = (HSI/2) * 12 = ~48 MHz */
-    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMUL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSI_DIV2 | RCC_CFGR_PLLXTPRE_HSE_PREDIV_DIV1 | RCC_CFGR_PLLMUL12);
-    /* Enable PLL */
-    RCC->CR |= RCC_CR_PLLON;
-    /* Wait till PLL is ready */
-    while((RCC->CR & RCC_CR_PLLRDY) == 0);
-    /* Select PLL as system clock source */
-    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
-    RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
-    /* Wait till PLL is used as system clock source */
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)RCC_CFGR_SWS_PLL);
-}
-```
-
-This code initializes an internal PLL, or phase-locked loop, to make use of the external crystal on our custom STM32 boards to generate a 48MHz clock.  This is the maximum clock speed of the STM32F0 series, and we'll use it for our labs.  We'll also use this code to initialize the clock in our labs, so it's good to have it in a separate file.  the Pico Extension will automatically include all your source code for you, as long as it is in the `src` folder.
-
-Next, we'll add a `syscalls.c` file to the `src` directory.  This file defines important functions that connect the standard library functions like `printf` and `scanf` to the UART communication peripheral on your STM32, allowing you to use those functions to communicate with your computer, and ideally debug your code.  Find the file `syscalls.c` and add it to your `src` directory.
-
+If any errors appear, you may need to restart VScode, and/or try to reinstall the Pico extension.  If you still have issues, please ask a TA for help.
 
 > [!IMPORTANT]
-> Commit all your code and push it to your repository now.  Use a descriptive commit message, eg. Step 3 code.
+> Commit the newly created project and push it to your repository now.  Use a descriptive commit message, eg. Step 3 new project.
 
-## Step 4: Writing microcontroller code in C
+## Step 4: First Flashes
 
-We've now configured our project to use the Pico 2 microcontroller, and we've added code to initialize a faster clock.  Let's now write some code to test it out.
+Now that we have a project, let's inspect the C code.  Open the `lab0.c` file.
 
-Under the `src` folder, create a new file called `main.c`.  In it, write a `main` function in C to create two `int` variables `x` and `y`, and in an infinite for loop, increment `x` until it reaches 10.  When `x` reaches 10, increment `y` and reset `x` to 0.  (Just a silly example to test our debugger).  Press Ctrl-S to save.
+We have some starter code that will initialize stdio (standard input/output) over UART, which will allow us to interact with the microcontroller using a serial monitor, and then print `Hello, world!` every second infinitely to the monitor.
 
-(We won't call the `internal_clock` function yet - we're just testing the debugger for now.)
+The UART is an example of a **peripheral**, which is an independent subsystem of your microcontroller, separate from the microprocessor, that can be configured to autonomously perform some operation without the CPU's intervention.  In this case, the UART is configured to automatically send and receive data over a serial connection, which is a common way to communicate with a microcontroller.  By the end of the course, you will learn how to configure this yourself, but for now, we'll use the provided code.
+
+Let's add some code that will also flash the onboard LED every second.  There is an LED on GPIO25 that we can use for this purpose.  After the `stdio_init_all` line, add the following code:
+
+```c
+    gpio_init(25);
+    gpio_set_dir(25, GPIO_OUT);
+```
+
+And inside the `while` loop that prints `Hello, world!`, add the following underneath the `printf`:
+
+```c
+    gpio_put(25, 1);
+    sleep_ms(250);
+    gpio_put(25, 0);
+    sleep_ms(250);
+```
+
+If you have your USB plugged into your Pico, disconnect it first, and then hold down the button labeled `BOOTSEL` on the board, and plug the USB back in.  This will put the Pico into a mode where it can be flashed.  If you're on Windows/macOS, you may see a pop-up appear saying there's a new drive.  This is normal, and is a way for you to drag UF2 files to flash the Pico with a new program.  However, we won't do that - we'll let VScode handle it for us.
+
+Go to the Pico menu and click `Run Project (USB)`.  This will build your code using the CMake build system (not the same as `make`) and flash it to your microcontroller.  If you see a textbox appear asking about CMakeLists.txt, you can hit Escape to get rid of it.  You should now see your LED flash twice every second (just so you can tell it's different from the factory condition).
+
+We'll figure out how to see the "Hello, world" in the next step (although with microcontrollers, a flashing LED is equivalent to a "Hello World").
 
 > [!IMPORTANT]
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-## Step 5: Build and Debug a Project
+## Step 5: Debugging and Printing
 
-Once saved, go back to the Pico Extension tab, and click the Upload option under `nucleo_f091rc` > General.  This will automatically build your code for you, and flash it to your microcontroller.  If you see a textbox appear asking about CMakeLists.txt, you can hit Escape to get rid of it. 
+The USB cable that we just flashed the Pico with is only useful for providing power and flashing the Pico.  However, there are two critical things we need to be able to use ~~the Pico~~ any microcontroller to its fullest potential:
 
+1. **Debugging** - the ability to step through code and inspect variables as the program runs on the microprocessor.
 
-If you see the following in your terminal:
+2. **Serial Communication** - the ability to send and receive data from the microcontroller to a computer.
+
+In your kit, there is a second item called the Raspberry Pi Debug Probe that will help us with these things.  Go ahead and pull this out and wire it up as per the instructions [here](https://www.raspberrypi.com/documentation/microcontrollers/debug-probe.html) to your Pico, and plug it into your PC.
+
+There are six important pins to connect on your Pico:
+- GND (ground) to GND on the Debug Probe.
+    - When you are interfacing two digital systems together, you must connect their grounds together to ensure that they have a common reference point.
+- The TX pin of the Debug Probe to the RX pin of the Pico.
+    - This is the transmit pin of the Debug Probe, which sends data to the Pico.  When you "type" into the Serial Monitor, the data is sent to the Debug Probe, which sends it to its UART TX pin, which is connected to the Pico's RX pin.
+- The RX pin of the Debug Probe to the TX pin of the Pico.
+    - This is the receive pin of the Debug Probe, which receives data from the Pico.  When the Pico sends data to the Debug Probe, it sends it to its UART RX pin, which is connected to the Pico's TX pin.
+- SWDIO and SWCLK to the SWDIO and SWCLK pins on the Pico.
+    - These are the Serial Wire Debug (SWD) pins, which are used to communicate with the microcontroller's debug interface.  This is how we will be able to step through code and inspect variables.  We can also use this to flash a new program to the Pico without having to hold down the BOOTSEL button.
+
+Once you're all connected, go back to VScode and click `Flash Project (SWD)` option.  You should see a recompilation and flash process using OpenOCD, which is a tool that talks to the Debug Probe to send the program to be flashed to your Pico.  You should see something like this in the case of a successful flash:
 
 ```
+Info : [rp2350.dap.core1] Examined RISC-V core
+Info : [rp2350.dap.core1]  XLEN=32, misa=0x40901105
+Info : [rp2350.dap.core1] Examination succeed
+Info : starting gdb server for rp2350.dap.core0 on 3333
+Info : Listening on port 3333 for gdb connections
+** Programming Started **
+Info : RP2040 Flash Probe: 33554432 bytes @0x10000000, in 8192 sectors
+
+Info : Padding image section 2 at 0x10002264 with 156 bytes (bank write end alignment)
+Warn : Adding extra erase range, 0x10002300 .. 0x10002fff       
 ** Programming Finished **
 ** Verify Started **
 ** Verified OK **
 ** Resetting Target **
-Info : Unable to match requested speed 1000 kHz, using 950 kHz
-Info : Unable to match requested speed 1000 kHz, using 950 kHz
 shutdown command invoked
 ```
 
-Your microcontroller should have flashed correctly!  Great work!
+If you see this, you have successfully flashed your Pico with the new program, and you should see the LED flashing twice a second again.  
 
-With a microcontroller, however, it can be hard to see what's going on under the hood.  This is a great opportunity to try out debugging, which allows us to step through each line of code and track what our variables contain, to ensure our code is working as we intend.  You'll do this a lot when you configure *peripherals*, which are devices that come with your microcontroller to do things like read from sensors, or control motors.  For now, we'll use the debugger to inspect our two variables `x` and `y`.
+To set up the Serial Monitor, press Ctrl-Shift-P (or Cmd-Shift-P on a Mac) and type `Terminal: Focus on Serial Monitor View`.  You can also pull it up if you have a terminal open by looking for the "Serial Monitor" tab.  Open it, and click Start Monitoring.  You should see the "Hello, world!" message appear every half second.
 
-Debugging does the same process as flashing your microcontroller, but instead of releasing control over the microcontroller, it tells it to pause a certain point in your code, typically the beginning of your `main` function.  You can then either continue to run through the code normally, or set up **breakpoints**, which are markers in your code to tell the debugger to pause at that specific point if you continue the program in debug mode. 
+![serial-monitor](serial-monitor.png)
 
-Here's the debugging process:
+Now, let's test debugging.  Before we just click Debug, we should make some changes to the CMakeLists.txt file in the project to ensure that all optimizations are turned off so that we can step through every line of our code without the compiler optimizing it away.  Open the `CMakeLists.txt` file in the project, and below the line that says `project(lab0 C CXX ASM)`, add the following lines:
 
-[debugging.webm](https://github.com/ece362-purdue/labs/assets/12859429/a8b9293d-83c2-4697-abbc-7b39a4dfaf06)
-
-To start debugging, press F5 (or Fn+F5, depending on your keyboard Fn lock), or click Debug > Start Debugging under the Quick Access sidebar on the Pico Extension tab.  You'll see the microcontroller be flashed again, but this time, a Debug Console will appear, and VScode will first take you to the Reset_Handler, before taking you to the first line of your `main` function.  By default, your debugger will pause here.
-
-Look for the (very small) new panel that has been added to the top-center of your VScode window: 
-
-<div class="center">
-    <img src="debugger.png" style="width: 90vw; max-width: 400px">
-</div>
-
-In order, we have:
-- Continue (F5) - Continue running the program until the next breakpoint, or until the program ends.
-    - Use this for when you want to run the program normally, or until the first breakpoint you've set.
-    - This button changes to a Pause button when the program is running.
-- Step Over (F10) - Run the next line of code, but don't step into any functions that may be called.
-    - Use this for when you want to skip over a function call, but still want to see what the function does.
-- Step Into (F11) - Run the next line of code, and step into any functions that may be called.
-    - Use this for when you want to see what a function does.
-- Step Out (Shift+F11) - Run the rest of the current function, and return to the calling function.
-    - Use this when you've reached a line inside the function that you wanted to check, and now want to return to the calling function.
-- Restart (Ctrl+Shift+F5) - Restart the program from the beginning.
-- Stop (Shift+F5) - Stop the program.
-
-Click the Step Over button, which you'll use most of the time, to execute the current line and move to the next one.  Notice that `x` and `y` appear as local variables on the left, and when you run a line that affects `x`, the value of `x` updates.  Nifty!  
-
-Keep stepping over (slowly) and you'll see the values update as the program progresses.  If you haven't thought it already, you may realize eventually that this gets very tedious.  If you were running the debugger to get to some distant part of your code, having to step over manually would get boring very quickly.  On the other hand, clicking Continue would only run to the end of your code.  This is where we add breakpoints.
-
-Note in the video that we set a breakpoint on the line where `y` gets incremented.  This is an example of such a scenario where you have a longer piece of code to execute before the line you want to check.  Set your breakpoint by adding the red dot next to the line, and then click Continue.  The debugger will run until the breakpoint, and then pause.  You can then step over to see the value of `y` increment.  Very nifty!  
-
-You can also hover over the variable to see its value, or add it to your Watch list to keep track of it.  You can even add expressions combining different variables!  Keep in mind that it cannot "watch" variables that are not in the current scope, so if you add variables from a function, and then return, you won't see those variables anymore.  Nonetheless it's a good option for global variables.
-
-https://github.com/ece362-purdue/labs/assets/12859429/f4d10be8-eed5-402e-acb1-9f3e5af56ce4
-
-> If there are any changes as per `git status`, commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
-
-## Step 6: Set up and interact with a Serial Port
-
-Now that you know how to build and debug a program, let's now try out a *peripheral*.  A peripheral is a part of a microcontroller that can interface with the outside world, and is capable of operating independently of the *microprocessor* on the microcontroller.
-
-UART, or universal asynchronous receiver/transmitter, is a very common peripheral that was used by computers since the 1970s.  We don't see them much these days, but it remains the prime example of bidirectional communication between two devices.  It's also a great way to get started with microcontroller peripherals, as it's very simple to use.
-
-Your microcontroller has a UART peripheral that can be used to act as a "transciever" - transmitter + receiver.  We'll configure it to wait for data to be **received**, and then **transmit** the same data back.  
-
-Modern computers don't have a UART peripheral anymore, so we'll use a chip in your 362 kit called the FTDI USB-UART interface.  This allows us to add a UART peripheral to our computers by connecting it to a USB port.  
-
-<div class="center">
-    <img src="img19.PNG" style="width: 90vw; max-width: 800px">
-</div>
-
-The very first thing you must do before you connect your red FTDI to your breadboard is ensure that it is set to 3.3V mode.  **If you don't, you will destroy your microcontroller**.  To do this, move the header (orange, yellow, or black cap on the pins just above the main pins on the bottom of the chip) to the 3V position, such that it connects the center and rightmost pin.  **Before you plug this in, call a TA over and make sure it is on the correct position**.  Then:
-
-- Place the pins of the serial adapter into the breadboard.
-- Connect Rx (Pin 2) of the serial adapter to PC12 of the devboard.
-- Connect Tx (Pin 3) of the serial adapter to PD2 of the devboard.
-- Connect GND on the devboard to the breadboard’s ground rail (blue).
-- Connect GND (Pin 6) of the serial adapter to the breadboard’s ground rail (blue).
-- Connect CTS (Pin 5) of the serial adapter to the breadboard’s ground rail (blue).
-
-You can check to see that you've wired your FTDI chip correctly by looking at the pins on the bottom of the chip.  The pinout is shown below:
-
-<div class="center">
-    <img src="img20.PNG" style="width: 90vw; max-width: 800px">
-</div>
-
-After this is wired properly, **check one last time to make sure the adapter is in 3V mode**. Then, connect the FTDI chip to your computer with the USB cable in your lab kit.
-
-Once the hardware is in place, we'll use the following code to test it out:
-
-```c
-#include "stm32f0xx.h"
-void internal_clock();
-void setup_serial(void)
-{
-    RCC->AHBENR |= 0x00180000;
-    GPIOC->MODER  |= 0x02000000;
-    GPIOC->AFR[1] |= 0x00020000;
-    GPIOD->MODER  |= 0x00000020;
-    GPIOD->AFR[0] |= 0x00000200;
-    RCC->APB1ENR |= 0x00100000;
-    USART5->CR1 &= ~0x00000001;
-    USART5->CR1 |= 0x00008000;
-    USART5->BRR = 0x340;
-    USART5->CR1 |= 0x0000000c;
-    USART5->CR1 |= 0x00000001;
-}
-int main(void)
-{
-    internal_clock();   // Never comment this out!
-    //autotest();         // We'll run this in the next step.
-    setup_serial();
-    while(1) {
-        if ((USART5->ISR & USART_ISR_RXNE))  // if receive buffer has some data in it
-            USART5->TDR = USART5->RDR;       // copy that data into transmit buffer.
-    }
-}
+```cmake
+set(CMAKE_BUILD_TYPE Debug)
+set(PICO_DEOPTIMIZED_DEBUG 1)
 ```
 
-Make sure to replace your `main` function from earlier.
+Next, set a breakpoint on the `printf` line by clicking in the left margin of the editor window - you'll see a red dot appear.  Then, click `Debug Project` in the Pico menu.  Select `Pico Debug (Cortex-Debug)` as the method of debugging.  This will start OpenOCD to connect through the Debug Probe and flash a program, but **not exit**, and start `gdb` to connect to the running OpenOCD process to control line-by-line debugging.  You should see the program stop at the first line of `main`.  Here is a picture of the window as you should see it:
 
-Go to the Pico Extension tab again, and this time, click 'Upload and Monitor' instead of 'Upload'.  This time, your code will flash, and a serial console will appear in the same output tab.  Try typing characters into this console - you should see the characters appear one after the other.  That indicates your STM32 and its UART are working and communicating as expected!
+![debugger](debug-view.png)
 
-If you have more than one serial device connected, you may be asked to pick which one to use.  Pick the one that has "FTDI USB to UART" or similar in its name.
+There are a lot of things going on in Debug mode that you should understand:
+
+- First, in the top right is a terminal with the OpenOCD process.  When you clicked Debug, it sent your compiled code to be flashed on to your Pico 2 through the Debug Probe.  Instead of "shutting down" as it did earlier, it is now "halted due to debug-request".  Your Pico 2 is dual-core, but your code will only run on one by default.
+- The Debug Console shows output from `gdb`, which may be familiar to you from prior coding classes.  You have used `gdb` in the past to debug programs as you ran them on your own computer's CPU, but now you are using it to debug a program running on a completely separate computer - your microcontroller.  This is called "remote debugging".
+- On the left sidebar, you have the `Variables` tab.  When you define variables, you can see their values here.  
+- The `Call Stack` tab shows you the current function call stack.  This is useful for understanding how you got to where you are in your code.  In a dual-core configuration, you can see the call stack for both cores.
+- The `Breakpoints` tab shows you all the breakpoints you have set in your code.  You can enable and disable them here.
+- The `XPeripherals` tab (not `Peripherals`) shows you the state of the peripherals on your microcontroller.  As you start configuring them in next labs, we'll have you look here to see their state and understand how they work.
+
+In the center-top of your window, you'll see a toolbar with the following buttons:
+
+- `Reset device` - this will reset your microcontroller.  You can use this to restart your program from the beginning.
+- `Continue` - this will continue running your program until the next breakpoint.
+- `Pause` - this will pause your program if it's running.
+- `Step over` - this will run the next line of code, but not step into any functions.
+- `Step into` - this will run the next line of code, and step into any functions.
+- `Step out` - this will run the rest of the current function and stop at the next line of the calling function.
+- `Restart` - this will restart your program from the beginning, similar to `Reset device`.
+- `Stop` - this will stop your program and disconnect the debugger, at which your Pico 2 will remain halted.
 
 > [!IMPORTANT]
-> Show your TA your working serial connection.  
-> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.  Show your TA that you have been pushing commits for each step.  
+> Show your TA your working serial connection and debug mode.  Show that you can step over the `printf` lines and the LED output value change lines, and that you can see the Pico 2 LED turn on you step over the `gpio_put(25, 1)` line.  **Do not proceed until you have shown a TA your working debugger.**
 
 ## Step 7: Run a command shell
 
@@ -397,53 +294,24 @@ In your upcoming labs, you will include a code object that gets built along with
 
 In this step, we will have you add the autotest file to your the Pico Extension project.  In the other labs, we will provide you with the Pico Extension project with the autotester included.
 
-Download the `autotest.o` file [here](../../../raw/main/lab0-intro/autotest.o) and place it in the `src` directory of your project.
+Download the `autotest.o` file [here](../../../raw/main/lab0-intro/autotest.o) and place it in the root directory of your project, alongside the C file.
 
 > [!NOTE]
 > To clarify, this is not a real autotester.  It is not responsible for giving you any credit on the lab.  This is just provided to show you how you can use it in future labs.
 > 
 > Credit for this lab is granted by showing your TA that you have completed all steps in lab or office hours, by pushing your code to the GitHub repository, and submitting your GitHub repository to Gradescope.  **You must submit your work to Gradescope before the beginning of your lab section next week.**
 
-In your `the Pico Extension.ini` file, edit the line starting with `build_src_flags` to include the path to the `autotest.o` file.  It should look like this:
+To include the autotester in your project, open the `CMakeLists.txt` file in your project, and change the `add_executable` line as follows:
 
-```ini
-build_src_flags = -DSTM32F091 "${the Pico Extension.src_dir}/autotest.o"
+```cmake
+add_executable(lab0 lab0.c ${CMAKE_CURRENT_SOURCE_DIR}/autotest.o)
 ```
 
-This tells the Pico Extension that when it compiles your code into object form, it should link that object file with your code.  The resulting binary will then include the code from `autotest.o` as well as your own.
+You can also make a dynamic target that automatically includes any .o or .c files in the project directory as follows. 
 
-Back in `main.c`, replace all contents with the following.  Take note of the added `autotest` function call.
-
-```c
-#include "stm32f0xx.h"
-extern void autotest();
-extern void internal_clock();
-void setup_serial(void)
-{
-    RCC->AHBENR |= 0x00180000;
-    GPIOC->MODER  |= 0x02000000;
-    GPIOC->AFR[1] |= 0x00020000;
-    GPIOD->MODER  |= 0x00000020;
-    GPIOD->AFR[0] |= 0x00000200;
-    RCC->APB1ENR |= 0x00100000;
-    USART5->CR1 &= ~0x00000001;
-    USART5->CR1 |= 0x00008000;
-    USART5->BRR = 0x340;
-    USART5->CR1 |= 0x0000000c;
-    USART5->CR1 |= 0x00000001;
-}
-int main(void)
-{
-    internal_clock();   // Never comment this out!
-
-    autotest();         // Only comment this out when you are done testing.
-    
-    setup_serial();
-    while(1) {
-        if ((USART5->ISR & USART_ISR_RXNE))  // if receive buffer has some data in it
-            USART5->TDR = USART5->RDR;       // copy that data into transmit buffer.
-    }
-}
+```cmake
+file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.c ${CMAKE_CURRENT_SOURCE_DIR}/*.o)
+add_executable(lab0 ${SOURCES})
 ```
 
 Flash this to your microcontroller, and reopen the Serial Terminal as you did in the prior step.  You may see nothing at first - this is normal.  By the time you pull up the serial monitor after the microcontroller has been flashed, the autotester will have already printed text that you did not see.  To see this text, you can press the reset button on your microcontroller, and you should see a "command shell" appear.  
