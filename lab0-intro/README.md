@@ -203,7 +203,9 @@ If you have your USB plugged into your Pico, disconnect it first, and then hold 
 
 Go to the Pico menu and click `Run Project (USB)`.  This will build your code using the CMake build system (not the same as `make`) and flash it to your microcontroller.  If you see a textbox appear asking about CMakeLists.txt, you can hit Escape to get rid of it.  You should now see your LED flash twice every second (just so you can tell it's different from the factory condition).
 
-We'll figure out how to see the "Hello, world" in the next step (although with microcontrollers, a flashing LED is equivalent to a "Hello World").
+Hold down the reset button, and you'll see that the Pico does nothing in this state.  The button is connected to the RUN pin on your board, which is tied to 3.3V high internally, and shorting it to ground resets the microcontroller.  Let go, and you'll see it run again.
+
+We'll figure out how to see the "Hello, world" text in the next step (although with microcontrollers, a flashing LED is equivalent to a "Hello World").
 
 > [!IMPORTANT]
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
