@@ -118,7 +118,7 @@ Your ECE Mini kit from prior courses has a large, four-panel breadboard similar 
     <img src="insert-pico.jpg" style="width: 90vw; max-width: 800px">
 </div>
 
-Typically, a microcontroller will be a little hard to get into the holes, but you should not have to remove it once it’s in there. To prevent damage to the board, press down on both ends of the board at once. Do not apply force to anything else, as parts of the board are delicate and may become damaged. When inserting, make sure there are two columns on either side of the development board to leave room to plug in wires. 
+Typically, a microcontroller will be a little hard to get into the holes, but you should not have to remove it once it's in there. To prevent damage to the board, press down on both ends of the board at once. Do not apply force to anything else, as parts of the board are delicate and may become damaged. When inserting, make sure there are two columns on either side of the development board to leave room to plug in wires. 
 
 Next, connect two wires: one from the 3V3(OUT) pin to the power rails, and one from the GND pins to the ground rails of your breadboard.  You can find the pinout for the Pico 2 here: https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf.  We'll use these in a second.
 
@@ -208,7 +208,7 @@ Hold down the reset button, and you'll see that the Pico does nothing in this st
 We'll figure out how to see the "Hello, world" text in the next step (although with microcontrollers, a flashing LED is equivalent to a "Hello World").
 
 > [!IMPORTANT]
-> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+> Show your TA your blinking LED.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
 ## Step 5: Debugging and Printing
 
@@ -288,7 +288,7 @@ In the center-top of your window, you'll see a toolbar with the following button
 - `Stop` - this will stop your program and disconnect the debugger, at which your Pico 2 will remain halted.
 
 > [!IMPORTANT]
-> Show your TA your working serial connection and debug mode.  Show that you can step over the `printf` lines and the LED output value change lines, and that you can see the Pico 2 LED turn on you step over the `gpio_put(25, 1)` line.  **Do not proceed until you have shown a TA your working debugger.**
+> Show your TA your working serial connection and debug mode.  Show that you can step over the `printf` lines and the LED output value change lines, and that you can see the Pico 2 LED turn on you step over the `gpio_put(25, 1)` line.  **Do not proceed until you have shown a TA your working debugger.**  Commit all your changes and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
 ## Step 7: Run a command shell
 
