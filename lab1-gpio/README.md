@@ -7,14 +7,11 @@
 | Step | Description | Points |
 |------|-------------|--------|
 | 0.1 | Set up your environment |   |
-| 0.2 | Wiring and organizing your breadboard |   |
-| 1 | Reading the datasheet | 20 |
-| 2 | Configuring inputs | 20 |
-| 3 | Configuring outputs | 10 |
-| 4 | Read PORTB pin inputs | 10 |
-|   | Wiring Up Your Circuit |   |
-| 5 | Buttons and LEDs | 20 |
-| 6 | Keypad and LEDs | 20 |
+| 0.2 | Wire and organize your breadboard |   |
+| 1 | Read the datasheet | 10 |
+| 2 | Configure output LEDs | 10 |
+| 3 | Configure input pushbuttons | 10 |
+| 5 | Configure and poll a keypad | 20 |
 | 7 | In-Lab Checkoff Step | 20* |
 | &nbsp; | Total: | 100 |
 <br>
@@ -30,44 +27,43 @@
 > By now, your breadboard should have been signed with a silver sharpie with your username and the signature of the TA.  If you have not yet done this, please notify a TA and get it signed as soon as possible.  **Failure to do so by lab 2 will result in a zero for the lab currently running in that week.**
 > 
 > Keep in mind the food-and-liquids policy of the lab, which is to bring absolutely no food or liquid with you to your lab sessions.  If you must bring it, keep it under the window in the back of BHEE 160.  **Failure to follow this rule will result in a penalty.** 
+> 
+> Similar to 270, 362 labs should be started at home, and checked off in lab.  **Do not wait to start your lab in your lab section, or you will not finish.**  You must be checked off for all steps in lab to receive full credit.
 
 > [!NOTE]
 If at any point you need to get checked off, or need to get help, you can add yourself to the [lab queue](https://engineering.purdue.edu/~menon18/queup/?room=36200).  **Bookmark this link in your lab machine browser.**
 
 ## General Purpose Input/Output (GPIO)
 
-In this experiment, you will learn how to connect simple input devices (push buttons and keypad) and simple output devices (LEDs) to a Pico 2 development board. You will learn how to configure the General Purpose Input/Output (GPIO) subsystems. You will read values from and write values to these pins.
+In this experiment, you will learn how to connect simple input devices (push buttons and keypad) and output devices (LEDs) to your Pico 2 development board. 
 
 The basic idea behind GPIO is to interface the microcontroller to external components.  The pins of your microcontroller are, first and foremost, GPIO pins, which means that they can take on one of three functionalities:
 
-1. Input: The pin can read a voltage level from an external component.  This is useful for reading the state of a button, or the output of a sensor.
+1. Input: The pin can **read** a voltage level from an external component.  This is useful for reading the state of a button, or the output of a sensor.
 
-2. Output: The pin can drive a voltage level to an external component.  This is useful for turning on an LED in series with a resistor, or engaging an actuator.
+2. Output: The pin can **drive** a voltage level to an external component.  This is useful for turning on an LED in series with a resistor, or engaging an actuator.
 
 3. Alternate Function: The pin can be used for a unique purpose that is not strictly input or output.  This is useful for allowing other peripherals on the microcontroller, such as UART, SPI, ADC/DAC, etc. to use the pin for their own purposes.
 
 ## Step 0.1: Set up your environment
 
-Make sure to clone the code repository from GitHub Classroom.  Keep in mind to add, commit and push any changes you make so that your work is accessible from a lab machine.  
+Make sure to clone the code repository from GitHub Classroom.  Keep in mind to add, commit and push any changes you make so that your work is accessible from a lab machine. 
 
-To start, open the "code" folder in VScode.  Do this by opening VScode, clicking File > Open Folder (or Ctrl-K + Ctrl-O), and then selecting the "code" folder.  By default, PlatformIO should auto-detect the project and open the PlatformIO side panel for you to use, including build and debug options that you used in lab 0.  Re-read lab 0 if you need a reminder on how to build, flash and debug your code.
+> [!CAUTION]
+> **If you have not set up VScode with the Pico extension as described in Lab 0 on BOTH your physical machine and your lab machine, we strongly recommend that you do that now.  Having two working environments provides you the necessary redundancy to ensure you can still work in case one environment randomly stops working, and you can use `git` to back up your work and seamlessly transition to the other machine.  Please do not assume this will not happen to you, because it absolutely can.**
 
-> [!NOTE]
-> If you're getting tired of having to click "Build" and "Upload", start getting used to **shortcuts**.  See this [PlatformIO note](https://docs.platformio.org/en/latest/integration/ide/vscode.html#key-bindings) on what keybindings to use for building and uploading your code.
-> In general, if you feel like a process is arduous, there is very likely an easier way to do it.  (This is an example of [Occam's Razor](https://en.wikipedia.org/wiki/Occam's_razor).)  Google should always be your first recourse.  If you can't find anything, ask a TA or your peers.
+In addition, a precompiled autotest object has been incorporated into the template folder.  You can utilize it to test the subroutines (another word for functions). To do so, make sure you have connected the UART serial adapter and the STLink to the microcontroller. Then you will need to uncomment the line `autotest()` in the `main.c` file and start the debugging on System Workbench. After the debugger successfully launches, make sure it goes into the `autotest()`, and launch a serial connection to the microcontroller in a terminal by clicking "Upload and Monitor" in the PlatformIO tab (the same one in lab 0).  
 
-In addition, a precompiled autotest object has been incorporated into the template folder. You can utilize it to test the subroutines (another word for functions). To do so, make sure you have connected the UART serial adapter and the STLink to the microcontroller. Then you will need to uncomment the line `autotest()` in the `main.c` file and start the debugging on System Workbench. After the debugger successfully launches, make sure it goes into the `autotest()`, and launch a serial connection to the microcontroller in a terminal by clicking "Upload and Monitor" in the PlatformIO tab (the same one in lab 0).  
+If you are on Windows, take care to select the correct COM port in the Serial Monitor window.  
 
-If you are on Windows, take care to select the correct COM port in the menu if it appears after clicking "Upload and Monitor".  You can also hardcode the serial port name under "monitor_port" in your `platformio.ini` file.  
+If you are on Linux (eg. a lab machine) and want to see the output in a separate window from VScode, you can also launch a serial connection in a separate window by clicking "Upload" only, and then typing `screen /dev/ttyACM0 115200` into a terminal.  To exit `screen`, press Ctrl-A, backslash (\\) and then 'y'.
 
-If you are on Linux (eg. a lab machine) and want to see the output in a separate window from VScode, you can also launch a serial connection in a separate window by clicking "Upload" only, and then typing `screen /dev/ttyUSB0 115200` into a terminal.  To exit `screen`, press Ctrl-A, backslash (\\) and then 'y'.
-
-If you don't see anything after the serial port connection is established, press the reset button on the microcontroller to see the introductory text from `autotest`.  Try typing something, and you should see the characters appear.  That should confirm the connection is working as intended.
+If you don't see anything after the serial port connection is established, press the Reset pushbutton you wired in lab 0 to see the introductory text from `autotest`.  Try typing something, and you should see the characters appear.  That should confirm the connection is working as intended.
 
 You should see a prompt similar to the following:
 
 ```text
-GPIO Lab Test Suite
+GPIO Lab Test Suite for Pico 2
 Type 'help' to learn commands.
 
 > 
@@ -75,94 +71,47 @@ Type 'help' to learn commands.
 
 You can then type `help` to learn what commands you can use to test a certain subroutine.  You will use this to demo your implementation and wiring to the TAs.
 
-> [!NOTE]
-> If you are trying to debug and are getting an error in the Debug Console about not being able to find `openocd`, try changing the location of the tool under the `debug_server` key in the `platformio.ini` file to `${platformio.packages_dir}/tool-openocd/bin/openocd`.
-
-## Step 0.2: Read the Good Wiring Practices guide
-
-Under your course Brightspace > Labs > Resources, read the Good Wiring Practices PDF to get an idea for how to properly organize your breadboard.  Each lab builds on the previous ones, so you should be sure to have the right setup for each lab to avoid possible overcrowding and messy wiring.
-
-## Step 1: Configuring Port B
-
-Using the `main.c` template file provided for this lab, fill in the C procedure for `initb`. This should: 
-
-- Enable the RCC clock for Port B.
-- Set pins PB8 - PB11 as outputs and; 
-- Set pins PB0 & PB4 as inputs. 
-
-Refer to the lecture notes to learn how this is done, and how each line affects the corresponding register to, in turn, configure the specific peripheral and/or pin.  This should be done without disabling other pins in `RCC` - a disastrous mistake, as changing other pins may cause your microcontroller to stop working entirely.   
-
-The global variable `RCC` is provided for you to use as the base address for the Reset and Clock Control I/O registers.  Use the global variable `RCC->AHBENR` to access the `AHBENR` I/O register. In addition, the enable values are also predefined as well. For instance, you can use `RCC_AHBENR_GPIOBEN` as a constant to enable the `GPIOB` bit in the `AHBENR` register. Most of these symbols should have the same names as in the Family Microcontroller manual, which you can find under Piazza > Resources.  You can use `CTRL + Space` to autocomplete these symbols in VScode.
-
-Similarly, the global variable `GPIOB` is provided along with the symbols for `MODER`, `IDR`, `ODR`, `BSRR`, etc. Use these in a similar manner to `RCC` and `AHBENR` (i.e. `GPIOB->MODER` will access the `MODER` register for GPIO port B) to configure pins PB8-PB11 as output pins (and to read and write their driven values in later sections.)
-
-If you look at the documentation in the Family Reference Manual regarding a GPIO port's `MODER` register, you will notice that all pins, that can be used as inputs, are set as inputs by default. Regardless of that, we want you to get some practice clearing bits of the `MODER` as well as setting bits, so you must set these pins as inputs **explicitly**.  Configure pins 0 and 4 of Port B as inputs as if they were configured as outputs.  This means you should clear the 2-bit value for each pin in question to **00**.
-
-Once you have finished this subroutine, try it out with the `autotest` function call uncommented.  The `autotest` module provided for you will call this and every other subroutine you write multiple times in different ways.  It will deliberately set and clear other bits in the `AHBENR` to make sure that you are doing a proper OR operation to set only the necessary bits and not setting or clearing any other bits.  The procedure for ORing bits into a configuration register may seem cumbersome, but it will occur repeatedly for many types of peripherals.  You'll get used to it.
-
-When debugging individual subroutines you should leave the call to `autotest` commented out so that you can step through the operation of each subroutine.  You must complete each step of implementation in sequence. **You will not get credit for steps 2 through 6 without first satisfactorily completing step 1.**
-
-> [!NOTE]
-> When debugging your code for a specific peripheral, you can access the peripheral's control registers via the Peripheral panel in the debug view.  Certain names may be different - for example, GPIOBEN is IOPBEN in the RCC->AHBENR view.  **This is a process you will use throughout the rest of the semester.**
+> [!TIP]
+> If you're getting tired of having to click through menus to click "Flash Project (SWD)", start getting used to **keyboard shortcuts**.  It's easier to press Ctrl-Shift-P and Enter to quickly rerun your last command.
 > 
-> ![io reg](debugger.png)
+> Quirks like these make programming easier.  If you feel like a process is *arduous*, there is very likely an easier way to do it.  (This is an example of [Occam's Razor](https://en.wikipedia.org/wiki/Occam's_razor).)  Google should always be your first recourse.  If you can't find anything, ask a TA or your peers for these quick hacks to make yourself more productive.
+
+## Step 0.2: Wire and organize your breadboard
+
+In ECE 36200, unlike prior courses, you will build on the **same** circuit in each lab.  This allows you to build up a full development board that will help you more easily prototype designs with a variety of external components.  **Therefore, it is very important that you follow the layout we provide in the lab manual.**  This will make it easier for you to debug your circuit, and for your TAs to help you debug your circuit.  It will also ensure you have space for all your components as long as you follow the layout.  **TAs will not help with complex wiring if it does not follow the required layout.**
+
+At this point, you should have only the Pico 2 development board and a reset pushbutton on your breadboard.  In this lab, we'll add two pushbuttons to the left of the reset button, LEDs on the lowest breadboard in series with current-limiting resistors, and the keypad towards the top of the breadboard.  This schematic shows the required layout for the lab:
+
+![lab1-schem.png](lab1_schem.png)
+
+To match the pin numbers on the schematic, the pinout for your Pico 2 can be found [here](https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf).  We **strongly recommend** you bookmark links like these for quicker access.  It is possible to create a bookmark folder in your browser and add links to datasheets, the lab manual, and other resources you use frequently.  This will save you time in the long run.
+
+**Be careful as you match the pin numbers while wiring your circuit** - the numbers on the schematic are the GPIO numbers, **not** the physical pin numbers.  For example, when connecting the left pushbutton on the schematic to the Pico 2, you will connect it to GP20, not physical pin 20.  This is because in the code, the GPIO numbers are how we reference the pins.  There's also pins like RUN, VBUS, VSYS, GND that aren't GPIO pins, so you can't use them in your code.
+
+> [!TIP]
+> The original Pico 2 board from Raspberry Pi does not etch the pin numbers on the physical board, which is not great when you're ensuring the correct pins are connected.  If you take a closer look at the pins on the board, you'll notice that the GPIO pins have **circular castellations** whereas the ground pins have **square castellations**.  Use those to guide you by starting your pin counting from one of them rather than from the end so that it's less tedious.  The pinout diagram shows this as well:
+> 
+> ![castellations](castellations.png)
+> 
+> Another idea is to tape small pieces of paper to the wires you connect with the pin number written on them, making future connections easier to make.
+
+## Step 1: Read the Datasheet
 
 > [!IMPORTANT]
 > Demonstrate to your TA that your code passes the `initb` test in `autotest`.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.  
 
-## Step 2: Configuring Port C
-
-For this section, you will need to complete the subroutine `initc` in `main.c` so that GPIOC's clock is enabled in RCC and it configures **only pins 4, 5, 6 and 7 of Port C as outputs**. These pins will drive the colunms of the keypad (the wiring and schematic for which will be introduced later). Set **pins 0, 1, 2, and 3 as inputs and to use the internal pull down resistors by setting the relevant bits in the PUPDR register**. These will read the rows of the keypad and need to be pulled down to keep from reading erroneous floating signals. You should use the symbolic constant `GPIOC` to access registers of GPIO port C. Similar to GPIOB, you can use `GPIOC->MODER` and `GPIOC->PUPDR` to access the mode register and the pull-up/down register for port C. 
-
-> [!NOTE]
-> Reminder: Be sure not to change the configuration for GPIOC pins 13, 14, and 15.
-
-> [!NOTE]
-> Recall the Peripheral view we used earlier?  You can actually right-click and press "Update Value" to change the value in the corresponding register!  Don't worry if it doesn't update immediately - the value will update when you move to the next line in the debugger.
-> A good way to test this is by stepping through your initc function, and stopping before the line that changes your pins to use the internal pull down resistors.  Then, change bits 6-7 of the ODR register under the GPIOC peripheral to 1.  You'll see the LEDs on your Pico 2 board light up!
+## Step 2: Configure output LEDs
 
 > [!IMPORTANT]
 > Demonstrate to your TA that your code passes the `initc` test in `autotest`.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-## Step 3: Set PORTB pin outputs
+## Step 3: Configure input pushbuttons
 
-For this section, you will need to complete the subroutines `setn` in `main.c`. The first parameter is the bit number (the same as the pin number) to be set (by `setn`). The second parameter is the value to set the pin to (either zero or anything not zero). 
 
-The `setn` subroutine turns off the pin/bit number in the `GPIOB_ODR` register if the value in the second parameter is zero. Otherwise, it turns on the pin/bit number. 
 
-For example, if you execute `setn(8, 0)`, it would turn pin 8 off. If you execute `setn(8, 59823)`, it would turn pin 8 on. Here, the value `59823` is arbitrary. Any value other zero in the second argument should turn the pin on. Use the variable `GPIOB->ODR` to ACCESS the output data register. You are encouraged to use the `BRR` and `BSRR` registers to implement these subroutines.
+## Step 4: Configure and poll a keypad
 
-> [!NOTE]
-> Hint: Students often ask why they can't just *toggle* the corresponding bit in the ODR directly.  The reason is that you may risk multiple changes to the same pin by different parts of your code, e.g. when an interrupt is triggered and you want to turn on a pin, but your main code is turning it off.  (If that doesn't make sense yet, wait for the lecture on interrupts.)  The BRR and BSRR registers are designed to prevent this from happening, as a write operation will **atomically** (independently, without interruption) set or clear the corresponding bit.
 
-## Step 4: Read PORTB pin inputs
-
-Complete the subroutine `readpin` in `main.c`. This function accepts a bit number as parameter 1. It returns the value in `GPIOB_IDR` at the bit specified by parameter 1. In other words, the subroutine should return `0x1` if the pin is high or `0x0` if the pin is low.
-
-## Wiring Up Your Circuit
-
-> [!IMPORTANT] 
-> **Before you proceed**: Unplug the programmer the USB port to remove power from the development board before you wire components. Anytime you plug things in to the microcontroller when the power is on, you run the risk of connecting something you shouldn't have and causing damage. By removing power, you have the opportunity to double-check your work before you reconnect power. You can ask one of your TAs to triple-check your work.
-
-After you remove the power from your development board, wire your circuit as shown below. Ensure that you are connecting resistors for the buttons to the 3V power. You are advised to connect the power buses on your breadboard array to the GND and 3V connections on the development board. (Leave the 5V pins unconnected to avoid using them.)
-
-![sch for led and buttons](external-circuits.png)
-
-Use your choice of red, yellow, and green LEDs to build the circuit above. To determine the orientation of an LED, look at the length of the leads. The long lead of the LED is usually the anode (the positive terminal) and the short lead is the cathode (the side connected to ground in the schematic). You can also search for a flattened section of the circular rim of the LED. That also indicates the cathode.
-
-Use four-lead "tactile" push buttons for the switches. The 6x6mm push buttons work the same way as the 12x12mm push buttons. Note that pins 1 and 2 are connected together internally as well are pins 3 and 4. The push button is "normally open". When it is pressed, pins 1 and 2 are connected to pins 3 and 4. See the diagrams below for more details.
-
-![switch](tactile-switch.png)
-
-You will use a 16-button keypad for this lab experiment. One configuration for such an arrangement of buttons would be to have two wires for each button (32 wires total) so that each button could be independently monitored. That would require a lot of pins on the keypad which might make it difficult to use on a breadboard. An optimization might be to have one common power connector and one more connector per button (17 wires total) so that each button could still be monitored individually. But this is still too many pins on the keypad than manufacturers will usually support, and the numbers would only be much worse for keypads with even more buttons.
-
-![keypad](keypad.png)
-
-The typical concession for keypads is to have multiple common pins that connect to groups of buttons. The logical extension to this trend is to configure a keypad as a matrix of rows and columns. If the number of rows and columns is about equal, this practice minimizes the number of pins on the keypad. The added challenge is that the keypad must be scanned one row or column at a time. For instance, a voltage can be applied to a row of buttons, and the columns can be sensed to detect if any of the buttons in the row are being pressed. Then the voltage can be removed from the row and re-applied to another row. By cycling through all the rows, all keys can eventually be detected.
-
-When you are finished, your circuitry should look something like below. You can, of course, arrange your circuitry in any manner you want, but we will be using the keypad in this configuration for the rest of the semester, It might be good if you keep it as close to this picture as possible. In particular, look at those blue resistors whose leads have been cut short to let them sit flush in on the breadboard. You are strongly encouraged to do the same. Later in the semester, we'll put the resistors under the keypad, and there is no good way to do that without making the leads short. Cut each lead so that only 8mm - 10mm extends from each side. Bend the leads at an angle, and push the resistor down into the breadboard. (Resistors are inexpensive. Don't feel bad about snipping them.)
-
-![wiring](wiring.jpg)
 
 ## Step 5: Buttons and LEDs
 
