@@ -97,13 +97,37 @@ To match the pin numbers on the schematic, the pinout for your Pico 2 can be fou
 
 ## Step 1: Read the Datasheet
 
+The first step to understanding any microcontroller is to read the datasheet.  This is a universal *first step* that we want you to remember for not just microcontrollers, but various parts that you will interface to in the future.  
+
+The Pico 2 board is, strictly speaking, not actually the microcontroller - it is a **development board** on which you have an RP2350A microcontroller, which is the black square chip in the center of your Pico 2 board.  This chip is what holds your microprocessor cores and peripherals.  The flash memory chip that sits above RP2350 is what receives and holds your program when you click "Flash Project" in VScode.  When you press the reset button, or provide power to your board, the RP2350 chip reads the program from this flash memory and executes it.  That code can then be made to interact with the peripherals on the RP2350 chip, and for this lab in particular, configure and control the GPIO pins on the RP2350, which are "broken out" to the physical pins you can see on your board.
+
+The datasheet for the RP2350 microcontroller can be found [here](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf).  You can gain a basic introduction to your RP2350-based Pico 2 by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).
+
+Next, read [Chapter 9: GPIO](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A585%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D) and answer the questions below:
+
+1. What is the default state of the GPIO pins on a RP2350 that has just powered up and has not yet executed code?  Are they high, low, or high-impedance?
+2. There are two banks of GPIO pins that can be used.  For simple purposes such as turning on an LED, which bank should you use? 
+3. Based on information in sections 9.10.1 and 9.11, what registers do you need to modify to do the following?  Each register name follows the format GPIOx_PROPERTY, where x is the pin number, and PROPERTY is the property you are modifying.  Also mention the specific bits you need to modify.
+    - Example:
+    - Set a pin as an output
+    - Set a pin as an input
+    - Read the value of an input pin
+    - Write a value to an output pin
+
 > [!IMPORTANT]
-> Demonstrate to your TA that your code passes the `initb` test in `autotest`.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.  
+> Prepare to answer the questions listed above to your TA.  You must have correct answers to earn points for this step.  
+> 
+> Avoid the urge to ask others (and AI/LLMs are included in "others") for answers.  These questions are specifically designed to get you to read the datasheet and figure out how to find information in it.
 
 ## Step 2: Configure output LEDs
 
+> [!WARNING]
+> We're now entering your first coding assignment, so it is worth mentioning at this stage - **do not use AI/LLM tools to auto-generate this code.**  If a TA catches you using Copilot in lab, **you will be given an immediate zero** on the spot.  This is because the purpose of the labs is to teach you how to code, and we are giving you credit for **your** work, not an LLM's.  
+>
+> You'll be given free rein to use whatever you want on the course project, but for now, we need to make sure you are learning the material.
+
 > [!IMPORTANT]
-> Demonstrate to your TA that your code passes the `initc` test in `autotest`.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+> Demonstrate to your TA that your code passes the `outputs` test in `autotest`.  Answer their questions and show them your code.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
 ## Step 3: Configure input pushbuttons
 
