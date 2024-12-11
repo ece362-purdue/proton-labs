@@ -9,8 +9,8 @@
 | 0.1 | Set up your environment |   |
 | 0.2 | Wire and organize your breadboard |   |
 | 1 | Read the datasheet | 10 |
-| 2 | Configure output LEDs | 10 |
-| 3 | Configure input pushbuttons | 10 |
+| 2 | Configure output pins for LEDs | 10 |
+| 3 | Configure input pins for pushbuttons | 10 |
 | 5 | Configure and poll a keypad | 20 |
 | 7 | In-Lab Checkoff Step | 20* |
 | &nbsp; | Total: | 100 |
@@ -101,60 +101,119 @@ The first step to understanding any microcontroller is to read the datasheet.  T
 
 The Pico 2 board is, strictly speaking, not actually the microcontroller - it is a **development board** on which you have an RP2350A microcontroller, which is the black square chip in the center of your Pico 2 board.  This chip is what holds your microprocessor cores and peripherals.  The flash memory chip that sits above RP2350 is what receives and holds your program when you click "Flash Project" in VScode.  When you press the reset button, or provide power to your board, the RP2350 chip reads the program from this flash memory and executes it.  That code can then be made to interact with the peripherals on the RP2350 chip, and for this lab in particular, configure and control the GPIO pins on the RP2350, which are "broken out" to the physical pins you can see on your board.
 
+Therefore, when we want to understand the internals of the microcontroller we wish to work with, we want to look up datasheets for "RP2350", not "Pico 2".  
+
 The datasheet for the RP2350 microcontroller can be found [here](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf).  You can gain a basic introduction to your RP2350-based Pico 2 by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).
 
-Next, read [Chapter 9: GPIO](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A585%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D) and answer the questions below:
+Next, read [Chapter 9: GPIO](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A585%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D) as well as [Chapter 3.1.3: GPIO Control](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A41%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C707.498%2Cnull%5D) under SIO.
 
-1. What is the default state of the GPIO pins on a RP2350 that has just powered up and has not yet executed code?  Are they high, low, or high-impedance?
-2. There are two banks of GPIO pins that can be used.  For simple purposes such as turning on an LED, which bank should you use? 
-3. Based on information in sections 9.10.1 and 9.11, what registers do you need to modify to do the following?  Each register name follows the format GPIOx_PROPERTY, where x is the pin number, and PROPERTY is the property you are modifying.  Also mention the specific bits you need to modify.
-    - Example:
-    - Set a pin as an output
-    - Set a pin as an input
-    - Read the value of an input pin
-    - Write a value to an output pin
+You may also want to dive into the "convenience" functions that the Pico SDK provides.  In your C file, inside main, try writing `gpio_init` as an example.  VScode's autocomplete will kick in and tell you what this function does.  If you were using the Pico 2 as a hobbyist, you can call this function, let it configure your pins, and forget about it forever.  
+
+However, we're computer engineers (or persons taking a 300-level computer engineering course)!  So, what we're going to do is **dive** into what this function does in terms of the hardware registers defined on RP2350.  When VScode highlights the function, that means that you can access the definition for it.  Hold down the Alt (or Option/Cmd on Mac) button and click on `gpio_init` to see where it is defined.  This takes you to the `gpio.c` file, where you'll see that `gpio_init` does three of the things we asked you to figure out above - set the direction of the pin, **put** the value 0 into it (which sets the pin's value to 0), and configures the pin's function to be SIO.  If you **dive** into those functions, you can see (hopefully) the very same C code you just came up with!  
+
+The animation below shows how you can *dive* into the function to see what it does.  This is critical to understanding how your microcontroller, at the lowest possible level, does what you need it to do.
+
+![function-dive.gif](function-dive.gif)
+
+Now, based on your function diving work into `gpio_init` and the list of SIO registers relevant to GPIO control in 3.1.11, specify the registers you will need to configure the Bank 0 GPIO pins on the RP2350.  To initialize a pin, you have to do the following:
+
+1. Configure the pin function to be SIO.  In C code, how do you set a specific GPIO pin as an SIO pin?
+    - This one's a little complicated, so we'll just tell you where to look.  Type `gpio_set_function`, and *dive* into it to see what register it modifies to set the function of the pin.
+2. Configure the pin as an input or output.  Depending on the purpose, you may have to write values in different registers, so specify both.  In C code, how do you set a specific GPIO pin as an input or output?
+3. If the pin is an output, configure the pin to drive high or low.  Depending on the value, you may have to write values in different registers, so specify both.  In C code, how do you set a specific GPIO pin as an input or output?  In C code, how do you set a specific GPIO pin to drive high or low?
+4. In C code, what register do you need to read to check the state of a specific pin?
+
+Your answers should start with `sio_hw` or `io_bank0_hw`, which are the SDK-provided structs that define hardware registers that, in turn, control the GPIO pins.  (You can even *dive* into `sio_hw`/`io_bank0_hw` to see the memory addresses they are defined at, and compare that to your datasheet!)
 
 > [!IMPORTANT]
-> Prepare to answer the questions listed above to your TA.  You must have correct answers to earn points for this step.  
+> Show your C code for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
 > 
-> Avoid the urge to ask others (and AI/LLMs are included in "others") for answers.  These questions are specifically designed to get you to read the datasheet and figure out how to find information in it.
+> Avoid the urge to ask others (AI/LLMs are included in "others") for answers.  These questions are specifically designed to get you used to looking at the datasheet for information, and for *you* to understand the microcontroller's specific configuration.
 
-## Step 2: Configure output LEDs
+## Step 2: Configure output pins for LEDs
 
 > [!WARNING]
-> We're now entering your first coding assignment, so it is worth mentioning at this stage - **do not use AI/LLM tools to auto-generate this code.**  If a TA catches you using Copilot in lab, **you will be given an immediate zero** on the spot.  This is because the purpose of the labs is to teach you how to code, and we are giving you credit for **your** work, not an LLM's.  
+> We're now entering your first coding assignment, so it is worth mentioning at this stage - **do not use AI/LLM tools to auto-generate this code**.  **If a TA catches you using Copilot/ChatGPT or similar tools in lab, you will be given an immediate zero on the spot**.  The purpose of the labs is to teach you how to use your microcontroller and understand it at its lowest level, and using one of these tools is tantamount to collaboration with another person, and will be treated as such.  
 >
-> You'll be given free rein to use whatever you want on the course project, but for now, we need to make sure you are learning the material.
+> Please take this rule seriously because you will have a lab practical that asks you to write code for your board **without access to the Internet**.
+>
+> You'll be allowed to use whatever you want on the course project, but for now, we need to make sure you are learning the material.
 
-> [!IMPORTANT]
-> Demonstrate to your TA that your code passes the `outputs` test in `autotest`.  Answer their questions and show them your code.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+Implement the function `init_outputs` to configure GPIO pins 16, 17, 18 (also called GP16, GP17, GP18) as outputs.  You do not need to change any other properties (slew rate, drive strength, etc).  
 
-## Step 3: Configure input pushbuttons
+The key requirement of this function is that you must not use the convenience functions `gpio_set_dir` or `gpio_init`.  Instead, your function must directly set and clear values in the corresponding registers that you determined above under the `sio_hw` struct.  What you should do instead is look at the definitions of those functions, and write your code in terms of the lowest level registers that they modify.  
 
-
-
-## Step 4: Configure and poll a keypad
-
-
-
-## Step 5: Buttons and LEDs
-
-Complete the subroutine `buttons` in `main.c`. This function will be called repeatedly in a loop. The purpose of this function is to map the button presses (inputs on PB0 and PB4) to 2 of the 4 LEDs (on PB8-PB11). So if a button is pressed, the corresponding LED should turn on, and once it is released, the LED should turn off.  The pseudo-code for this function is:
+An example - if we wanted to configure GP5 as an output, you would write code similar to the pseudocode below:
 
 ```C
-void buttons(void) {
-    // Use the implemented subroutines
-    // Read button input at PB0
-    // Put the PB0 value as output for PB8
-    // Read button input at PB4
-    // Put the PB4 value as output for PB9
-}
+sio -> output enable set register = 1 << 5; // Turn on the output enable for the pin
+sio -> clear register = 1 << 5; // Initializes the pin to logic 0
+iobank0 -> io control register[5] = (SIO function number) << (position of the bit that controls the function-select for bank0, gpio0 in iobank0)
+```
+
+This provides you a consistent format for how you should modify each register.  Some registers are **Write-Only**, so you would write a 1 to achieve some effect, but then you can't read what you previously put into that register.  For those registers, we directly assign the value without reading the prior value first.  All the registers referenced above are examples of Write-Only registers.
+
+Adapt this code for pins 16, 17, 18 where you should have wired up to LEDs and resistors at this point, and call the function in `main`, followed by three lines to turn on each LED (in the same format as when you cleared them, but using a different register to **set** them).  Run "Flash Project (SWD)" from the Pico extension menu or by typing it into the command palette (Ctrl/Cmd-Shift-P), and check that the LEDs turn on.
+
+You'll see that that didn't work!  Why is that?  If we dive again into `gpio_set_function`'s definition in `gpio.c`, we will see the line that sets the function of the pin, but perhaps you missed the line that says `hw_clear_bits...`.  This is an example of a weird quirk unique to the RP2350 that we have to work around, and is the reason that the manufacturer provides an SDK, so that we don't have to think about it.  Again, as engineers, it's worth thinking about, so look up "Pad Isolation Latches" in the RP2350 datasheet to see why this line is necessary, in particular, the note about "clearing the ISO bit".
+
+Therefore, you should add one more line to your `init_outputs` function.  
+
+```c
+pads bank0 -> iso register[16] &= ~PADS_BANK0_GPIO0_ISO_BITS; // Clear the ISO bit for pin 16, do this for 17 and 18 as well
+```
+
+*Why didn't you just tell me this earlier?*  Your instructor made the same mistake while learning about the Pico 2, and this is a good example of what they had to do to debug their code when it didn't work as expected, which was to **use the SDK functions to find what was missing**, and then to **dive into the datasheet to understand why the missing line was necessary**.
+
+Hopefully, this will make your LEDs turn on.  If they still don't, verify that your wiring is correct by testing it with the SDK functions, which should always work assuming correct wiring.  
+
+```c
+gpio_init(16);
+gpio_set_dir(16, GPIO_OUT);
+gpio_put(16, 1);    // repeat for 17,18
+```
+
+If it works, carefully compare your `init_outputs` function to the internal code for the SDK functions, and fix any differences.
+
+If it still doesn't work, there's a wiring issue.  Check the polarity of your LEDs, whether your grounds are properly connected, and that the resistors are connected to the LEDs and the **correct** GPIO pins.
+
+> [!IMPORTANT]
+> Demonstrate to your TA that your code passes the `init_outputs` test in `autotest`.  Answer their questions and show them your code.  For full credit, your `init_outputs` function must not use any of the SDK functions (`gpio_init`, etc.) and must only directly modify registers.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+
+> [!NOTE]
+> The eagle-eyed among you may notice that we ignored the `hw_write_masked` line after the comment "Set input enable on, output disable off" in `gpio_set_function` in our code.  Sometimes, we don't need everything that the SDK suggests, unless of course something goes wrong!  This was the sort of thing we determined was unnecessary by pure experimentation.
+> 
+> We can also tell this line is unnecessary because it enables the input circuitry for the pin, which we don't necessarily need.  However, we'll need this for the next step...
+
+## Step 3: Configure input pins for pushbuttons
+
+*Whew* that was a lot of work to configure outputs!  Thankfully, configuring inputs is mostly *symmetric* to how we configured outputs.  
+
+The process for configuring GP20, which should be connected to the left pushbutton, with the SDK functions is as follows:
+
+```c
+gpio_init(20);
+gpio_set_dir(20, GPIO_IN);
+```
+
+Duplicate your `init_outputs` function and rename it to `init_inputs`.  Modify it to configure GP20, GP21, and GP22 as inputs.  Your function should do the following for both GPIO pins:
+
+```c
+// Disable the output enable for the pin.
+sio -> output enable clear register = 1 << GPIO_NUM; 
+// Connect the pin to the SIO peripheral.
+iobank0 -> io control register[GPIO_NUM] = (SIO function number) << (position of the bit that controls the function-select for bank0, gpio0 in iobank0)
+```
+
+In case you missed the note from the previous step, you need one additional line to set the IE bits in  figure out what register it modifies and assign the correct value to set the IE bits in the register corresponding to GP20 and 21.  The line will look something like this:
+
+```c
 ```
 
 > [!IMPORTANT]
-> Demonstrate to your TA that your code passes the `buttons` test in `autotest`.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+> Demonstrate to your TA that your code passes the `init_outputs` test in `autotest`.  Answer their questions and show them your code.  For full credit, your `init_outputs` function must not use any of the SDK functions (`gpio_init`, etc.) and must only directly modify registers.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-## Step 6: Keypad and LEDs
+## Step 4: Configure and poll a keypad
 
 Complete the subroutine `keypad`. It will be called in an infinte loop. The subroutine should iterate through all the column pins (PC4-PC7), setting one high and the rest low on each iteration. In each iteration, it should check all the row input values (PC0-PC3). For each column, if a button in a certain row is pressed, a light should turn on, and when it is released, it should turn off. No two columns can use buttons on the same row (the simplest arrangement will be the diagonal **1, 5, 9, D** so that only buttons on this diagonal can turn on/off the LEDs) and no two columns can use the same LED. Pseudo-code for this function is provided below:
 
