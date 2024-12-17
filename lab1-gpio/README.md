@@ -186,7 +186,11 @@ If it works, carefully compare your `init_outputs` function to the internal code
 If it still doesn't work, there's a wiring issue.  Check the polarity of your LEDs, whether your grounds are properly connected, and that the resistors are connected to the LEDs and the **correct** GPIO pins.
 
 > [!IMPORTANT]
-> Demonstrate to your TA that your code passes the `init_outputs` test in `autotest`.  Answer their questions and show them your code.  For full credit, your `init_outputs` function must not use any of the SDK functions (`gpio_init`, etc.) and must only directly modify registers.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+> Demonstrate to your TA that your code passes the `init_outputs` test in `autotest`, and that the LEDs turn on in sequence.  Answer their questions and show them your code.  
+> 
+> For full credit, your `init_keypad` function must not use any of the SDK functions (`gpio_init`, etc.) and must only directly modify registers.  
+> 
+> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
 > [!NOTE]
 > The eagle-eyed among you may notice that we ignored the `hw_write_masked` line after the comment "Set input enable on, output disable off" in `gpio_set_function` in our code.  Sometimes, we don't need everything that the SDK suggests, unless of course something goes wrong!  This was the sort of thing we determined was unnecessary by pure experimentation.
@@ -243,7 +247,11 @@ for(;;) {
 ```
 
 > [!IMPORTANT]
-> Demonstrate to your TA that your code passes the `init_inputs` test in `autotest`.  Answer their questions and show them your code.  For full credit, your `init_inputs` function must not use any of the SDK functions (`gpio_init`, etc.) and must only directly modify registers.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+> Demonstrate to your TA that your code passes the `init_inputs` test in `autotest`, and that pressing the left pushbutton turns on the red LED at GP16 and vice-versa with the right pushbutton and the yellow LED at GP17.  Answer their questions and show them your code.  
+> 
+> For full credit, your `init_inputs` function must not use any of the SDK functions (`gpio_init`, etc.) and must only directly modify registers.  
+>
+> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
 ## Step 4: Configure and poll a keypad
 
@@ -270,7 +278,7 @@ while(true) {
 }
 ```
 
-Note the `sleep_ms` requirement - this is needed to ensure that the current "settles" in the chosen keypad column pin before reading the row pins.  If you don't do this, you may get incorrect readings from the keypad.
+Note the `sleep_ms` line - this is needed to ensure that when we drive a logic 1 to the pin, the current "settles" before we read the row pins, so that we can get a reliable reading.
 
 Students often get confused at this step - if you'd like a visualization of what's supposed to happen when reading the keypad, here's a flowchart.  Each key on the diagonal should turn on one LED, and their associated positions are shown on the diagram:
 
@@ -279,9 +287,13 @@ Students often get confused at this step - if you'd like a visualization of what
 So, holding 1 should turn on the LED at GP16, holding 5 should turn on the LED at GP17, etc.
 
 > [!IMPORTANT]
-> Demonstrate to your TA that your code passes the `init_keypad` test in `autotest`.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.  
+> Demonstrate to your TA that your code passes the `init_keypad` test in `autotest`, and that pressing 1/5/9/D turns on the corresponding LEDs on your board.  Answer their questions and show them your code.  
+> 
+> For full credit, your `init_keypad` function must not use any of the SDK functions (`gpio_init`, etc.) and must only directly modify registers.  
+> 
+> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.  
 
-## Step 7: In-Lab Checkoff Step
+## Step 5: In-Lab Checkoff Step
 
 > [!CAUTION]
 > Run `verify` in `autotest` to generate your confirmation code.  Make sure to first set your username in the `main.c` file.  Save the confirmation code ONLY into a new file called "confirmation.txt" in the root of your repository.  
