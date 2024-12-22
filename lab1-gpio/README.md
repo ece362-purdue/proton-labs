@@ -139,11 +139,14 @@ Your answers should start with `sio_hw` or `io_bank0_hw`, which are the SDK-prov
 ## Step 2: Configure output pins for LEDs
 
 > [!WARNING]
-> We're now entering your first coding assignment, so it is worth mentioning at this stage - **do not use AI/LLM tools to auto-generate this code**.  **If a TA catches you using Copilot/ChatGPT or similar tools in lab, you will be given an immediate zero on the spot**.  The purpose of the labs is to teach you how to use your microcontroller and understand it at its lowest level, and using one of these tools is tantamount to collaboration with another person, and will be treated as such.  
+> We're now entering your first coding assignment, so it is worth mentioning at this stage - **do not use AI/LLM tools to auto-generate this code**.  **If a TA observes you using Copilot/ChatGPT or similar tools in lab, you will be subject to academic dishonesty penalties**.  The purpose of the labs is to teach you how to use your microcontroller and understand it at its lowest level, and using one of these tools is tantamount to collaboration with another person, and will be treated as such.  
 >
 > Please take this rule seriously because you will have a lab practical that asks you to write code for your board **without access to the Internet**.
 >
 > You'll be allowed to use whatever you want on the course project, but for now, we need to make sure you are learning the material.
+
+> [!WARNING]
+> At this stage, make sure your Debug Probe is connected to the debug and UART pins of your Pico 2, as described [here](https://www.raspberrypi.com/documentation/microcontrollers/debug-probe.html).  Add a `printf` after `stdio_init_all()` and turn on the Serial Monitor in VScode to ensure that you are receiving data from the Pico 2 via the probe.
 
 Implement the function `init_outputs` to configure GPIO pins 16, 17, 18, 25 (also called GP16, GP17, GP18, GP25) as outputs.  You do not need to change any other properties (slew rate, drive strength, etc).  
 
@@ -163,7 +166,9 @@ This provides you a consistent format for how you should modify each register.  
 
 Adapt this code for pins 16, 17, 18 where you should have wired up to LEDs and resistors at this point, as well as for 25 connected to the onboard green LED, and call the function in `main`, followed by three lines to turn on each LED (in the same format as when you cleared them, but using a different register to **set** them).  Run "Flash Project (SWD)" from the Pico extension menu or by typing it into the command palette (Ctrl/Cmd-Shift-P), and check that the LEDs turn on.
 
-You'll see that that didn't work!  Why is that?  If we dive again into `gpio_set_function`'s definition in `gpio.c`, we will see the line that sets the function of the pin, but perhaps you missed the line that says `hw_clear_bits...`.  This is an example of a weird quirk unique to the RP2350 that we have to work around, and is the reason that the manufacturer provides an SDK, so that we don't have to think about it.  Again, as engineers, it's worth thinking about, so look up "Pad Isolation Latches" in the RP2350 datasheet to see why this line is necessary, in particular, the note about "clearing the ISO bit".
+They won't turn on.  Try it again.  That still didn't work!  Why is that?  
+
+If we dive again into `gpio_set_function`'s definition in `gpio.c`, we will see the line that sets the function of the pin, but perhaps you missed the line that says `hw_clear_bits...`.  This is an example of a weird quirk unique to the RP2350 that we have to work around, and is the reason that the manufacturer provides an SDK, so that we don't have to think about it.  Again, as engineers, it's worth thinking about, so look up "Pad Isolation Latches" in the RP2350 datasheet to see why this line is necessary, in particular, the note about "clearing the ISO bit".
 
 Therefore, you should add one more line to your `init_outputs` function.  
 
