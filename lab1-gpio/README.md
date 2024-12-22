@@ -301,13 +301,14 @@ So, holding 1 should turn on the LED at GP16, holding 5 should turn on the LED a
 ## Step 5: In-Lab Checkoff Step
 
 > [!CAUTION]
-> Run `verify` in `autotest` to generate your confirmation code.  Make sure to first set your username in the `main.c` file.  Save the confirmation code ONLY into a new file called "confirmation.txt" in the root of your repository.  
-> 
-> Add, commit and push it to your remote repository, and submit your GitHub repository to the Lab 1 assignment on Gradescope.  The autograder will decode your confirmation code, and you will receive a score proportional to the tests you passed.  **You will not receive credit for this lab if you do not submit your confirmation code in your repository to Gradescope.**
+In ECE 362, you must do two things to achieve full credit on a lab:
+1. **Demonstrate all steps you were able to complete to your TA**.  You are expected to verify that you got checked off here: https://engineering.purdue.edu/ece362/checkoff/  The last step is a penalty step and must have been given full credit to avoid a lab penalty.
+2. Run `verify` in `autotest` to generate your confirmation code.  Make sure to first set your username in the `main.c` file.  Save the confirmation code ONLY into a new file called "confirmation.txt" in the root of your repository.  **Double-check that your confirmation code is accepted on Gradescope and that it gives you the points you earned**, **because we will not change scores** after the lab is due for missing or mistakenly-typed confirmation codes.
 
-> [!IMPORTANT]
-> Please make sure to close all windows, log out of the machine (click on your name on the top bar, and click Log Out, or similar), take all your belongings with you, and **wait for a TA to confirm that you can leave.**.  They will ask you to check that you submitted your work, that you have logged out properly, and that your station is clean.  **Failure to do so will result in a penalty (cleanliness, late) for the lab currently running in that week.**
-> 
-> If you did not manage to finish by the end of the lab, **you should still submit the confirmation code to Gradescope**.  We will later apply the late penalty on Brightspace.  Keep in mind that the late penalty period is only in effect from the time your lab section ends, to the beginning of your next lab section.  **After that, it is a zero on the lab.**
-> 
-> If you have a case where your pre-deadline submission score is higher than your post-deadline submission score, we will take the higher of the two.  For example, if you got a 90 before the end of your lab section, but fixed your code and resubmitted to Gradescope after the deadline and got an 80, your score will be 90.  However, it is in your best interest to finish all work correctly, as code from some labs may be relied on in future labs.
+Failure to get checked off for all completed work (as per the confirmation code) will result in a 20% penalty.  Getting checked off is for necessary physical verification by your TAs that you did your work on your own breadboard.
+
+Failure to submit a **valid** confirmation code, at least before the late penalty deadline, will result in a **zero**, regardless of what other work was uploaded.  Even if you did not finish by the end of your lab section, you **must** still submit a confirmation code once you are done with your lab to ensure you get credit for those steps, even when a late penalty will be added later.
+
+In the event of a mismatch between checkoffs or the confirmation code, the lower of the two scores will be your lab score.  Therefore, if you checked off steps 1-3, and submitted a confirmation code for steps 1-4, you will only get points for steps 1-3.  This is especially important for physical checkoffs, so even if you are late on a lab, please make sure to get checked off in office hours after your lab section.
+
+Once you have done both things, **call a TA to confirm that you can leave**.  They will ask you to check that you submitted your work and that your station is clean.  **Failure to do so will result in a penalty (cleanliness, late) for the lab currently running in that week.**  Once your TA confirms that you are good to leave, confirm your checkoffs, log out of the machine, and you will be free to leave.

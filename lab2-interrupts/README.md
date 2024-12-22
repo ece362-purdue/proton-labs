@@ -106,7 +106,7 @@ You'll notice that there's not any information about **configuring** or **enabli
 4. What pair of registers is associated with the compare value of the timer?
 5. When does the interrupt occur in terms of these two pairs of registers?
 6. How do you properly change the compare value of the timer?
-7. Look at section 8.5.1 to understand how "Tick Generation" can be used to synchronize timers to real time.  What should the cycle count be for the timer to generate an interrupt **every second**?
+7. Look at section 8.5.1 to understand how "Tick Generation" can be used to synchronize timers to real time.  What should the cycle count be for the timer to generate an interrupt every microsecond?
 
 [Chapter 6.5.3: DORMANT State](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A488%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C223.738%2Cnull%5D)
 
@@ -123,7 +123,7 @@ You'll notice that there's not any information about **configuring** or **enabli
 > 
 > However, for the timer and doorbell interrupts, we still need an active clock signal since both the Platform Timer and the CPU cores still need a clock to function, so we'll use the "Sleep" state.  In such cases, the interrupts originates **from** the peripherals, so turning off the clock will not do us any good!
 
-In [Chapter 3.2: Interrupts](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A84%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C361.924%2Cnull%5D), identify the IRQ number that corresponds to the interrupt source that would trigger when pushbuttons on GP20 or GP21 are pressed (which you should have wired up from the last lab).
+In [Chapter 3.2: Interrupts](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A84%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C361.924%2Cnull%5D), identify the IRQ numbers that correspond to the RISC-V Platform Timer and the core-local doorbell interrupt.
 
 > [!IMPORTANT]
 > Show your answers for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
@@ -139,26 +139,148 @@ In this step, you will configure an external interrupt on the Pico 2.  We'll use
 
 Configuring interrupts on the Pico 2 is quite complex, so we won't have you pull out the code from the convenience functions this time.  To counter that, we will have you dive into the function we'll give you to understand the overall picture of what is happening.
 
+First, configure GP25 as an output - we'll toggle the LED on and off with all the various interrupt sources we'll use in this lab.  Do this immediately after the `stdio_init_all` call in `main`.  Then add a call to `init_gpio_irq`, which we'll implement next.
+
 The function you want to use is `gpio_set_irq_enabled_with_callback`.  Find the code example for this in the datasheet, and implement the `init_gpio_irq` function to do the following:
 
 1. Configure GP21 as an input.  This is the right pushbutton on your breadboard.
-    - You can now use `gpio_init` and `gpio_set_dir` if you wish.
-2. Configure GP25 as an output.  This is the green LED onboard the Pico 2.
-3. Using `gpio_set_irq_enabled_with_callback`, configure an interrupt as follows:
+    - You can now use `gpio_init` and `gpio_set_dir` if you wish, since you covered how they work in a prior lab.
+2. Using `gpio_set_irq_enabled_with_callback`, configure an interrupt as follows:
     - The interrupt should fire **only** on a rising edge on GP21.
     - The ISR should be named `gpio_callback`.  (Create a new function above this one with a `void` return type and no arguments.)
         - In `gpio_callback`, toggle the current value of GP25.  (Hint: you can do this in one go without needing to read the current value of the pin.  Look around for a function you can use to do this.)
-4. Add the line from the code sample to enable the DORMANT state that you found in Step 1.  (Hint: it modifies the `scb_hw->scr` register.)
+3. Add the line from the code sample to enable the DORMANT state that you found in Step 1.  (Hint: it modifies the `scb_hw->scr` register.)
 
-Test your implementation by calling `init_gpio_irq` in `main()`.  Then, start the dormant state by writing `asm volatile ("wfi")` - this is the Wait-For-Interrupt instruction, and tells your CPU to go to the dormant state until an interrupt occurs, which turns off all clocks and utilizes zero dynamic power.  Add a `sleep_ms(1)` after the `wfi` instruction so that we can see the effect of the interrupt when it wakes up.
+After the `init_gpio_irq` call in `main`, create an infinite loop.  In it, start the dormant state by writing `asm volatile ("wfi")` - this is the [Wait-For-Interrupt instruction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A86%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C631.754%2Cnull%5D), and tells your CPU to go to sleep, specifically the dormant state which we configured, until an interrupt occurs, which turns off all clocks and utilizes zero dynamic power.  Add a `sleep_ms(1)` after the `wfi` instruction so that we can see the effect of the interrupt when it wakes up.  Both lines should be in the loop.
 
 Pressing the right pushbutton on your breadboard should cause the Pico 2 to exit the dormant state, execute the ISR, and toggle the green LED on or off.  
 
-Now, enter debugging mode, and set a breakpoint on the `sleep_ms` function.  When you continue the program, the execution should not immediately stop at the `sleep_ms` function until 1) you press the right pushbutton to execute the `gpio_callback` ISR, or 2) you press Pause on the debugger.  Both actions are valid interrupts that will cause the CPU to wake up, and continue to the next line of code after the `wfi` instruction.
+Now, enter debugging mode, and set a breakpoint on the `sleep_ms` function.  When you continue the program, the execution should not immediately stop at the `sleep_ms` function until 1) you press the right pushbutton to execute the `gpio_callback` ISR, or 2) you press Pause on the debugger.  Both actions are valid interrupts that will cause the CPU to wake up, and continue to the next line of code after the `wfi` instruction.  
+
+If you look at your Debug Console when you press Pause, you can even see the `SIGINT` signal produced that causes the interrupt and wakes up the CPU:
+
+```
+1 "rp2350.dap.core0" received signal SIGINT, Interrupt.
+main () at ... lab2.c:40
+40	        sleep_ms(1);
+```
 
 > [!IMPORTANT]
 > Show your implementation to your TA, including the LED turning on and off when you press the pushbutton, and the debugger being able to exit the dormant state when you click Pause.  You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-### Step 3: 
+### Step 3: Configure Platform Timer interrupts
+
+In this step, we'll use the timer to toggle the onboard LED on and off every second.  We'll use the RISC-V platform timer to do this, since it's a simple timer that can be configured to generate an interrupt at a certain time.  We'll explore timers in more detail in the next lab.
+
+At this stage, comment out `init_gpio_irq` in `main()`, and implement the `init_timer_irq` function using the information you found in Step 1.  `init_timer_irq` takes two arguments to control the timer: `cmp`, which should be the **compare** value that should be written to MTIMECMP, and `cycles`, which is the number of clock cycles for the tick generator to count.
+
+However, the datasheet alone unfortunately does not tell us how to do this in C, and even your instructor had quite a bit of trouble finding the functions.  Therefore, we're going to use a new resource that you may not have noticed until now - the **Hardware API** Documentation under the Pico 2 extension.  
+
+Add the following `includes` at the top of the file:
+
+```c
+#include "../../rp2_common/hardware_riscv_platform_timer/include/hardware/riscv_platform_timer.h"
+#include "../../rp2_common/hardware_ticks/include/hardware/ticks.h"
+```
+
+These will give you access to the source code for the functions you'll need.
+
+If you click the extension > Documentation > Hardware APIs, a new window will open showing you the various APIs available for you to use the peripherals on your Pico 2.  Search for the RISC-V Platform Timer API, and in it, identify the functions you need to do the following and implement them in `init_timer_irq`:
+
+1. Using the `hardware_riscv_platform_timer` API, set the MTIMECMP registers using the appropriate functions with the `cmp` value passed as an argument.  Make sure to disable the timer first and re-enable the timer afterward.  To ensure the timer starts at zero, set the MTIME register to 0.  (This is also a hint for later...)
+
+2. Using the `hardware_ticks` API, stop the tick generator for the RISC-V platform timer, and start it again with `cycles` as the new cycle count.  
+
+3. Using the `hardware_irq` API, add `gpio_callback` as a shared handler (**not** the exclusive handler), and enable the interrupt for the RISC-V platform timer.  (You should have found the IRQ number for the timer in Step 1.  If you missed it, it's also in the relevant IRQ API page.)
+
+Finally, in `main`, call `init_timer_irq` with the appropriate `cmp` and `cycles` values to generate an interrupt every second.  The formula is as follows:
+
+<img style="padding: 5px; background: white" src="https://latex.codecogs.com/gif.latex?freq = \frac{clock\_hz}{cycles * cmp}"/>
+
+One `cycles` value is suggested in the datasheet under the Tick Generator section.  Use that, and determine what your `cmp` value should be, and pass those as parameters to `init_timer_irq`.  Leave the infinite loop in place below it, make sure `init_gpio_irq` is commented out, and flash your program to your Pico 2.
+
+You will see that the green onboard LED turns on, but does not blink!  Why is that?
+
+This is a perfect opportunity to explore the **Peripherals** view under your debugger.  Either press F5 (or Fn+F5), or click "Debug Project (SWD)" under the Pico extension menu to start debugging.  By default, you'll stop at the first line of `main`.  
+
+A very common debugging technique is to ensure that the registers we are trying to set are actually being set.  While that may sound ridiculous, keep in mind that we are assuming that the functions are correct.  However, being *correct* is not the same as *doing what we want*!
+
+From the datasheet, we know that the RISC-V Platform Timer triggers an interrupt when the `{MTIMEH,MTIME}` registers (that form a 64-bit value) exceed the value in `{MTIMECMPH,MTIMECMP}`.  So, let's check the values of these registers.  Set a breakpoint inside the `gpio_callback` ISR, so that when the timer interrupt fires, you can check the values of these registers in the **Peripherals** view.
+
+In the left sidebar under the Debug Menu, click **Peripherals** (or **XPeripherals**, depending on your configuration).  If you dive into the functions for changing the `MTIMECMP` registers, you'll see that they're located under `sio_hw`, so we need to look under SIO -> MTIMECMP.  The screenshot below expands some other registers that are also helpful to look at.
+
+![Peripherals View](xperipherals.png)
+
+If you hover over the registers, the extension gives a highly useful description of the register, as well as the value represented as hex, decimal and binary.  Nifty!  Use this to confirm that MTIMECMP is being set correctly.
+
+Since we reset MTIME to 0 in `init_timer_irq`, we should expect that `MTIME` is equal to `MTIMECMP` when the interrupt **first** fires.  (If this was your mistake, go fix it!)  Therefore, when we continue our program, we expect that `MTIME` resets and `MTIMECMP` is set to the correct value, and the LED should blink every second.  Right?  Click Continue here.
+
+Wrong!  When the interrupt fires, it fires almost immediately with no delay, and we see that MTIME is now a value higher than MTIMECMP.  This highlights a problem we didn't anticipate - the timer does not automatically reset MTIME to 0 when it reaches MTIMECMP, and we just read that the interrupt will also fire when MTIME **exceeds** MTIMECMP.  So, we need to reset MTIME to 0 when the interrupt fires.  Add this to the `gpio_callback` ISR, and click "Flash Project (SWD)".  We should now see the green LED blinking!
+
+> [!NOTE]
+> *Why didn't you just tell me to do that in the first place?*
+> 
+> Because you wouldn't have known to check the registers in the Peripherals view, and you wouldn't have known to look at the datasheet to understand the behavior of the timer.  Quirks and problems like these will always happen, and you need to be prepared to use the various tools available to you to help you to debug them.  Sometimes, datasheets and API documentation isn't enough (hard as that may be to believe...)
+> 
+> One more question to consider - can you set `cycles` any higher than 511?  Why not?  (Hint: look up the definition of the register, that `cycles` is assigned to, in the datasheet.)
+
+> [!IMPORTANT]
+> Show your implementation to your TA.  Show the (X)Peripherals view with the MTIME/MTIMECMP registers, and how adding the line to reset MTIME to 0 allows the LED to blink properly.  You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
+> 
+> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+
+### Step 4: Configure doorbell interrupts
+
+> [!WARNING]
+> Multi-core programming may not be covered in lecture.  If there are any doubts as to how this works, ask your **lab** instructor to clarify them.
+
+Now for the fun part!  We're going to split the operation of pressing a pushbutton to turn an LED on across two cores.  This is perhaps far too simplistic, but as computation scales, you may find it useful to dedicate one core to handling computation and the other to handling all the external stimuli/responses.  
+
+In this step, we'll configure a doorbell interrupt to signal the other core to toggle the onboard LED on or off.  We'll use the left pushbutton on your breadboard to trigger the interrupt, and we'll set up the ISR to toggle the onboard LED on or off on the other core.  Here's a diagram to help visualize this, based on one from the datasheet:
+
+![dual-core](dual-core.png)
+
+This diagram shows the various interaction methods between the cores on the bus fabric, so that the CPU cores can access things like:
+- Their own and each other's CPUID (typically just 0 and 1)
+- 4x32-byte FIFO queue for each core to pass messages.
+- 32 hardware spinlocks for each core to lock shared resources in memory.
+- 8 doorbell interrupts "each way" for the cores to signal the other core to do something.
+- The RISC-V Platform Timer we configured in Step 3.
+
+The "Secure/Non-Secure SIO" refers to the ability to have secure and non-secure memory regions on the Pico 2, where "secured" code has access to the secure peripherals and memory regions, and the non-secure world has access to the rest.  We won't worry about this for the most part - we're only using the Non-Secure SIO anyway.  
+
+At the top, each core **loads** the same instructions from memory, so our code needs to tell the individual cores to do different things.  We achieve this with if/else statements in the same code.  [Section 5.3](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A377%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C511.598%2Cnull%5D) describes how core 1 can be started with a different block of code.
+
+Comment out `init_timer_irq` and complete the following functions as follows:
+
+- `init_gpio_doorbell_irq` - does exactly the same thing as `init_gpio_irq`, except it adds `core0_gpio_callback` as the ISR.
+- `core0_gpio_callback` - triggers a doorbell interrupt on the opposite core.  You have to assign a specific value to a certain register that we discussed in Step 1 to "raise an interrupt on the opposite core".
+- `core1_main` - this is the main function for the second core.  In it:
+    - Configure GP25 as an output as you did earlier (make sure not to do it in the core 0 `main` as well!).
+    - Add `core1_led_callback` as the ISR for when a doorbell interrupt occurs.  The IRQ number for the doorbell interrupt is the same as the one you found in Step 1.  Don't forget to enable the interrupt as well!
+    - Add the infinite loop from `main` that executes the `wfi` instruction and sleeps 1 ms after waking.
+- `core1_led_callback` - when the doorbell interrupt fires, toggle the LED on GP25.
+
+In `main` which runs on core 0, call `init_gpio_doorbell_irq`, and then use the `multicore_launch_core1` function to start `core1_main` on core 1.  Flash your program to your Pico 2, and press the left pushbutton on your breadboard.  If the LED has already turned on, it may be that the interrupt fired immediately, so press the button again to see the LED toggle on and off... which won't work!  
+
+Try pressing Reset to see if that fixes it, and that should properly recognize the pushbutton at a logic 0, so when you press the Right pushbutton, it turns on the LED, but it doesn't seem to turn off!  Notice, however, that is slightly dimmer than usual... that is a hint that your callback function is being called over and over again, even though we're not pressing a pushbutton.  Why is that?
+
+If we look back at the datasheet under [Section 3.1.6: Doorbells](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A44%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C147.15%2Cnull%5D), we see that in order to raise a doorbell interrupt, we write to an OUT_SET register, but it seems that we missed that the opposite core also needs to write the same value to an IN_CLR register!  Add this line to `core1_led_callback`, and you should now be able to toggle the LED on and off with the left pushbutton.  (You may have to press Reset after flashing over SWD for this to work properly).
+
+Congratulations on running your first multi-core interruptible embedded program!
+
+> [!IMPORTANT]
+> Show your implementation to your TA.  Show the LED turning on and off when you press the left pushbutton, and the LED turning on when you press the right pushbutton.  You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
+> 
+> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+
+### Step 5: In-Lab Checkoff Step
+
+> [!CAUTION]
+> Make sure you got checked off here: https://engineering.purdue.edu/ece362/checkoff/
+> 
+> Make sure to upload your confirmation code and verify that it is accepted by Gradescope.  You will know it is accepted if you get the points from Gradescope.
+> 
+> Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs, that your confirmation code was accepted on Gradescope before logging out and leaving for the day.
