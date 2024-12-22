@@ -272,7 +272,11 @@ If we look back at the datasheet under [Section 3.1.6: Doorbells](https://datash
 Congratulations on running your first multi-core interruptible embedded program!
 
 > [!IMPORTANT]
-> Show your implementation to your TA.  Show the LED turning on and off when you press the left pushbutton, and the LED turning on when you press the right pushbutton.  You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
+> Show your implementation to your TA.  Show the LED turning on and off when you press the left pushbutton, and the LED turning on when you press the right pushbutton.  
+> 
+> Show your TA that your code runs on different cores by starting the debugger with a breakpoint in `core1_led_callback`, and show that the function is being executed by core 1 in the Call Stack view in the debugger. 
+> 
+> You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
