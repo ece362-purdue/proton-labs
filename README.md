@@ -1,5 +1,8 @@
 # ECE 36200 Lab Experiments (Raspberry Pi Pico 2)
 
+> [!CAUTION]
+> **Work in progress.  Contents of these lab experiments may change closer to the start of the semester.**
+
 Each link below takes you to the README.md file for each lab, so you don't have to click through the folders to find the page.
 
 If you're looking for the code template associated with each lab, it (necessarily) changes every semester.  Look for the associated Piazza post made for each lab, which should be pinned, to get the corresponding GitHub Classroom link.  
