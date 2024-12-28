@@ -195,6 +195,8 @@ If you click the extension > Documentation > Hardware APIs, a new window will op
 
 3. Using the `hardware_irq` API, add `gpio_callback` as a shared handler (**not** the exclusive handler), and enable the interrupt for the RISC-V platform timer.  (You should have found the IRQ number for the timer in Step 1.  If you missed it, it's also in the relevant IRQ API page.)
 
+(Adding a *shared* handler instead of *exclusive* will throw some kind of error.  Carefully read the error, understand what's missing, and read the description of the function to figure out what you need to add.  In general, the suggested option from that function's description is the **default** one to use.)
+
 Finally, in `main`, call `init_timer_irq` with the appropriate `cmp` and `cycles` values to generate an interrupt every second.  The formula is as follows:
 
 <img style="padding: 5px; background: white" src="https://latex.codecogs.com/gif.latex?freq = \frac{clock\_hz}{cycles * cmp}"/>
@@ -236,7 +238,9 @@ Wrong!  When the interrupt fires, it fires almost immediately with no delay, and
 > [!WARNING]
 > Multi-core programming may not be covered in lecture.  If there are any doubts as to how this works, ask your **lab** instructor to clarify them.
 
-Now for the fun part!  We're going to split the operation of pressing a pushbutton to turn an LED on across two cores.  This is perhaps far too simplistic, but as computation scales, you may find it useful to dedicate one core to handling computation and the other to handling all the external stimuli/responses.  
+Now for the fun part!  We're going to split the operation of pressing a pushbutton to turn an LED on across the two selected cores on your Pico 2.  This is perhaps far too simplistic, but as computation scales, you may find it useful to dedicate one core to handling computation and the other to handling all the external stimuli/responses.  
+
+Your Pico 2 has a total of four cores, two ARM-based, and two RISC-V-based.  ARM and RISC-V are examples of **instruction set architectures** which dictate how the CPU cores should process instructions.  On the Pico 2 specifically, the ARM cores carry a lot more functionality like floating-point computations and security features at the cost of having to license the instruction set from ARM, while the RISC-V cores are free and open source (you can even see the Verilog used to make them [here](https://github.com/Wren6991/Hazard3)).  
 
 In this step, we'll configure a doorbell interrupt to signal the other core to toggle the onboard LED on or off.  We'll use the left pushbutton on your breadboard to trigger the interrupt, and we'll set up the ISR to toggle the onboard LED on or off on the other core.  Here's a diagram to help visualize this, based on one from the datasheet:
 
