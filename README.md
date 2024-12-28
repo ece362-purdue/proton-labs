@@ -29,3 +29,5 @@ Embedded:
 *Not for credit*  
 [Lab - I2C](lab-i2c/README.md)  
 -->
+
+ECE 36200 Pico 2 Lab Experiments © 2025 by Purdue University, Niraj Menon is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
