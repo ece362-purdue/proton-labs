@@ -14,6 +14,8 @@
 | 2.2 | Implement `init_7seg_timer` and `seg7_timer_isr` | 20 |
 | 3 | Implement keypad scanning |   |
 | 3.1 | Implement `drive_column` | 5 |
+| 3.2 | Implement `read_rows` | 10 |
+| 3.3 | Implement `update_history` | 15 |
 | 4 | Play a game |  |
 | 5 | In-Lab Checkoff Step | 20* |
 | &nbsp; | Total: | 100 |
