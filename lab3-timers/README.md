@@ -14,6 +14,7 @@
 | 2.2 | Implement `init_7seg_timer` and `seg7_timer_isr` | 20 |
 | 3 | Implement keypad scanning |   |
 | 3.1 | Implement `drive_column` | 5 |
+| 4 | Play a game |  |
 | 5 | In-Lab Checkoff Step | 20* |
 | &nbsp; | Total: | 100 |
 <br>
@@ -136,6 +137,8 @@ Now, for the timers.  On the Pico 2, we have the following ones:
 
 The system timers can be considered **general-purpose timers**, because the interrupts that they generate can be used to run any type of custom handlers that you provide.  However, unlike the Platform Timer, there are up to 4 alarms that can be set on each timer, and each alarm can be set to generate an interrupt at a certain frequency.  
 
+An alarm triggers when the configured counter value for that alarm is reached by the timer's own counter, which increments with every rising edge of its clock source.  Therefore, you need to set the alarm counter value to a sum of the **current** timer value and the number of *ticks* you want to wait before the alarm triggers.  
+
 Read [Section 12.8 - System Timers](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A1179%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C302.622%2Cnull%5D) and answer the following questions:
 
 1. What is the default **clock source** for timers TIMER0 and TIMER1? (i.e. what is the input clock to the tick generator?)
@@ -144,7 +147,7 @@ Read [Section 12.8 - System Timers](https://datasheets.raspberrypi.com/rp2350/rp
 
 3. What needs to be done to clear a latched interrupt (i.e. acknowledge a timer interrupt) so that it does not fire again?
 
-4. What is the furthest point in time, in minutes, that the alarms can be set to generate an interrupt? 
+4. What is the furthest point in time, in minutes, that the alarms can be set to generate an interrupt?
 
 > [!IMPORTANT]
 > Show your answers for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
@@ -235,33 +238,47 @@ This took us a while to figure out, and it is because the Pico 2 by default does
 
 To fix this, copy in the portion of code where you configured TIMER0 to trigger ALARM0 every 1 ms into `seg7_timer_isr` after acknowledging the interrupt and calling `print_7seg`.  This will reset the timer to trigger the interrupt again in 1 ms, and will allow the display to cycle through the characters in `message` every 1 ms.
 
-We should finally see 01234567 on the display, with the decimal point appearing to shift through each digit every 0.25 seconds.  If you see this, you have successfully implemented code to show numbers on all seven-segment displays at once!
+We should finally see **01234567** on the display, with the decimal point appearing to shift through each digit every 0.25 seconds.  If you see this, you have successfully implemented code to show numbers on all seven-segment displays at once!
 
 ![7seg](7seg.gif)
 
+> [!IMPORTANT]
+> Show your working display to your TA to earn points for this step.  You must have the display cycling through the characters in `message`, and the decimal point shifting through each digit every 0.25 seconds.  If you have any issues, ask your TA for help.
+> 
+> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+
 ### Step 3: Implement keypad scanning
 
-Now, let's get started on the keypad scanning.  You've already read from the keypad in lab 1 (If you haven't wired this up, go back to lab 1), but in that lab, we implemented the scanning code in the `main` loop of the program, with delays in between each scan.  This is not ideal, because we could be using the CPU for other computationally-intensive tasks.
+Now, let's get started on the keypad scanning.  You've already scanned the keypad in lab 1 (If you haven't wired this up, go back to lab 1), but in that lab, we implemented the scanning code in the `main` loop of the program, with delays in between each scan.  This is not ideal, because we could be using the CPU for other computationally-intensive tasks.
 
-Therefore, for this step, we'll use a timer to do this instead, and interrupt the CPU instead when it has to scan next.  First, though, we need to create some keypad handling functions.
+Therefore, for this step, we'll use a timer to periodically scan the keypad instead, and interrupt the CPU when it has to scan next, instead of continually waiting on a key.  
+
+The gist of what we're going to do is:
+- Create small functions that achieve one thing individually, like driving the column, reading the rows, and registering the pressed key.
+- Utilize a 16-bit by 16 keys FIFO structure to maintain history of whether a key was pressed, how long it was pressed, and at what point it was released.
+    - Buttons, as you may have noticed in lab 1, add a lot of electrical *bounce* by nature of their construction.  When you press and release a button, the resulting "bounce" can register as multiple presses and releases in a very short time, which isn't ideal.
+    - Maintaining a **history** buffer for each of the 16 keys allows us to filter out these bounces.  
+- Display each press and release of a button on the seven-segment displays, based on the aforementioned history buffer.
 
 ### 3.1 - `drive_column`: Update the keypad column being scanned
 
-Implement the function `drive_column(int c)` that updates the column of the keypad that has a logic high applied to it.  You'll want to use the `gpio_set` and `gpio_clr` registers under the SIO subsystem to make this easier, instead of writing a loop which wastes valuable CPU time.
+Implement the function `drive_column(int c)` that updates the column of the keypad that has a logic high applied to it.  You'll want to use the `gpio_set` and `gpio_clr` **registers** (not SDK function calls) under the SIO subsystem to set or clear multiple pins at once, instead of writing a loop which wastes valuable CPU time.  
 
 ```C
 void drive_column(int c) {
-    c = least 2 bits of c (use AND operator)
+    c = least 2 bits of c (use AND operator) (why?)
     first clear the COL4-COL1 pins
     then set ONE of the COL4-COL1 pins corresponding to the column `c`
 }
 ```
 
-**The keypad columns are scanned from right-to-left, where the rightmost column is COL1 and the leftmost column is COL4. Rows are interpreted from bottom-to-top.**
+**The keypad columns are scanned from right-to-left, where the rightmost column is COL1 and the leftmost column is COL4. Rows are interpreted from top-to-bottom.**
 
 ### 3.2 - `read_rows`: Read the row values
 
-Implement the following function to examine the **GPIO input register** and return the 4-bit reading of the rows of the keypad.  Make sure to **shift** the value appropriately - the permitted range of values from this function is between 0b0000 and 0b1111, inclusive.
+Once the column is driven, we need to identify what button was pressed by looking at the rows.
+
+Implement the following function to examine the **GPIO input register** and return the 4-bit reading of the row pins of the keypad.  Make sure to **shift** the value appropriately - the permitted range of values from this function must be between 0b0000 and 0b1111, inclusive.
 
 ```C
 int read_rows() {
@@ -269,14 +286,14 @@ int read_rows() {
 }
 ```
 
-### 3.3 - `rows_to_key`: Translate row of a column to a key
+### 3.3 - `update_history`: Track what key was pressed up to 8 scans
 
-Implement the following function that examines the rows reading for a particular column and turns it into a character.  Remember that only the lower two bits of the `col` determine the column.  We want to turn the row/column combination into a number and then use that number as the offset into an array called the `keymap_arr` that is initialized for you in `main.c`.
+A 16-element, 8-bit buffer called `hist` has been defined for you in `support.c`.  The purpose of `update_history` is to shift in a 1 when a key press is detected, and 0 when the key is no longer pressed.  We derive that information from `c`, which is the currently driven column, and `rows`, which is the result returned from `read_rows`.  Both of these will be passed as arguments to `update_history`.
 
-**The keypad columns are scanned from right-to-left, where the rightmost column is column 0 and the leftmost column is column 3. Rows are interpreted from bottom-to-top.**
+In this function, you need to update `hist` at indices as specified by `c` and `rows`.  Therefore, for any digit that was pressed, you need to shift in a 1 into `hist[4*(col)+(row)]` where `col` and `row` correspond to that digit, and shift in zeroes for all other buttons on that column that were NOT pressed.  Shifting in a value requires that you shift the existing value to the left by 1, and then OR the new value into the least significant bit.  
 
 ```
-Buttons:                 Offsets:
+Buttons:                 hist offsets:
 +---+---+---+---+        +---+---+---+---+
 | 1 | 2 | 3 | A |        | f | b | 7 | 3 |
 +---+---+---+---+        +---+---+---+---+
@@ -288,30 +305,31 @@ Buttons:                 Offsets:
 +---+---+---+---+        +---+---+---+---+
 ```
 
+For example for digit 5, you should shift a 1 into `hist[4*2+2]`, and a 0 into `hist[4*2+3]` for "2", `hist[4*2+1]` for "8", and `hist[4*2+0]` for "0".  Do this with a for loop that iterates over the 4 rows, and shifts in the value of the row into the appropriate index of `hist`.
+
+Next, we need to identify whether a button has been just pressed, or just let go.  The purpose of **shifting** in ones and zeroes is so that we can identify proper button presses instead of bounce as a result of releasing a button.  We maintain up to 8 scans by shifting in a 1 into an 8-bit element for each key, and so we will only check for two cases for the checked `hist` element:
+
+- If its value is 0x01, then the button was just pressed.
+    - In that case, use `push_queue` to push the value `0x80` ORed with `keymap[4*col+row]` (where `col` and `row` correspond to the button being checked).  This generates the seven-segment representation of the button being pressed, and pushes it into the queue.
+    - ORing `0x80` should be familiar from the previous step - you OR in this value to turn on the decimal point of the seven-segment display that this digit will be displayed on.
+- If its value is 0xfe, then the button was just released after being held down.
+    - In that case, push the value `keymap[4*col+row]` only into the queue using `push_queue`.  This generates the seven-segment representation of the button being released, and pushes it into the queue, with the decimal point turned off to indicate a key release.
+
+**The keypad columns are scanned from right-to-left, where the rightmost column is COL1 (index 0) and the leftmost column is COL4 (index 3). Rows are interpreted from top-to-bottom.**
+
 ![keypad](keypad.png)
-
-For instance, if the '8' button is pressed, the number for that button should be 0x9 (an offset of one from the start of column 2: 2\*4 + 1 = 9). When the '\*' button is pressed, the offset should be 12 (hexadcimal 0xc) since it is in column 3, row 0 (3*4 + 0 = 12).
-
-The function to implement is: 
-
-```C
-char rows_to_key(int rows) {
-    // Note `rows` will be the 4 bit value from read_rows that indicates 1 for a row if a button was pressed.
-    compute the offset of the button being pressed right now from `rows` and `col` (start checking from the lowest row)
-    lookup `c` in the `keymap_arr` indexed by the offset
-    return c;
-}
-```
 
 This part can be a little confusing to get.  What it comes down to is that the value of "rows" is **not** just the index of the row.  You need to find the relationship between them, so consider what "rows" is indicating here.  
 
 One hint: Think about what the `read_rows` function returns.  How does the value returned determine what row is being asserted?  What happens if no buttons were pressed?
 
-Another hint: The keymap array is indexed by the calculated offset of the button being pressed.  Take a look at font.S to see what the arrangement of the keymap is to get a better idea of how the offset should be calculated.
-
 ### 3.4 - `init_keypad_timer` and `keypad_timer_isr`
 
-Implement `init_keypad_timer` to configure TIMER1 to generate an interrupt on ALARM0 every 10 ms.  When the interrupt signal fires, it should invoke `keypad_timer_isr`.
+Implement `init_keypad_timer` to: 
+
+1. Configure GP2-GP5 as outputs, and GP6-GP9 as inputs.
+2. Configure TIMER1 to generate an interrupt on ALARM0 every 10 ms.  
+    - When the interrupt signal fires, it should invoke `keypad_timer_isr`.
 
 In `keypad_timer_isr`, add the following:
 
@@ -321,25 +339,53 @@ int rows = read_rows();
 update_history(col, rows);
 col = (col + 1) & 3;
 drive_column(col);
-// TODO: reset the timer
+// TODO: reset the timer's counter
 ```
 
-The diagram for the keypad is provided again below so that you know what rows are associated with what buttons for a particular column.  
+Then in `main`, after adding `init_keypad_timer`, call `show_keys`.  This function waits for a key press to occur by checking a queue every time an interrupt fires, and then displays the key press/release on the seven-segment displays by shifting it into `message`.  
 
-One change is needed - instead of turning on an LED when a row is pressed with its corresponding column, as you did in lab 1, you should instead set a bit in a global variable `keypad_state` to indicate that a key is pressed.  The bit should be set to 1 if the key is pressed, and 0 if it is not. 
+Now that you've written all these functions, it's important to go through the added backend code that is helping you with the scanning:
 
-**The keypad columns are scanned from right-to-left, where the rightmost column is column 0 and the leftmost column is column 3. Rows are interpreted from bottom-to-top.**
+- In an infinite loop, `show_keys` will call `get_key_event`.
+- `get_key_event` will execute the `wfi` instruction, which will cause the CPU to sleep until an interrupt occurs.
+- When an interrupt occurs and the waking ISR has been executed, control flow will return to the line just after the `wfi` instruction.  If anything has been added to the queue by then as a result of a key press/release, it will be **popped**, and returned to `show_keys`
+    - When you use `push_queue`, you are storing the 8-bit 7-segment+DP representation into a 2-element queue.  
+    - The value being popped is the one you pushed via this function from `update_history`.
+- `show_keys` will then shift in the value of the key press/release into `message`, and then call `print` to write the value into the global `message` array.
+- Roughly 1 ms later, `print_7seg` will be called by TIMER0's interrupt handler, and the value of `message` will be displayed on the seven-segment displays.
 
-```
-Buttons:                 Offsets:
-+---+---+---+---+        +---+---+---+---+
-| 1 | 2 | 3 | A |        | f | b | 7 | 3 |
-+---+---+---+---+        +---+---+---+---+
-| 4 | 5 | 6 | B |        | e | a | 6 | 2 |
-+---+---+---+---+        +---+---+---+---+
-| 7 | 8 | 9 | C |        | d | 9 | 5 | 1 |
-+---+---+---+---+        +---+---+---+---+
-| * | 0 | # | D |        | c | 8 | 4 | 0 |
-+---+---+---+---+        +---+---+---+---+
-```
+Run your code on your microcontroller, and you should first see "01234567" before pressing any keys.  `show_keys` will be waiting for a button press, so go ahead and press "9" (do not release it!) on the keypad.  You should see "9" with the decimal point displayed on the rightmost seven-segment display, where it was shifted in.  Release "9", and a second "9" will appear on the display with the decimal point turned off.  If you see this, you have successfully implemented code to scan the keypad and display the pressed keys on the seven-segment displays!
 
+You'll notice that you have to slowly press and release the buttons to make sure that it catches the released button.  This is because the keypad is being scanned every 10 ms, and the key press/release has to be detected within that time frame.  Think about what you could do to improve on that.
+
+> [!IMPORTANT]
+> Show your working keypad to your TA to earn points for this step.  Demonstrate a key press and release and how it updates the display.  If you have any issues, ask your TA for help.
+> 
+> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+
+### Step 4: (Optional) Play a game
+
+That was a long lab, so you deserve a game after all that hard work!  
+
+Remove `show_keys`, and replace it with `game()` in `main`, after `init_keypad_timer`, and you'll be able to play a game that may be familiar to you from ECE 27000.  As a reminder:
+
+- Your lunar lander starts at 4500 ft above the moon with 800 units of gas.
+- Press A for altitude, B for velocity, C for gas, and D to view thrust.  0-9 changes thrust.
+- The lander immediately starts picking up speed due to gravity, so its velocity will decrease (entering negative values) as it falls.
+- Press "0" to let it pick up a velocity of around -100 ft/s, then press "5".
+- Wait until altitude reaches 1800 ft to set the thrust to 9 to counteract the velocity.
+- Wait until the velocity reaches -10 ft/s, then press "5", and wait until the altitude reaches 0 to safely land (which will say "LANDED").
+
+Keep in mind that button presses will be registered very slowly since it is in the same interrupt handler as the quantity updation, so be patient!
+
+> [!IMPORTANT]
+> Nothing to demonstrate for this step.
+
+### Step 5: In-Lab Checkoff Step
+
+> [!CAUTION]
+> Make sure you got checked off here: https://engineering.purdue.edu/ece362/checkoff/
+> 
+> Make sure to upload your confirmation code and verify that it is accepted by Gradescope.  You will know it is accepted if you get the points from Gradescope.
+> 
+> Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs, that your confirmation code was accepted on Gradescope before logging out and leaving for the day.
