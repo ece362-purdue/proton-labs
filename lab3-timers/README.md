@@ -9,10 +9,11 @@
 | 0.1 | Set up your environment |   |
 | 0.2 | Wire and organize your breadboard |   |
 | 1 | Read the datasheet | 20 |
-| 2 | Implement keypad scanning | 30 |
-| 2.1 | 
-| 3 | Use a multiplexed display | 10 |
-| 4 | Create a scrolling display | 10 |
+| 2 | Use a multiplexed display |   |
+| 2.1 | Implement `print_7seg` | 10 |
+| 2.2 | Implement `init_7seg_timer` and `seg7_timer_isr` | 20 |
+| 3 | Implement keypad scanning |   |
+| 3.1 | Implement `drive_column` | 5 |
 | 5 | In-Lab Checkoff Step | 20* |
 | &nbsp; | Total: | 100 |
 <br>
@@ -69,11 +70,11 @@ If we combine the 11 pins on the seven-segment displays as **bits**, we get an 1
 
 In your lab kit, you have two 74HC595 shift registers, which are 8-bit shift registers with enables.  You can cascade them together to create a 16-bit shift register, which is enough to control the 11 bits of the seven-segment displays.  The pins QH-QA together form the 8-bit output of the shift register (with QH being MSB and QA being LSB), and on every rising edge of SRCLK, the bit on SER is shifted into QA, with all other bits being shifted into the next bit (QA goes to QB, QB goes to QC, etc).  In our case, the bit getting shifted out of the last bit (QH) of one shift register, goes into the first bit (QA) on the other shift register. 
 
-Use the diagram below to wire up the two shift registers between the parallel driver card and the Pico 2 pins GP13-GP15:
+**Use the diagram below** to wire up the two shift registers between the parallel driver card and the Pico 2 pins GP13-GP15:
 
 ![sr](sr.png)
 
-Our suggested placement is to put the parallel driver card on the top left of the board, and the shift registers on the breadboard panel directly below the parallel driver card.  
+Our suggested placement is to put the parallel driver card on the **top left** of the board, and the shift registers on the breadboard panel directly below the parallel driver card.  Make sure to flip the chips so that pin 1 of both registers is facing the 7-segment driver card, so that most wires don't have to cross over the chip to reach the card.
 
 **Note the seemingly random connections between QA-QH to the D8-D1 pins** of your parallel driver card - this is a mistake on the card that carried over from prior versions of these labs, when students used to manually wire up the displays, 74HC138, and TLC59211 chips.  While the wiring may seem tedious to do, this is to allow you to assign segments DP-G-F-E-D-C-B-A, in that order, to the 8 bits of the rightmost shift register.  The 3 select lines SEL2,SEL1,SEL0 form the bottom 3 bits of the left shift register, allowing you to easily concatenate the values as a single 11-bit value `{SEL2,SEL1,SEL0,D8,D7,D6,D5,D4,D3,D2,D1}`.  
 
@@ -150,13 +151,101 @@ Read [Section 12.8 - System Timers](https://datasheets.raspberrypi.com/rp2350/rp
 > 
 > Avoid the urge to ask others (AI/LLMs are included in "others") for answers.  These questions are specifically designed to get you used to looking at the datasheet for information, and for *you* to understand the microcontroller's specific configuration.
 
-### Step 2: Implement keypad scanning
+### Step 2: Use the multiplexed display
 
-Now that you understand the clock tree and the timers, let's get started on the keypad scanning.  You've already read from the keypad in lab 1 (If you haven't wired this up, go back to lab 1), but in that lab, we implemented the scanning code in the `main` loop of the program, with delays in between each scan.  This is not ideal, because we could be using the CPU for other computationally-intensive tasks.
+Now that you understand the clock tree and the timers, let's get started on the display.  We understand that to display on any given digit of the display, we need to push out an 11-bit value to the shift registers, of which:
+
+1. The top three bits are the select lines for the 74HC138 3-to-8 decoder to select one of the eight digits, and;
+2. The bottom eight bits are the decimal point and segments of the chosen digit display.
+
+To see the multiplexing effect in real time, run `check_wiring` on the autotest object you were provided.  The way it works is by quickly pushing out eight 11-bit values successively, with a delay in between each value to ensure the digit is lit for long enough that you can see it.  
+
+Implement the functions as follows to achieve this effect.
+
+### 2.1 - `print_7seg`
+
+In this function, implement the data transmission to the 11 pins of your seven-segment card so that it displays the currently selected digit, using `msg_idx` contained in the global array `message`, which is 8 characters long.  By default, `message` is initialized to display "01234567" on the 8 seven segment displays.
+
+The idea is that you will call `print_7seg` in a loop, incrementing the index to 7 and wrapping back around to 0, which will give the appearance of a static display.  The function will be called in a timer interrupt handler, which will be set to fire every 1 ms.
+
+The general algorithm is as follows:
+
+```c
+void print_7seg() {
+    // clear the enable GPIO pin
+    // for each of the bits 11 through 0 of message[msg_idx], starting from the MSB:
+    //     set the data GPIO pin to the selected bit
+    //     set the clock GPIO pin high
+    //     WAIT 1 us (if you use sleep_us, you'll get an error.  Use a similar function.)
+    //     set the clock GPIO pin low
+    //     WAIT 1 us (if you use sleep_us, you'll get an error.  Use a similar function.)
+    // set the enable GPIO pin high
+    // if msg_idx == 7, set it to 0, 
+    //    else increment msg_idx (how to do this without if/else? hint: AND operator)
+}
+```
+
+This concept of setting the data high, before *clocking* it in, is very important, and we'll see it again in a future lab with a peripheral that can do this for us automatically.  Right now, we're doing it manually, which is also called **bit-banging**.  We do this for every "digit" in `message`, each of which is 11 bits long (3 bits for the decoder + 8 bits for the seven-segment display).
+
+To test this, initialize GP13-GP15 as outputs, and call `print_7seg` in an infinite loop in `main`.  You should now see your seven-segment displays light up with the characters "01234567" in sequence.  If you don't, check your wiring with the autotest's `check_wiring`, and recheck your implementation of `print_7seg`.
+
+### 2.2 - `init_7seg_timer` and `seg7_timer_isr`
+
+Now, instead of doing it in a loop, we can use a **timer** to let the CPU know when to call `print_7seg`.  This introduces a short delay of 1 millisecond in between each call, which doesn't produce much of a difference on the display, but it gives the CPU a **lot** more time to execute other instructions in between calls.
+
+Implement `init_7seg_timer` so that it:
+
+1. Initializes GP13-GP15 as outputs as you did in `main` (which you can now remove).
+2. Configures TIMER0 to generate an interrupt on ALARM0 every 1 ms.
+    - Keep in mind the clock frequency for the **timer** as opposed to the entire microcontroller, and how to therefore set the timer's counter value to generate an interrupt every 1 millisecond (0.001 seconds or 1 KHz).
+    - Look at the code sample under System Timers > Programmer's Model to understand how to do this.  **Take note of the specific registers used to enable the interrupt, and to set the counter value at which the alarm should trigger.**
+3. Enable the interrupt on ALARM0.
+
+Implement `seg7_timer_isr` so that it calls `print_7seg` in the interrupt handler.  This will allow the display to cycle through the characters in `message` every 1 ms.  (If you find hints to add anything else, don't add them just yet - only call `print_7seg` for now.)
+
+Now, call `init_7seg_timer` in main.  It should be the only other function running alongside the `print_7seg` function.  If you see the display cycling through the characters in `message`, it may seem that you successfully displayed the numbers... but there is more than meets the eye here!
+
+To demonstrate our point, we're going to try lighting up each of the decimal points on each digit every 0.25 seconds.  After the `init_7seg_timer` call in `main`, add this code:
+
+```c
+int i = 0;
+for(;;) {
+    message[i] |= 0x80;
+    sleep_ms(250);
+    message[i++] &= ~0x80;
+    i &= 7;
+}
+```
+
+This turns on a specific digit's decimal point, sleeps 250 ms, then clears it and immediately sets the next one (hence the `i++`).  The sleep creates some time for the timer to take over and cycle through the display, but now that we're modifying `message` in `main`, we should expect that the `print_7seg` function will pick up that change and show the lit decimal point.
+
+However, when we flash it, we'll see something interesting - only the decimal point of the leftmost display lights up, and the rest of the decimal points remain blank.  Time to debug!
+
+When we enter the debugger, let the program continue operation, wait a few seconds, and then press Pause.  You'll see that we'll be paused inside `print_7seg` as called by the interrupt handler:
+
+![call-stack](call-stack.png)
+
+Try setting some breakpoints in `main`, or running and clicking Pause multiple times - all signs will point to the problem that your microcontroller is currently stuck in the interrupt handler, and not returning to `main` to pick up the changes to `message`.  
+
+This is an example of the need (in some cases) to **acknowledge** the interrupt.  In this case, the interrupt is latched, and the CPU will not return to `main` until the interrupt is acknowledged and will continually keep calling `print_7seg`.  To acknowledge the interrupt, you will need to write a 1 to the appropriate bit in a certain register (covered just above Programmer's Model in System Timers in the datasheet.)  Do that **first** in the interrupt handler, and then call `print_7seg`.  Save your changes, and flash the program again.
+
+However, we now see a **second** problem!  The display will no longer cycle through the digits - only 0 (zero) and it's decimal point are lit up.  Debug this again, and you should now see that while the interrupt is being acknowledged the first time, it is not being acknowledged the second time... almost like the interrupt handler is not being called at all, compared to the previous issue where the handler was being called constantly.
+
+This took us a while to figure out, and it is because the Pico 2 by default does not automatically create a **repeating timer**, as per their documentation.  There is a function `add_repeating_timer_ms` as part of the SDK, but for simplicity's sake, and because we want you to take charge of your own code where possible, we can just manually reset the timer in the interrupt handler.  
+
+To fix this, copy in the portion of code where you configured TIMER0 to trigger ALARM0 every 1 ms into `seg7_timer_isr` after acknowledging the interrupt and calling `print_7seg`.  This will reset the timer to trigger the interrupt again in 1 ms, and will allow the display to cycle through the characters in `message` every 1 ms.
+
+We should finally see 01234567 on the display, with the decimal point appearing to shift through each digit every 0.25 seconds.  If you see this, you have successfully implemented code to show numbers on all seven-segment displays at once!
+
+![7seg](7seg.gif)
+
+### Step 3: Implement keypad scanning
+
+Now, let's get started on the keypad scanning.  You've already read from the keypad in lab 1 (If you haven't wired this up, go back to lab 1), but in that lab, we implemented the scanning code in the `main` loop of the program, with delays in between each scan.  This is not ideal, because we could be using the CPU for other computationally-intensive tasks.
 
 Therefore, for this step, we'll use a timer to do this instead, and interrupt the CPU instead when it has to scan next.  First, though, we need to create some keypad handling functions.
 
-### 2.1 - `drive_column`: Update the keypad column being scanned
+### 3.1 - `drive_column`: Update the keypad column being scanned
 
 Implement the function `drive_column(int c)` that updates the column of the keypad that has a logic high applied to it.  You'll want to use the `gpio_set` and `gpio_clr` registers under the SIO subsystem to make this easier, instead of writing a loop which wastes valuable CPU time.
 
@@ -170,7 +259,7 @@ void drive_column(int c) {
 
 **The keypad columns are scanned from right-to-left, where the rightmost column is COL1 and the leftmost column is COL4. Rows are interpreted from bottom-to-top.**
 
-### 2.2 - `read_rows`: Read the row values
+### 3.2 - `read_rows`: Read the row values
 
 Implement the following function to examine the **GPIO input register** and return the 4-bit reading of the rows of the keypad.  Make sure to **shift** the value appropriately - the permitted range of values from this function is between 0b0000 and 0b1111, inclusive.
 
@@ -180,7 +269,7 @@ int read_rows() {
 }
 ```
 
-### 2.3 - `rows_to_key`: Translate row of a column to a key
+### 3.3 - `rows_to_key`: Translate row of a column to a key
 
 Implement the following function that examines the rows reading for a particular column and turns it into a character.  Remember that only the lower two bits of the `col` determine the column.  We want to turn the row/column combination into a number and then use that number as the offset into an array called the `keymap_arr` that is initialized for you in `main.c`.
 
@@ -220,23 +309,20 @@ One hint: Think about what the `read_rows` function returns.  How does the value
 
 Another hint: The keymap array is indexed by the calculated offset of the button being pressed.  Take a look at font.S to see what the arrangement of the keymap is to get a better idea of how the offset should be calculated.
 
-### 2.4 - `handle_key`: Do something for a particular key
+### 3.4 - `init_keypad_timer` and `keypad_timer_isr`
 
-Implement the following function that decides what to do for a key passed as an argument. The function to implement is: 
+Implement `init_keypad_timer` to configure TIMER1 to generate an interrupt on ALARM0 every 10 ms.  When the interrupt signal fires, it should invoke `keypad_timer_isr`.
 
-```C
-void handle_key(char key) {
-    if key == 'A'/'B'/'D', set mode to key
-    else if key is a digit, set thrust to the represented value of key, i.e. if key == '1', thrust = 1, not '1'
-}
+In `keypad_timer_isr`, add the following:
+
+```c
+// TODO: acknowledge the interrupt for ALARM1 on TIMER1
+int rows = read_rows();
+update_history(col, rows);
+col = (col + 1) & 3;
+drive_column(col);
+// TODO: reset the timer
 ```
-
-> [!IMPORTANT]
-> Demonstrate to your TA that your code passes the `drive_column`, `read_rows`, `rows_to_key` and `handle_key` tests.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.  
-
-Implement `init_keypad_timer` to configure TIMER0 to generate an interrupt on ALARM0 every 1 ms.  An interrupt every millisecond may sound like too many until you remember how fast the clock is, making key scanning the least intensive operation the CPU has to handle.  When the interrupt signal fires, it should invoke `keypad_timer_isr`.
-
-In `keypad_timer_isr`, implement the keypad scanning logic you used in lab 1, but modify it such that you check all the rows when a column is driven high, instead of the matching row.  If a row is matched, then instead of turning on an LED, 
 
 The diagram for the keypad is provided again below so that you know what rows are associated with what buttons for a particular column.  
 
