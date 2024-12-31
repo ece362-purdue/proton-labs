@@ -162,8 +162,9 @@ In the Pico Extension sidebar that appears, click New C/C++ Project.  In the win
     - Feel free to try out assembly code from your lectures (when you get to it) on this board!
 - Set the Pico SDK version to the highest value.
     - As of 2025, the extension is being constantly updated, so the highest version will change constantly.  v2 or higher supports the Pico 2.
-- Under Stdio (standard I/O) support, tick `Console over UART`.
+- **Under Stdio (standard I/O) support, tick `Console over UART`.**
     - You should always select this feature when creating a new project, as it will allow you to use the serial monitor to interact with your microcontroller.
+    - Don't forget to do this, or you won't be able to see any output from your Pico 2 via the terminal!
 - Leave all the other options at their defaults.
 
 Finally, click `Create`.  The extension will close, and you'll see a new window appear.  
