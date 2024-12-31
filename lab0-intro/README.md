@@ -112,7 +112,7 @@ Open your ECE 362 lab kit and find the Pico 2 development board. It should look 
     <img src="pico-side.webp" style="margin: 1em 0; width: 20vw; max-width: 400px">
 </div>
 
-Your ECE Mini kit from prior courses has a large, four-panel breadboard similar to the one pictured below.  Place the devboard so that it is on the bottom of the second panel with the USB receptacle facing outward, shown below.
+Your ECE Mini kit from prior courses has a large, **four-panel** breadboard similar to the one pictured below.  Place the devboard so that it is on the bottom of the second panel with the USB receptacle facing outward, shown below.
 
 <div class="center">
     <img src="insert-pico.jpg" style="width: 90vw; max-width: 800px">
@@ -120,9 +120,9 @@ Your ECE Mini kit from prior courses has a large, four-panel breadboard similar 
 
 Typically, a microcontroller will be a little hard to get into the holes, but you should not have to remove it once it's in there. To prevent damage to the board, press down on both ends of the board at once. Do not apply force to anything else, as parts of the board are delicate and may become damaged. When inserting, make sure there are two columns on either side of the development board to leave room to plug in wires. 
 
-Next, connect two wires: one from the 3V3(OUT) pin to the power rails, and one from the GND pins to the ground rails of your breadboard.  You can find the pinout for the Pico 2 here: https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf.  We'll use these in a second.
+Next, connect two wires: one from the 3V3(OUT) pin to the power rails, and one from the GND pins to the ground rails of your breadboard.  You can find the pinout for the Pico 2 here: https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf.  We'll use this in a second.
 
-Take a pushbutton and place it at the end of the board.  Connect the bottom left pin to ground, and the bottom right pin to GPIO15.  This will be your reset button, and you can use it to reset your Pico 2 to the start of a program without having to unplug and replug it.
+Take a pushbutton and place it at the end of the board.  Connect the bottom left pin to ground, and the bottom right pin to GP25.  This will be your reset button, and you can use it to reset your Pico 2 to the start of a program without having to unplug and replug it.
 
 Connect your Pico 2 to your computer using the USB cable provided in your lab kit.  The Pico 2 will power on, and you should see a green LED blink on the board.  This indicates that the board is powered on and ready to go.  (If you borrowed it from another student, it may have another program on it, so don't worry if you see something else happening.)
 
@@ -253,6 +253,10 @@ shutdown command invoked
 If you see this, you have successfully flashed your Pico with the new program, and you should see the LED flashing twice a second again.  
 
 To set up the Serial Monitor, press Ctrl-Shift-P (or Cmd-Shift-P on a Mac) and type `Terminal: Focus on Serial Monitor View`.  You can also pull it up if you have a terminal open by looking for the "Serial Monitor" tab.  Open it, and click Start Monitoring.  You should see the "Hello, world!" message appear every half second.
+
+If you are monitoring but you see no messages, verify that:
+- A light is blinking at least every second on your Debug Probe without any intervention.  This verifies that text is being sent to your computer through it from the Pico 2.
+- You are connected to the correct Port.  Some computers may have virtual COM port devices, so you may be connected to the wrong one.  Try changing the Port options to see if the message appears.
 
 ![serial-monitor](serial-monitor.png)
 
