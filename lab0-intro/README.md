@@ -122,7 +122,7 @@ Typically, a microcontroller will be a little hard to get into the holes, but yo
 
 Next, connect two wires: one from the 3V3(OUT) pin to the power rails, and one from the GND pins to the ground rails of your breadboard.  You can find the pinout for the Pico 2 here: https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf.  We'll use this in a second.
 
-Take a pushbutton and place it at the end of the board.  Connect the bottom left pin to ground, and the bottom right pin to GP25.  This will be your reset button, and you can use it to reset your Pico 2 to the start of a program without having to unplug and replug it.
+Take a pushbutton and place it at the end of the board.  Connect the bottom left pin to ground, and the bottom right pin to physical pin 30 (**not GP30**), or RUN.  This will be your reset button, and you can use it to reset your Pico 2 to the start of a program without having to unplug and replug it.
 
 Connect your Pico 2 to your computer using the USB cable provided in your lab kit.  The Pico 2 will power on, and you should see a green LED blink on the board.  This indicates that the board is powered on and ready to go.  (If you borrowed it from another student, it may have another program on it, so don't worry if you see something else happening.)
 
