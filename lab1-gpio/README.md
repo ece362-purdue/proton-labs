@@ -8,10 +8,10 @@
 |------|-------------|--------|
 | 0.1 | Set up your environment |   |
 | 0.2 | Wire and organize your breadboard |   |
-| 1 | Read the datasheet | 10 |
-| 2 | Configure output pins for LEDs | 20* |
-| 3 | Configure input pins for pushbuttons | 20* |
-| 4 | Configure and poll a keypad | 20 |
+| 1 | Read the datasheet | 30* |
+| 2 | Configure output pins for LEDs | 20 |
+| 3 | Configure input pins for pushbuttons | 20 |
+| 4 | Configure and poll a keypad | 30 |
 | 5 | In-Lab Checkoff Step | 20* |
 | &nbsp; | Total: | 100 |
 <br>
@@ -123,11 +123,11 @@ The animation below shows how you can *dive* into the function to see what it do
 
 Now, based on your function diving work into `gpio_init` and the list of SIO registers relevant to GPIO control in 3.1.11, specify the registers you will need to configure the Bank 0 GPIO pins on the RP2350.  To initialize a pin, you have to do the following:
 
-1. Configure the pin function to be SIO.  In C code, how do you set a specific GPIO pin as an SIO pin?
+1. (5 points) Configure the pin function to be SIO.  In C code, how do you set a specific GPIO pin as an SIO pin?
     - This one's a little complicated, so we'll just tell you where to look.  Type `gpio_set_function`, and *dive* into it to see what register it modifies to set the function of the pin.
-2. Configure the pin as an input or output.  Depending on the purpose, you may have to write values in different registers, so specify both.  In C code, how do you set a specific GPIO pin as an input or output?
-3. If the pin is an output, configure the pin to drive high or low.  Depending on the value, you may have to write values in different registers, so specify both.  In C code, how do you set a specific GPIO pin as an input or output?  In C code, how do you set a specific GPIO pin to drive high or low?
-4. In C code, what register do you need to read to check the state of a specific pin?
+2. (10 points) Configure the pin as an input or output.  Depending on the purpose, you may have to write values in different registers, so specify both.  In C code, how do you set a specific GPIO pin as an input or output?
+3. (10 points) If the pin is an output, configure the pin to drive high or low.  Depending on the value, you may have to write values in different registers, so specify both.  In C code, how do you set a specific GPIO pin as an input or output?  In C code, how do you set a specific GPIO pin to drive high or low?
+4. (5 points) In C code, what register do you need to read to check the state of a specific pin?
 
 Your answers should start with `sio_hw` or `io_bank0_hw`, which are the SDK-provided structs that define hardware registers that, in turn, control the GPIO pins.  (You can even *dive* into `sio_hw`/`io_bank0_hw` to see the memory addresses they are defined at, and compare that to your datasheet!)
 
