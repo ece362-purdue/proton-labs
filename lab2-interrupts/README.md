@@ -9,9 +9,9 @@
 | 0.1 | Set up your environment |   |
 | 0.2 | Read about interrupts |   |
 | 1 | Read the datasheet | 30 |
-| 2 | Configure external interrupts | 10 |
+| 2 | Configure external interrupts | 20 |
 | 3 | Configure Platform Timer interrupts | 20 |
-| 4 | Configure doorbell interrupts | 20 |
+| 4 | Configure doorbell interrupts | 30 |
 | 5 | In-Lab Checkoff Step | 20* |
 | &nbsp; | Total: | 100 |
 <br>
@@ -91,7 +91,7 @@ So what interrupts are available?  Scroll down to section 3.2, and you'll see:
 
 ### Step 1: Read the datasheet
 
-Make sure you did the reading in Step 0.2, and then read the following sections of the RP2350 datasheet and answer the questions underneath.
+Make sure you did the reading in Step 0.2, and then read the following sections of the RP2350 datasheet and answer the questions underneath. (3 points each)
 
 [Chapter 3.1.6: Doorbells](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A44%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C147.15%2Cnull%5D)
 
@@ -166,7 +166,11 @@ main () at ... lab2.c:40
 ```
 
 > [!IMPORTANT]
-> Show your implementation to your TA, including the LED turning on and off when you press the pushbutton, and the debugger being able to exit the dormant state when you click Pause.  You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
+> Show your implementation to your TA, including the LED turning on and off when you press the pushbutton, and the debugger being able to exit the dormant state when you click Pause.  
+> 
+> Show that you pass the `gpio` test in the test suite by typing `gpio` in the Serial Monitor.
+> 
+> You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
@@ -199,7 +203,7 @@ If you click the extension > Documentation > Hardware APIs, a new window will op
 
 Finally, in `main`, call `init_timer_irq` with the appropriate `cmp` and `cycles` values to generate an interrupt every second.  The formula is as follows:
 
-<img style="padding: 5px; width: 200px; background: white" src="formula.gif?nocache=1"/>
+<img style="width: 200px; background: white" src="formula.gif?nocache=1"/>
 
 One `cycles` value is suggested in the datasheet under the Tick Generator section.  Use that, and determine what your `cmp` value should be, and pass those as parameters to `init_timer_irq`.  Leave the infinite loop in place below it, make sure `init_gpio_irq` is commented out, and flash your program to your Pico 2.
 
@@ -229,7 +233,11 @@ Wrong!  When the interrupt fires, it fires almost immediately with no delay, and
 > One more question to consider - can you set `cycles` any higher than 511?  Why not?  (Hint: look up the definition of the register, that `cycles` is assigned to, in the datasheet.)
 
 > [!IMPORTANT]
-> Show your implementation to your TA.  Show the (X)Peripherals view with the MTIME/MTIMECMP registers, and how adding the line to reset MTIME to 0 allows the LED to blink properly.  You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
+> Show your implementation to your TA.  Show the (X)Peripherals view with the MTIME/MTIMECMP registers, and how adding the line to reset MTIME to 0 allows the LED to blink properly.  
+> 
+> Show that you pass the `timer` test in the test suite by typing `timer` in the Serial Monitor.
+> 
+> You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
@@ -279,6 +287,8 @@ Congratulations on running your first multi-core interruptible embedded program!
 > Show your implementation to your TA.  Show the LED turning on and off when you press the left pushbutton, and the LED turning on when you press the right pushbutton.  
 > 
 > Show your TA that your code runs on different cores by starting the debugger with a breakpoint in `core1_led_callback`, and show that the function is being executed by core 1 in the Call Stack view in the debugger. 
+>
+> Show that you pass the `doorbell` test in the test suite by typing `doorbell` in the Serial Monitor.
 > 
 > You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
 > 
