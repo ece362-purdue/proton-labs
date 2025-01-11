@@ -181,8 +181,8 @@ However, the datasheet alone unfortunately does not tell us how to do this in C,
 Add the following `includes` at the top of the file:
 
 ```c
-#include "../../rp2_common/hardware_riscv_platform_timer/include/hardware/riscv_platform_timer.h"
-#include "../../rp2_common/hardware_ticks/include/hardware/ticks.h"
+#include "hardware/riscv_platform_timer.h"
+#include "hardware/ticks.h"
 ```
 
 These will give you access to the source code for the functions you'll need.
