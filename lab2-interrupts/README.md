@@ -199,7 +199,7 @@ If you click the extension > Documentation > Hardware APIs, a new window will op
 
 Finally, in `main`, call `init_timer_irq` with the appropriate `cmp` and `cycles` values to generate an interrupt every second.  The formula is as follows:
 
-<img style="padding: 5px; background: white" src="https://latex.codecogs.com/gif.latex?freq = \frac{clock\_hz}{cycles * cmp}"/>
+<img style="padding: 5px; width: 200px; background: white" src="formula.gif"/>
 
 One `cycles` value is suggested in the datasheet under the Tick Generator section.  Use that, and determine what your `cmp` value should be, and pass those as parameters to `init_timer_irq`.  Leave the infinite loop in place below it, make sure `init_gpio_irq` is commented out, and flash your program to your Pico 2.
 
@@ -255,7 +255,7 @@ This diagram shows the various interaction methods between the cores on the bus 
 
 The "Secure/Non-Secure SIO" refers to the ability to have secure and non-secure memory regions on the Pico 2, where "secured" code has access to the secure peripherals and memory regions, and the non-secure world has access to the rest.  We won't worry about this for the most part - we're only using the Non-Secure SIO anyway.  
 
-At the top, each core **loads** the same instructions from memory, so our code needs to tell the individual cores to do different things.  We achieve this with if/else statements in the same code.  [Section 5.3](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A377%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C511.598%2Cnull%5D) describes how core 1 can be started with a different block of code.
+At the top, each core **loads** the same instructions from memory, so our code needs to tell the individual cores to do different things.  [Section 5.3](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A377%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C511.598%2Cnull%5D) describes how the non-primary second core can be started with a different block of code.
 
 Comment out `init_timer_irq` and complete the following functions as follows:
 
