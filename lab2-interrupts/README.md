@@ -199,7 +199,7 @@ If you click the extension > Documentation > Hardware APIs, a new window will op
 
 Finally, in `main`, call `init_timer_irq` with the appropriate `cmp` and `cycles` values to generate an interrupt every second.  The formula is as follows:
 
-<img style="padding: 5px; width: 200px; background: white" src="formula.gif"/>
+<img style="padding: 5px; width: 200px; background: white" src="formula.gif?nocache=1"/>
 
 One `cycles` value is suggested in the datasheet under the Tick Generator section.  Use that, and determine what your `cmp` value should be, and pass those as parameters to `init_timer_irq`.  Leave the infinite loop in place below it, make sure `init_gpio_irq` is commented out, and flash your program to your Pico 2.
 
