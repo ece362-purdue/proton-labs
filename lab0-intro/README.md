@@ -325,6 +325,10 @@ In your `main.c` file, add `autotest();` as a new line at the top of your `main`
 
 Flash this to your microcontroller, and reopen the Serial Terminal as you did in the prior step.  You may see nothing at first - this is normal.  By the time you pull up the serial monitor after the microcontroller has been flashed, the autotester will have already printed text that you did not see.  To see this text, you can press the reset button on your microcontroller, and you should see a "command shell" appear.  
 
+To be able to **type** into the Serial Monitor, you have to switch it to Terminal Mode - unfortunately, the default is to type into the long textbox at the bottom and then hit Enter, which in our opinion is not how these things should work.  In the same row as "Start Monitoring", there is an icon with a ">" symbol that indicates Terminal Mode.  Make sure that's enabled before you start typing into the terminal window.
+
+![terminal.png](terminal.png)
+
 This "command shell" is where you will type commands to execute code on your microcontroller.  For the rest of your labs, we'll give you commands to test individual functions, but for now, type 'help' to see what commands are available.  You can type 'exit' to leave the shell.
 
 By the end of the embedded systems labs, we'll give you instructions on how to write your own command shell.
