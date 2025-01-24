@@ -218,6 +218,7 @@ Next, implement `init_pwm_audio` to do the following:
 6. Similar to what you did in the previous step, enable IRQ in the PWM peripheral.
 7. Set `pwm_audio_handler` as the exclusive handler for when the appropriate slice's counter register wraps around to 0.  You can find the interrupt numbers in the datasheet, hardware API, or in `pwm.h`.
 8. Enable the interrupt for that same interrupt number.
+    - Be very careful how you do this.  A mistake in choosing the right API function will result in absolute confusion when you try to debug it.  When in doubt, make sure the registers that you think you should be enabled are actually being enabled.  Your instructor spent a whole week just trying to find out why PWM channel interrupts weren't triggering while writing this step!
 
 In `pwm_audio_handler`, do the following:
 
@@ -230,4 +231,11 @@ This *offset magic* is how we implement a lower frequency, which we'll work out 
 
 1. Call `init_pwm_audio`.
 2. Call `set_freq` with the float value 440.00, to set up a frequency of 440.00 Hz.
-    - If you look at the code for `set_freq`, you'll see that the global variable `step0` is set to `(440 * 1000 / 20000) * (1 << 16)`, which is 
+3. Start an infinite loop calling `asm volatile ("wfi");`, letting the PWM take over.
+
+Ideally, you should hear a 440 Hz sine wave.  To verify the frequency, connect an oscilloscope to GP19 and measure the frequency on the scope.  
+
+> [!IMPORTANT]
+> Show your TA the sine wave on the oscilloscope, and demonstrate that you can change the frequency of the sine wave by changing the argument to `set_freq`.  Show them the code you wrote, and that it passes the `audio` test case.
+>
+> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
