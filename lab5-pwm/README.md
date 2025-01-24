@@ -12,7 +12,6 @@
 | 2 | Implement a static duty cycle PWM signal | 20 |
 | 3 | Implement a variable duty cycle PWM signal | 20 |
 | 4 | Convert PWM to an audio signal | 30 |
-| 5 | (Optional) Play with a drum machine |   |
 | 5 | In-Lab Checkoff Step | 20* |
 | &nbsp; | Total: | 100 |
 <br>
@@ -239,3 +238,23 @@ Ideally, you should hear a 440 Hz sine wave.  To verify the frequency, connect a
 > Show your TA the sine wave on the oscilloscope, and demonstrate that you can change the frequency of the sine wave by changing the argument to `set_freq`.  Show them the code you wrote, and that it passes the `audio` test case.
 >
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+
+<!-- ### Step 5: (Optional) Play with a drum machine
+
+Call the function `drum_machine` with no arguments in `main` to try it out!
+
+A = kick
+B = snare
+C = hi-hat
+D = snare
+
+Pressing a button will play the corresponding sound.  You can also press multiple buttons at once to play multiple sounds at once.  -->
+
+### Step 5: In-Lab Checkoff Step
+
+> [!CAUTION]
+> Make sure you got checked off here: https://engineering.purdue.edu/ece362/checkoff/
+> 
+> Make sure to upload your confirmation code and verify that it is accepted by Gradescope.  You will know it is accepted if you get the points from Gradescope.
+> 
+> Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs, that your confirmation code was accepted on Gradescope before logging out and leaving for the day.
