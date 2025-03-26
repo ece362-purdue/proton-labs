@@ -264,13 +264,13 @@ The keypad is your most important key-entry mechanism that you'll likely encount
 
 Using the code you've now written above, configure the following pins as follows in the function `init_keypad`:
 - GP6, GP7, GP8, GP9 as outputs
-- GP10, GP11, GP12, GP13 as inputs
+- GP2, GP3, GP4, GP5 as inputs
 
 Call it in the `main` function, and then write the following loop below the `init_keypad` call:
 
 ```C
 int COLS[] = {6, 7, 8, 9};  // COL4=GP6, COL3=GP7, COL2=GP8, COL1=GP9
-int ROWS[] = {2, 3, 4, 5};  // ROW4=GP10, ROW3=GP11, ROW2=GP12, ROW1=GP13
+int ROWS[] = {2, 3, 4, 5};  // ROW4=GP2, ROW3=GP3, ROW2=GP4, ROW1=GP5
 while(true) {
     loop i = 1, 2, 3, 4 {
         set ith column to be 1 using the SIO gpio_set register (see the COLS array)
