@@ -126,10 +126,10 @@ If you want to solder your headers outside of lab, you may do so, but make sure 
 
 ## Step 2: Place the Development Board on a Breadboard
 
-Open your ECE 362 lab kit and find the Proton development board. It should look like the one in the image below.
+Once you have soldered headers and placed the shorting plugs on your Proton development board, place it back on the breadboard as shown.
 
 <div class="center">
-    <img src="pico-side.webp" style="margin: 1em 0; width: 20vw; max-width: 400px">
+    <img src="images/bb-layout.jpg" style="margin: 1em 0; width: 20vw; max-width: 400px">
 </div>
 
 Your ECE Mini kit from prior courses has a large, **four-panel** breadboard similar to the one pictured below.  Place the devboard so that it is on the bottom of the second panel with the USB receptacle facing outward, shown below.
