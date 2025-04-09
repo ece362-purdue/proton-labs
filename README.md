@@ -1,4 +1,4 @@
-# ECE 36200 Lab Experiments (Raspberry Pi Pico 2)
+# ECE 36200 Lab Experiments (Purdue Proton, RP2350B Development Board)
 
 > [!CAUTION]
 > **Work in progress.  Contents of these lab experiments may change closer to the start of the semester.**
