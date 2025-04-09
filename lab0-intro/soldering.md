@@ -1,6 +1,6 @@
-## Soldering pin headers to your Proton board
+# Soldering pin headers to your Proton board
 
-### Tools and materials needed
+## Tools and materials needed
 - Your brand new Purdue Proton board
 - Two 60-pin pin headers
 - Your breadboard
@@ -13,6 +13,8 @@
 > - Ensure the soldering is turned OFF. 
 > - Ensure the fume hood is turned ON so that it pulls fumes away from your face.
 > - Ensure the soldering iron is in its holder.
+
+## Introduction
 
 You should have your components in front of you, as shown below.
 
@@ -44,6 +46,8 @@ For now, however, we'll put down the pin headers in their place instead, using t
 <br>
 
 We'll solder these last.
+
+## Soldering the debug pins
 
 Now, take two of the 3-pin headers, and place them into the Proton board in the 2x3 pin positions as shown below, but **upside down**, and insert the pins into the breadboard so that the board sits upside down on them.  This will allow us to more easily hold the board in place as we start soldering the 2x3 header.  The pictures below show how to do this.  Make sure the longer side goes in the breadboard, and the shorter side sticks up above the board, as shown in the last image.
 
