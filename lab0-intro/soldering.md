@@ -17,7 +17,7 @@
 You should have your components in front of you, as shown below.
 
 <div class="center">
-    <img src="images/soldering-setup.jpg" style="margin: 1em 0; width: 20vw; max-width: 400px">
+    <img src="images/soldering-setup.jpg" style="margin: 1em 0; width: 20vw; max-width: 500px">
 </div>
 
 Take one of the row header and break it as follows:
@@ -39,17 +39,25 @@ Next, place the headers into the breadboard in the positions indicated.  With th
 For now, however, we'll put down the pin headers in their place instead, using the breadboard to ensure proper alignment.  Note how the board is now aligned with the pin header layout as shown.
 
 <div class="center">
-    <img src="images/soldering-alignment.png" style="margin: 1em 0; width: 20vw; max-width: 400px">
+    <img src="images/soldering-alignment.png" style="margin: 1em 0; width: 20vw; max-width: 500px">
 </div>
+<br>
 
 We'll solder these last.
 
-Now, take two of the 3-pin headers, and place them into the Proton board in the 2x3 pin positions as shown below, but **upside down**, and insert the pins into the breadboard.  This will allow us to more easily hold the board in place as we start soldering the 2x3 header.  The video below shows exactly how to do this.
+Now, take two of the 3-pin headers, and place them into the Proton board in the 2x3 pin positions as shown below, but **upside down**, and insert the pins into the breadboard.  This will allow us to more easily hold the board in place as we start soldering the 2x3 header.  The pictures below show how to do this.  Make sure the longer side goes in the breadboard, and the shorter side sticks up above the board, as shown in the last image.
 
-<video src="https://media.githubusercontent.com/media/ece362-purdue/pico-labs/main/lab0-intro/images/soldering-pin2x3.webm"
-       controls
-       autoplay
-       loop
-       muted
-       width="640"
-       height="360">
+<div class="center">
+    <img src="images/soldering-debug-pins-1.png" style="margin: 1em 0; width: 20vw; max-width: 500px">
+    <img src="images/soldering-debug-pins-2.png" style="margin: 1em 0; width: 20vw; max-width: 500px">
+    <img src="images/soldering-debug-pins-3.png" style="margin: 1em 0; width: 20vw; max-width: 500px">
+    <img src="images/soldering-debug-pins-4.png" style="margin: 1em 0; width: 20vw; max-width: 500px">
+    <img src="images/soldering-debug-pins-5.png" style="margin: 1em 0; width: 20vw; max-width: 500px">
+</div>
+
+Now, let's get to soldering!  Grab your flux pen - it'll be a white pen with a yellow cap - pull off the cap, and dab the pins with flux as shown below.
+
+
+<div class="center">
+    <img src="images/soldering-flux.gif" style="margin: 1em 0; width: 20vw; max-width: 800px">
+</div>
