@@ -151,7 +151,11 @@ By the end, your board should look like this.  If it does, <span style="color: g
 
 Now, we need to take the board out of the breadboard to clean it - a difficult task owing to the large number of pins on the board!  You will only have to do this **once** throughout the course.  
 
-You'll need to **see-saw** the board out, which is to say that we'll slowly lift the board from both sides, while being extremely careful to not snap the board in the middle.  (Even if it does snap, it's not an issue, since we soldered on pin headers and can just connect them later.  But it's nice not to break it!)
+You'll need to **see-saw** the board out, which is to say that we'll slowly lift the board from each side, while being extremely careful to not snap the board in the middle.  Look carefully at the line between the two standing pin headers, and you'll see that it appears lighter than the rest of the board - this is to offer you the ability to **snap off** the debugger portion and move it to another part of your breadboard, or to use the board with another type of debugger if you wish.  For the course, however, there is no need to snap off the debugger.
+
+(Even if it does snap, it's not an issue, since we soldered on pin headers and can just connect them later.  But it's nice not to break it!)  
+
+Then, slowly pull up on the board from the middle, using the black pin shrouds as anchors, which should pull out most of the pins and reduce the force needed to lift up on the board.
 
 *2x speed to reduce file size.*
 
