@@ -6,23 +6,25 @@
 
 | Step | Description | Points |
 |------|-------------|--------|
-| 0 | Initialize your git repository | 0 |
-| 1 | Place the Development Board on a Breadboard | 10 |
-| 2 | Install VScode and the Pico Extension | 10 |
-| 3 | Configure the Pico Extension for your board | 20 |
-| 4 | First Flashes | 20 |
-| 5 | Debugging and Printing | 20 |
-| 6 | Set up and interact with a Serial Port | 10 |
-| 7 | Run a command shell | 10 |
+| 0 | Initialize your git repository for your lab at home | ** |
+| 1 | Solder pin headers to your development board | ** |
+| 2 | Place the Development Board on a Breadboard | ** |
+| 3 | Install VScode and PlatformIO | ** |
+| 4 | Configure PlatformIO for your board | ** |
+| 5 | Writing microcontroller code in C | ** |
+| 6 | Debugging and Printing | ** |
+| 7 | Run a command shell | ** |
 | &nbsp; | Total: | 100* |
 <br>
 
-\* - This lab is actually worth points - it is not a "free" lab!  Attendance and completion before lab 1 is required.
+\* - This lab is actually worth points - it is not a "free" lab!  Completion before lab 1 is required.  
+  
+\*\* - These steps are provided to show you the order of the lab and do not have associated points.  To earn full credit for this lab, you must submit your work to Gradescope and have soldered pin headers to your development board **before the beginning of your lab section for lab 1**.
 
 ## Instructional Objectives
 - To become familiar with the BHEE 162 laboratory, policies, lab stations, and equipment.
 - To configure your GitHub account for use with GitHub Classroom and add SSH keys for easy access.
-- To get hands-on experience with the Pico 2 microcontroller, its accompanying components, and the Pico Extension IDE in VScode that you will use all semester.
+- To get hands-on experience with the Proton development board, its accompanying components, and the Pico Extension IDE in VScode that you will use all semester.
 
 > [!CAUTION]
 > HALT!  
@@ -33,15 +35,15 @@
 
 ## Welcome to ECE 36200!
 
-In ECE362, you will learn fundamentals of microcontrollers, including their operation, and usage. In addition to the lecture portion of the course, students are expected to complete a series of lab experiments using a microcontroller and the supporting IDE.  
+In ECE 36200, you will learn fundamentals of microcontrollers, including their operation, and usage. In addition to the lecture portion of the course, students are expected to complete a series of lab experiments and a course project using a microcontroller and the supporting IDE.  
 
-Computers and measurement equipment are provided in the course laboratory facilities to assist students in completing labs, however, **this course is designed to allow you to perform experiment exercises on their own computers at home or elsewhere, and we require that you make the most of this**.  The instructions provided in this lab document will guide you in setting up the microcontroller development environment used in ECE362 to provide a consistent user experience between home and the laboratory.
+Computers and measurement equipment are provided in the course laboratory facilities to assist students in completing labs, however, **this course is designed to allow you to perform experiment exercises on their own computers at home or elsewhere, and we require that you make the most of this**.  The instructions provided in this lab document will guide you in setting up the microcontroller development environment used in ECE 362 to provide a consistent user experience between home and the laboratory.
 
 ## Introduction
 
-Lab 0 will have you set up your brand new Pico 2 microcontroller that you should have received at the beginning of lab.  If you have not yet received it, please ask a TA or lab coordinator.
+Lab 0 will have you set up your brand new Proton development board that you should have received at the beginning of lab.  If you have not yet received it, please ask a TA or lab coordinator.
 
-If at any point you need help, you can add yourself to the lab queue via [QueUp](https://engineering.purdue.edu/~menon18/queup/?room=36200).
+If you are in-person in lab and at any point you need help, you can add yourself to the lab queue via [QueUp](https://engineering.purdue.edu/~menon18/queup/?room=36200).  TAs in lab monitor this queue and will come to the station number you provide.
 
 > [!IMPORTANT]
 > In ECE 36200, labs are designed to be started **at home**, when the lab is released online.  This means that you must set up **both** your lab machine, and your personal computer, to do the labs.
@@ -58,13 +60,13 @@ If at any point you need help, you can add yourself to the lab queue via [QueUp]
 > 
 > Debugging in this course can get very difficult with more complex circuits, so starting early is crucial to success in this course.  Do not put things off until the last minute - if you have breadboard issues, our recommendation is just to replace it, because **it will save you a lot of time and frustration in the long run**.
 
-## Step 0: Initialize your git repository
+## Step 0: Initialize your git repository for your lab at home
 
-In this course, you should use git to keep track of your code.  When you start work on a lab, you will **accept** a GitHub Classroom (abbreviated GHC) assignment that will give you your own private GitHub repository to work in.  You should work on each lab by backing up your work to this repository, allowing you to access it from either your personal machine or a lab machine.  In general, you'll follow these steps:
+In this course, you are required to use `git` to keep track of your code.  When you start work on a lab, you will **accept** a GitHub Classroom (abbreviated GHC) assignment that will give you your own private GitHub repository to work in.  You should work on each lab by backing up your work to this repository, allowing you to access it from either your personal machine or a lab machine.  In general, you'll follow these steps:
 
 1. Starting at home, clone the newly created GHC repository to your local computer (which may be blank). 
-2. Inside the cloned repository folder, create a project for your Pico 2 board using the relevant VScode extension.
-3. For each step, follow the lab instructions to write code and test it on your Pico 2 board, and then add, commit and push your code to your repository.  The message must contain the step number you worked on.
+2. Inside the cloned repository folder, create a project for your Proton board using the relevant VScode extension.
+3. For each step, follow the lab instructions to write code and test it on your Proton board, and then add, commit and push your code to your repository.  The message must contain the step number you worked on.
     - Commits are how we will determine your effort on each lab assignment.  **You must commit your code for each lab to your respective git repository at each step of the lab, and not just one big commit at the end of the lab.** 
 4. When you are done with the whole lab, submit your repository to Gradescope.  **You must submit your work to Gradescope before the beginning of your lab section next week.**
 5. When you come to your lab section to get your work checked off, you can bring your personal machine, or you can clone your repository to a lab machine and show your work there.  **You must always show your work to a TA in lab or office hours to get credit for the lab**, unless you have been instructed otherwise.
@@ -104,9 +106,27 @@ If you are on Windows, it is possible to use PowerShell to do this.  If you are 
 > [!IMPORTANT]
 > Create a new file called hello.txt in your repository, and add some text to it.  Commit and push this change to your repository.  Use a descriptive commit message, eg. "Step 0 commit".
 
-## Step 1: Place the Development Board on a Breadboard
+## Step 1: Solder pin headers to your development board
 
-Open your ECE 362 lab kit and find the Pico 2 development board. It should look like the one in the image below.
+**Soldering!?  In ECE 36200?  What is this, ECE 20008?**
+
+No, this isn't a typo.  In ECE 36200, you will be using a development board that has no pin headers soldered to it.  One of our two reasons is to eliminate the labor cost associated in soldering the pin headers to your board.  
+
+The other reason is to start teaching you how to solder **before** you go into senior design.  When you are working with a microcontroller, there are numerous components that you will need to solder to your board, and forming the skillset necessary to soldering and desoldering components is a critical skill to have.  
+
+In this lab, we are starting out with the most common component that you will need to solder - pin headers.  When you start doing projects, and you need to use external components that come on PCBs without headers, you will need to add them on before you can attach them to your breadboard, for both ECE 36200 and your senior design project.
+
+Open [this page](soldering.md) in a new tab and follow the instructions.  
+
+> [!CAUTION]
+> 
+> **Soldering is a skill that takes time to learn.  If you have never soldered before, please ask a TA for help.  If you have soldered before, please still ask a TA for help.  We want to make sure that you are doing it correctly.**
+
+If you want to solder your headers outside of lab, you may do so, but make sure to get it done as soon as possible.  You will need to have your board in place on your breadboard, wired up, and running some test code before you start lab 1.
+
+## Step 2: Place the Development Board on a Breadboard
+
+Open your ECE 362 lab kit and find the Proton development board. It should look like the one in the image below.
 
 <div class="center">
     <img src="pico-side.webp" style="margin: 1em 0; width: 20vw; max-width: 400px">
@@ -120,11 +140,11 @@ Your ECE Mini kit from prior courses has a large, **four-panel** breadboard simi
 
 Typically, a microcontroller will be a little hard to get into the holes, but you should not have to remove it once it's in there. To prevent damage to the board, press down on both ends of the board at once. Do not apply force to anything else, as parts of the board are delicate and may become damaged. When inserting, make sure there are two columns on either side of the development board to leave room to plug in wires. 
 
-Next, connect two wires: one from the 3V3(OUT) pin to the power rails, and one from the GND pins to the ground rails of your breadboard.  You can find the pinout for the Pico 2 here: https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf.  We'll use this in a second.
+Next, connect two wires: one from the 3V3(OUT) pin to the power rails, and one from the GND pins to the ground rails of your breadboard.  You can find the pinout for the Proton here: https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf.  We'll use this in a second.
 
-Take a pushbutton and place it at the end of the board.  Connect the bottom left pin to ground, and the bottom right pin to physical pin 30 (**not GP30**), or RUN.  This will be your reset button, and you can use it to reset your Pico 2 to the start of a program without having to unplug and replug it.
+Take a pushbutton and place it at the end of the board.  Connect the bottom left pin to ground, and the bottom right pin to physical pin 30 (**not GP30**), or RUN.  This will be your reset button, and you can use it to reset your Proton to the start of a program without having to unplug and replug it.
 
-Connect your Pico 2 to your computer using the USB cable provided in your lab kit.  The Pico 2 will power on, and you should see a green LED blink on the board.  This indicates that the board is powered on and ready to go.  (If you borrowed it from another student, it may have another program on it, so don't worry if you see something else happening.)
+Connect your Proton to your computer using the USB cable provided in your lab kit.  The Proton will power on, and you should see a green LED blink on the board.  This indicates that the board is powered on and ready to go.  (If you borrowed it from another student, it may have another program on it, so don't worry if you see something else happening.)
 
 > [!IMPORTANT]
 > In ECE 36200, you will build upon the existing circuit on the breadboard for each lab, so **do not take parts off your breadboard when you are done with a lab** - including this one!
@@ -133,7 +153,7 @@ Connect your Pico 2 to your computer using the USB cable provided in your lab ki
 > 
 > For every lab, ensure that you have received your checkoffs by checking this page: https://engineering.purdue.edu/ece362/checkoff/
 
-## Step 2: Install VScode and the Pico Extension
+## Step 3: Install VScode and the Pico Extension
 
 As mentioned above, these labs are entirely doable at home as they are in lab.  For applications that require looking at an oscilloscope, you may want to use an AD2 from the ECE shop in its place at home.  Make it a habit to look ahead at labs so that you know when you may need one.  
 
@@ -150,21 +170,21 @@ If it shows the sidebar, it should be good to go!  If it doesn't, you may need t
 > [!IMPORTANT]
 > Show your newly installed VScode and Pico Extension to a TA.  
 
-## Step 3: Configure the Pico Extension for your board
+## Step 4: Configure the Pico Extension for your board
 
 In the Pico Extension sidebar that appears, click New C/C++ Project.  In the window that appears, do the following:
 
 - Specify `lab0` as the name.
-- Select `Pico 2` as the board.
+- Select `Proton` as the board.
 - Set the project location to be `lab0` in your respective `lab-0-intro-username` repository.
     - This will allow you to commit and push your newly created project to be submitted.
 - Tick the box for RISC-V architecture.
     - Feel free to try out assembly code from your lectures (when you get to it) on this board!
 - Set the Pico SDK version to the highest value.
-    - As of 2025, the extension is being constantly updated, so the highest version will change constantly.  v2 or higher supports the Pico 2.
+    - As of 2025, the extension is being constantly updated, so the highest version will change constantly.  v2 or higher supports the Proton.
 - **Under Stdio (standard I/O) support, tick `Console over UART`.**
     - You should always select this feature when creating a new project, as it will allow you to use the serial monitor to interact with your microcontroller.
-    - Don't forget to do this, or you won't be able to see any output from your Pico 2 via the terminal!
+    - Don't forget to do this, or you won't be able to see any output from your Proton via the terminal!
 - Leave all the other options at their defaults.
 
 Finally, click `Create`.  The extension will close, and you'll see a new window appear.  
@@ -176,7 +196,7 @@ If any errors appear, you may need to restart VScode, and/or try to reinstall th
 > [!IMPORTANT]
 > Commit the newly created project and push it to your repository now.  Use a descriptive commit message, eg. Step 3 new project.
 
-## Step 4: First Flashes
+## Step 5: First Flashes
 
 Now that we have a project, let's inspect the C code.  Open the `lab0.c` file.
 
@@ -202,7 +222,7 @@ And inside the `while` loop that prints `Hello, world!`, add the following under
 
 If you have your USB plugged into your Pico, disconnect it first, and then hold down the button labeled `BOOTSEL` on the board, and plug the USB back in.  This will put the Pico into a mode where it can be flashed.  If you're on Windows/macOS, you may see a pop-up appear saying there's a new drive.  This is normal, and is a way for you to drag UF2 files to flash the Pico with a new program.  However, we won't do that - we'll let VScode handle it for us.
 
-Go to the Pico menu and click `Run Project (USB)`.  **When your Pico 2 has no program flashed on it, or is otherwise in bootloader mode (done by holding down BOOSEL and clicking the reset button or applying power), you need to click this first.**  This will build your code using the CMake build system (not the same as `make`) and flash it to your microcontroller.  If you see a textbox appear asking about CMakeLists.txt, you can hit Escape to get rid of it.  You should now see your LED flash twice every second (just so you can tell it's different from the factory condition).
+Go to the Pico menu and click `Run Project (USB)`.  **When your Proton has no program flashed on it, or is otherwise in bootloader mode (done by holding down BOOSEL and clicking the reset button or applying power), you need to click this first.**  This will build your code using the CMake build system (not the same as `make`) and flash it to your microcontroller.  If you see a textbox appear asking about CMakeLists.txt, you can hit Escape to get rid of it.  You should now see your LED flash twice every second (just so you can tell it's different from the factory condition).
 
 Hold down the reset button, and you'll see that the Pico does nothing in this state.  The button is connected to the RUN pin on your board, which is tied to 3.3V high internally, and shorting it to ground resets the microcontroller.  Let go, and you'll see it run again.
 
@@ -211,7 +231,7 @@ We'll figure out how to see the "Hello, world" text in the next step (although w
 > [!IMPORTANT]
 > Show your TA your blinking LED.  Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-## Step 5: Debugging and Printing
+## Step 6: Debugging and Printing
 
 The USB cable that we just flashed the Pico with is only useful for providing power and flashing the Pico.  However, there are two critical things we need to be able to use ~~the Pico~~ any microcontroller to its fullest potential:
 
@@ -256,7 +276,7 @@ If you see this, you have successfully flashed your Pico with the new program, a
 To set up the Serial Monitor, press Ctrl-Shift-P (or Cmd-Shift-P on a Mac) and type `Terminal: Focus on Serial Monitor View`.  You can also pull it up if you have a terminal open by looking for the "Serial Monitor" tab.  Open it, and click Start Monitoring.  You should see the "Hello, world!" message appear every half second.
 
 If you are monitoring but you see no messages, verify that:
-- A light is blinking at least every second on your Debug Probe without any intervention.  This verifies that text is being sent to your computer through it from the Pico 2.
+- A light is blinking at least every second on your Debug Probe without any intervention.  This verifies that text is being sent to your computer through it from the Proton.
 - You are connected to the correct Port.  Some computers may have virtual COM port devices, so you may be connected to the wrong one.  Try changing the Port options to see if the message appears.
 
 ![serial-monitor](serial-monitor.png)
@@ -274,7 +294,7 @@ Next, set a breakpoint on the `printf` line by clicking in the left margin of th
 
 There are a lot of things going on in Debug mode that you should understand:
 
-- First, in the top right is a terminal with the OpenOCD process.  When you clicked Debug, it sent your compiled code to be flashed on to your Pico 2 through the Debug Probe.  Instead of "shutting down" as it did earlier, it is now "halted due to debug-request".  Your Pico 2 is dual-core, but your code will only run on one by default.
+- First, in the top right is a terminal with the OpenOCD process.  When you clicked Debug, it sent your compiled code to be flashed on to your Proton through the Debug Probe.  Instead of "shutting down" as it did earlier, it is now "halted due to debug-request".  Your Proton is dual-core, but your code will only run on one by default.
 - The Debug Console shows output from `gdb`, which may be familiar to you from prior coding classes.  You have used `gdb` in the past to debug programs as you ran them on your own computer's CPU, but now you are using it to debug a program running on a completely separate computer - your microcontroller.  This is called "remote debugging".
 - On the left sidebar, you have the `Variables` tab.  When you define variables, you can see their values here.  
 - The `Call Stack` tab shows you the current function call stack.  This is useful for understanding how you got to where you are in your code.  In a dual-core configuration, you can see the call stack for both cores.
@@ -290,10 +310,10 @@ In the center-top of your window, you'll see a toolbar with the following button
 - `Step into` - this will run the next line of code, and step into any functions.
 - `Step out` - this will run the rest of the current function and stop at the next line of the calling function.
 - `Restart` - this will restart your program from the beginning, similar to `Reset device`.
-- `Stop` - this will stop your program and disconnect the debugger, at which your Pico 2 will remain halted.
+- `Stop` - this will stop your program and disconnect the debugger, at which your Proton will remain halted.
 
 > [!IMPORTANT]
-> Show your TA your working serial connection and debug mode.  Show that you can step over the `printf` lines and the LED output value change lines, and that you can see the Pico 2 LED turn on you step over the `gpio_put(25, 1)` line.  **Do not proceed until you have shown a TA your working debugger.**  Commit all your changes and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+> Show your TA your working serial connection and debug mode.  Show that you can step over the `printf` lines and the LED output value change lines, and that you can see the Proton LED turn on you step over the `gpio_put(25, 1)` line.  **Do not proceed until you have shown a TA your working debugger.**  Commit all your changes and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
 ## Step 7: Run a command shell
 

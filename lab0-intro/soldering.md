@@ -16,7 +16,9 @@
 
 You should have your components in front of you, as shown below.
 
-![Soldering setup](images/soldering-setup.jpg)
+<div class="center">
+    <img src="images/soldering-setup.jpg" style="margin: 1em 0; width: 20vw; max-width: 400px">
+</div>
 
 Take one of the row header and break it as follows:
 - 1 4-pin header
@@ -36,7 +38,9 @@ Next, place the headers into the breadboard in the positions indicated.  With th
 
 For now, however, we'll put down the pin headers in their place instead, using the breadboard to ensure proper alignment.  Note how the board is now aligned with the pin header layout as shown.
 
-![alignment](images/soldering-alignment.png)
+<div class="center">
+    <img src="images/soldering-alignment.png" style="margin: 1em 0; width: 20vw; max-width: 400px">
+</div>
 
 We'll solder these last.
 
