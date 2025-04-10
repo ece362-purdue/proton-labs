@@ -1,0 +1,27 @@
+site_name: Purdue Proton Docs
+theme:
+  name: material
+  logo: assets/favicon362.png
+  palette: 
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: light
+      toggle:
+        icon: material/brightness-7 
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: dark
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+extra:
+  homepage: https://github.com/ece362-purdue/proton-labs
+markdown_extensions:
+  - admonition
+extra_css:
+  - stylesheets/extra.css
+copyright: Purdue Proton Docs &copy; 2025 by Purdue University, Niraj Menon is licensed under CC Attribution-NonCommercial-ShareAlike 4.0 International.  All external materials belong to their respective authors.
+

@@ -1,0 +1,12 @@
+[data-md-color-scheme="default"], [data-md-color-scheme="slate"] {
+    --md-primary-fg-color:        #c28f0eda;
+    --md-hue: hsla(30, 30, 30, 50); 
+}
+.md-header__button.md-logo {
+    margin: 0;
+    padding: 0;
+}
+.md-header__button.md-logo img, .md-header__button.md-logo svg {
+    height: 2rem;
+    width: 2rem;
+}
