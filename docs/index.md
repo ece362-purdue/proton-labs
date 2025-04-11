@@ -1,20 +1,19 @@
 # Purdue Proton
 
-Purdue Proton is an educational RP2350B devboard with a debug probe intended for use in ECE embedded systems courses.  It is used by ECE 36200 at Purdue University.
+!!! warning
+    **This page is a work in progress.**
+
+Purdue Proton is an educational RP2350B devboard with a detachable debug probe intended for use in embedded systems labs.  
 
 ![front board](assets/front.png)
 ![back board](assets/back.png)
 
-This page hosts various documentation for the Purdue Proton development board, including for the RP2350B microcontroller on which it is based, and the Raspberry Pi Debug Probe that its debug probe is based on.
+This page hosts relevant documents for the Purdue Proton development board.
 
 <hr>
 
 ## Schematics, Pinouts, and Datasheets
 
-This page hosts the important information unique to the Purdue Proton development board for the embedded systems labs in ECE 36200.  
-
-!!! warning
-    **This page is a work in progress.**
 
 To open a page in a new tab, hold Ctrl/Cmd and click on the link!
 
