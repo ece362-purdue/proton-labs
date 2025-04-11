@@ -1,3 +1,7 @@
+# Purdue Proton Docs
+
+This page hosts various documentation for the Purdue Proton development board for the embedded systems labs in ECE 36200, as well as the RP2350B microcontroller on which it is based, and the Raspberry Pi Debug Probe.
+
 # Datasheets, Pinouts, and Schematics
 
 This page hosts the important information unique to the Purdue Proton development board for the embedded systems labs in ECE 36200.  
