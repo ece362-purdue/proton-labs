@@ -9,7 +9,7 @@ This page hosts various documentation for the Purdue Proton development board, i
 
 <hr>
 
-# Schematics, Pinouts, and Datasheets
+## Schematics, Pinouts, and Datasheets
 
 This page hosts the important information unique to the Purdue Proton development board for the embedded systems labs in ECE 36200.  
 
@@ -18,11 +18,11 @@ This page hosts the important information unique to the Purdue Proton developmen
 
 To open a page in a new tab, hold Ctrl/Cmd and click on the link!
 
-## KiCAD Schematic and PCB Files
+### KiCAD Schematic and PCB Files
 
 *will be uploaded once finalized*
 
-## Purdue Proton Datasheets
+### Purdue Proton Datasheets
 
 <!-- Proton User Guide (Coming soon)   -->
 [Proton User Guide](assets/Proton%20User%20Guide.pdf)    
@@ -34,6 +34,6 @@ Proton Pinout Diagram (Coming soon)
 [Pico C/C++ SDK](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf)  
 [Hardware Design Guide for RP2350](https://datasheets.raspberrypi.com/rp2350/hardware-design-with-rp2350.pdf)  
 
-## Raspberry Pi Debug Probe Resources
+### Raspberry Pi Debug Probe Resources
 [Debug Probe Schematics](https://datasheets.raspberrypi.com/debug/raspberry-pi-debug-probe-schematics.pdf)  
 [Raspberry Pi `debugprobe` firmware](https://github.com/raspberrypi/debugprobe)
