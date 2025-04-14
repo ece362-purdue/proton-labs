@@ -24,29 +24,13 @@ You should have your components in front of you, as shown below.
 </div>
 
 Take the single-sided pin header and break it as follows:
-- 1 4-pin header
+- One 4-pin header
     - This will be used as the debug and boot pins on the Proton debugger.
-- 3 3-pin headers
+- Three 3-pin headers
     - One will be used as the UART pins on the Proton debugger.
     - The other two will be used to connect the debugger to the Proton board, using the 2x3 through-hole pads (holes) on both sides of the line joining the Proton board and the debugger.
-- 1 28-pin header
+- One 28-pin header
     - This will populate the holes on the Proton board on one side.
-
-Then, take the other row header and break off 56 pins so that it goes in on the other side of the Proton board.  Use the board itself to help you properly count the pins.
-
-> [!TIP]
-> If you accidentally break off fewer pins, you can still solder on the smaller piece and add the extra pins separately.
-
-Next, place the headers into the breadboard in the positions indicated.  With the head of the breadboard (where the title and voltage plug holders are) turned left, you will (eventually) place the Proton board on the third row from the top with the top of the Proton board facing outward.  
-
-For now, however, we'll put down the pin headers in their place instead, using the breadboard to ensure proper alignment.  Note how the board is now aligned with the pin header layout as shown.
-
-<div class="center">
-    <img src="images/soldering-alignment.png" style="margin: 1em 0; width: 40vw; max-width: 500px">
-</div>
-<br>
-
-We'll solder these last.
 
 ## Soldering the debug pins
 
@@ -80,9 +64,7 @@ Once the desired temperature has been reached, unspool some solder and hold the 
 > [!WARNING]
 **Read the paragraph below in full and watch the animation first before trying it.**
 
-Touch the solder to the pin and pad, and move the iron to the same position such that it makes contact with the solder.  You'll have to angle how you press down on the board to ensure the pins are standing up straight and not at an angle.  Touch the iron to the solder, and the second you see the gap being plugged by the melted solder, **pull the iron back** and look at the connection formed between the pin and the pad.  
-
-It might be that you touch the solder at a different angle and it ends up on the iron, facing upward.  In that case, just turn the iron and touch the melted solder ball on to the pad, which will have the same effect.  
+Touch the iron to the pin and the pad at the same time, wait for about one second to let it heat up, and then touch the solder in between the pin and the pad.  The solder will quickly melt, forming a connection between the pin and the pad, at which point you should pull back the solder and inspect the joint.  
 
 <div class="center">
     <img src="images/soldering-first.gif" style="margin: 1em 0; max-width: 800px">
@@ -107,13 +89,34 @@ If the pins are okay, continue soldering the rest of the pins.  At the end, they
 
 ## Soldering the main headers
 
+Take your board off the breadboard, and take the unbroken double-sided row header and break off 27 pins so that it goes in on the other side of the Proton board.  Use the board itself to help you properly count the pins.  Therefore, you should now have the following headers from the set of double-sided headers you received:
+
+- One 4-pin header
+    - This will be used as the debug and boot pins on the Proton debugger.
+- One 3-pin header
+    - This will be used as the UART pins on the Proton debugger.
+- Two 27-pin headers 
+    - These will go on the rest of the pins on the Proton board.
+
+> [!TIP]
+> If you accidentally break off fewer pins, you can still solder on the smaller piece and add the extra pins separately.
+> 
+> If you accidentally break off more, you can use a pair of pliers to break off the extra pins.  Just be careful not to break the header itself, as it will be difficult to solder on the board.
+
+Place the headers into the breadboard in the positions indicated below.  You should insert it such that the slightly smaller side should go into the breadboard.  Therefore, we're using the breadboard to ensure proper alignment.
+
+<div class="center">
+    <img src="images/soldering-alignment.png" style="margin: 1em 0; width: 40vw; max-width: 500px">
+</div>
+<br>
+
 Now, put the board back on the pin headers we laid out on the breadboard.  As a reminder, it should go in the third (from the top) row of your breadboard, with the USB-C connector on the short side of the board facing outward, and the debugger USB-C connector facing towards the top of the breadboard, as shown below.
 
 <div class="center">
     <img src="images/bb-layout.jpg" style="margin: 1em 0; width: 80vw">
 </div>
 
-The board should sit flush against the pin headers, with all the pins going through the pads.  If it doesn't, take out the pin headers and fix the positioning accordingly.
+The board should sit flush against the pin headers, with all the pins going through the pads.  If it doesn't, take out the pin headers and fix the positioning accordingly.  
 
 Next, apply flux to all the pads on the board with your pen.  You only need about a dab per pin, or until you see the flux liquid appear around the pad.  The easiest way is to drag across the outer boundaries of the pads for an even flux distribution, which is fine since we'll be holding the solder from the outside anyway.
 
@@ -124,7 +127,7 @@ Starting with the side furthest from you, solder the leftmost 5V pin, and the GN
     <img src="images/solder-board-2.gif" style="margin: 1em 0; width: 45vw">
 </div>
 
-This method isn't quite necessary since we're using a breadboard, but it is good practice to solder the edge pins first to ensure that the pins are in the right position before you continue soldering the rest of the pins.  Look at the board from different angles to ensure that your board is still sitting flush, and that it is not raised at an angle.  If you make a mistake here, now is the time to fix it by reflowing the two pins with your soldering iron.
+This method isn't quite necessary since we're using a breadboard, but it is good practice to solder the edge pins first to ensure that the pins are in the right position before you continue soldering the rest of the pins.  Look at the board from different angles to ensure that your board is still sitting flush, and that it is not raised at an angle.  If you make a mistake here, now is the time to fix it by re-soldering the two pins with your soldering iron.
 
 Next, we're going to try **drag-soldering** the remaining pins on this side of the board.  Hold the solder line against all the pins, with the end on the rightmost pin, take your iron, and touch the solder to the first pin.  As soon as the solder melts, start moving your iron to the left, pausing to let the solder melt on to each pad before you continue.
 
@@ -151,11 +154,11 @@ By the end, your board should look like this.  If it does, <span style="color: g
 
 Now, we need to take the board out of the breadboard to clean it - a difficult task owing to the large number of pins on the board!  You will only have to do this **once** throughout the course.  
 
-You'll need to **see-saw** the board out, which is to say that we'll slowly lift the board from each side, while being extremely careful to not snap the board in the middle.  Look carefully at the line between the two standing pin headers, and you'll see that it appears lighter than the rest of the board - this is to offer you the ability to **snap off** the debugger portion and move it to another part of your breadboard, or to use the board with another type of debugger if you wish.  For the course, however, there is no need to snap off the debugger.
+Start by **see-sawing** the board out, which is to say that we'll slowly lift the board by its sides, while being extremely careful to not snap the board in the middle.  Look carefully at the line between the two standing pin headers, and you'll see that it appears lighter than the rest of the board - this is to offer you the ability to **snap off** the debugger portion and move it to another part of your breadboard, or to use the board with another type of debugger if you wish.  For the course, however, there is no need to snap off the debugger.
 
 (Even if it does snap, it's not an issue, since we soldered on pin headers and can just connect them later.  But it's nice not to break it!)  
 
-Then, slowly pull up on the board from the middle, using the black pin shrouds as anchors, which should pull out most of the pins and reduce the force needed to lift up on the board.
+Then, slowly pull up on the board in the middle as shown below, using the black pin shrouds as anchors, which should pull out most of the pins and ensure that too much force is not applied on any one part of the board.
 
 *2x speed to reduce file size.*
 
@@ -163,7 +166,7 @@ Then, slowly pull up on the board from the middle, using the black pin shrouds a
     <img src="images/bb-extraction.gif" style="margin: 1em 0; width: 80vw">
 </div>
 
-Spray the board with isopropyl alcohol, focusing on the soldered pins, and lightly scrub it with a metal brush.  This will remove the flux that we applied earlier, and any other contaminants that may have gotten on to the board during soldering.  The alcohol will evaporate quickly, so you don't need to worry about it damaging the board.  If there's still some wetness to the board, take a tissue and dab it off - don't rub.
+Spray the board with isopropyl alcohol, focusing on the soldered pins, and lightly scrub it with a metal brush.  This will remove the flux that we applied earlier, and any other contaminants that may have gotten on to the board during soldering.  The alcohol will evaporate quickly, so you don't need to worry about it damaging the board - but of course, give it at least 15 minutes before plugging it in.  If there's still some wetness to the board, take a tissue and dab it off - don't rub.
 
 *2x speed to reduce file size.*
 
@@ -171,15 +174,17 @@ Spray the board with isopropyl alcohol, focusing on the soldered pins, and light
     <img src="images/brush-clean.gif" style="margin: 1em 0; width: 20vw">
 </div>
 
-## Adding the shorting plugs
+## Adding the shunt jumpers
 
-Go ahead and put on the **shorting plugs** on your board's debugger pins.  The purpose of this 2x3 pin header is to allow you access to the **debugging interface** on your microcontroller, a very common feature in embedded systems development.  When your product goes out into the real world, the debugger is not normally attached, but since our primary focus is **learning** embedded systems, the debugger is critical to understanding what your code is, which is why it's part of your Proton devboard.  Your shorting plugs should go on between the devboard and debugger, like this:
+Go ahead and put on the **shunt jumpers** on your board's debugger pins.  The purpose of this 2x3 pin header is to allow you access to the **debugging interface** on your microcontroller, a very common feature in embedded systems development.  When your product goes out into the real world, the debugger is not normally attached, but since our primary focus is **learning** embedded systems, the debugger is critical to understanding what your code is, which is why it's part of your Proton devboard.  Your shunt jumpers should go on between the devboard and debugger, like this:
 
 <div class="center">
     <img src="images/debugger.jpg" style="margin: 1em 0; width: 40vw">
 </div>
 
-By adding the shorting plugs, you're connecting the debugger's SWCLK, GND and SWD pins to the devboard.  The SWCLK and SWD pins are akin to `clock` and `data` signals that you should recall seeing from ECE 27000, and are controlled by the debugger when it is attached to your PC via the USB-C connector.
+By adding the shunt jumpers, you're connecting the debugger's SWCLK, GND and SWD pins to the devboard.  SW stands for Serial Wire, a debugging protocol created by ARM for microcontrollers.  The SWCLK and SWD pins are akin to `clock` and `data` signals that you should recall seeing from ECE 27000, and are controlled by the debugger when it is attached to your PC via the USB-C connector.
+
+When you create an embedded system, you typically leave off the debugger from your microcontroller, to ensure that the program on the chip cannot be changed or inspected.  This is done for security reasons, and is a common practice in the industry.  Since we are using the debugger to learn about embedded systems, we will be using it throughout the course, but we give you the option to move around the debugger (if you wish to do so) by snapping it off the Proton board.
 
 ## Admire your work!
 
