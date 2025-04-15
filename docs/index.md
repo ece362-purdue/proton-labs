@@ -1,7 +1,7 @@
 # Purdue Proton
 
-!!! warning
-    **This page is a work in progress.**
+<!-- !!! warning
+    **This page is a work in progress.** -->
 
 Purdue Proton is an educational RP2350B devboard with a detachable debug probe intended for use in embedded systems labs. 
 
@@ -28,19 +28,20 @@ Purdue Proton is an educational RP2350B devboard with a detachable debug probe i
 
 ## Buy a Proton
 
-Purchase links will be made available once boards have been finalized.
+*Purchase links will be made available once boards have been finalized.*
 
 ## Schematics, Pinouts, and Datasheets
 
 You can find the schematics, pinouts, and datasheets for the Purdue Proton [here](datasheets.md).
 
+## Lab Experiments
+
+Purdue Proton is used by embedded systems labs in ECE 36200 at Purdue University.  Their labs can be found [here](https://github.com/ece362-purdue/proton-labs).  The labs cover embedded programming with the Pico SDK in C utilizing the [PlatformIO IDE](https://platformio.org/platformio-ide).
+
 ## Powered by Raspberry Pi
 
 Purdue Proton is part of the Powered by Pi scheme.  
 
-<picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/powered_by_pi_reverse.png">
-    <img id="pi-logo" src="assets/powered_by_pi.png" alt="Powered by Raspberry Pi" style="width: 400px; height: auto;"/>
-</picture>
+<img id="pi-logo" src="assets/powered_by_pi.png" alt="Powered by Raspberry Pi" style="width: 400px; height: auto;"/>
 
 Our certificate can be found [here](assets/purdue_university_proton_cert.pdf).
