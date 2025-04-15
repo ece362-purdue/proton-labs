@@ -11,3 +11,11 @@
     height: 2rem;
     width: 2rem;
 }
+#pi-logo {
+    background: url(../assets/powered_by_pi.png) center / cover;
+}
+@media (prefers-color-scheme: dark) {
+    #pi-logo {
+        background: url(../assets/powered_by_pi_reverse.png) center / cover;
+    }
+}

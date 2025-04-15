@@ -38,6 +38,9 @@ You can find the schematics, pinouts, and datasheets for the Purdue Proton [here
 
 Purdue Proton is part of the Powered by Pi scheme.  
 
-![Powered by Raspberry Pi](assets/powered_by_pi.png)
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/powered_by_pi_reverse.png">
+    <img id="pi-logo" src="assets/powered_by_pi.png" alt="Powered by Raspberry Pi" style="width: 400px; height: auto;"/>
+</picture>
 
 Our certificate can be found [here](assets/purdue_university_proton_cert.pdf).
