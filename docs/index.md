@@ -42,6 +42,7 @@ Purdue Proton is used by embedded systems labs in ECE 36200 at Purdue University
 
 Purdue Proton is part of the Powered by Pi scheme.  
 
-<img id="pi-logo" src="assets/powered_by_pi.png" alt="Powered by Raspberry Pi" style="width: 400px; height: auto;"/>
+<img class="pi-logo light" style="width: 400px" src="assets/powered_by_pi.png" alt="Powered by Raspberry Pi" />
+<img class="pi-logo dark" style="width: 400px" src="assets/powered_by_pi_reverse.png" alt="Powered by Raspberry Pi (dark)" />
 
 Our certificate can be found [here](assets/purdue_university_proton_cert.pdf).

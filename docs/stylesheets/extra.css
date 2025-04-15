@@ -46,8 +46,8 @@
     height: 2rem;
     width: 2rem;
 }
-#pi-logo {
-    background: url(../assets/powered_by_pi.png) center / cover;
+.pi-logo.dark {
+    display: none
 }
 [data-md-color-scheme="slate"] {
     --md-default-bg-color: #1a1a1a!important;
@@ -55,7 +55,10 @@
     --md-code-fg-color: hsla(0, 0, 96%, 1);
 }
 [data-md-color-scheme="slate"] {
-    #pi-logo {
-        background: url(../assets/powered_by_pi_reverse.png) center / cover;
+    .pi-logo.light {
+        display: none
+    }
+    .pi-logo.dark {
+        display: block
     }
 }
