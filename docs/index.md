@@ -26,7 +26,7 @@ To open a page in a new tab, hold Ctrl/Cmd and click on the link!
 <!-- Proton User Guide (Coming soon)   -->
 [Proton User Guide](assets/Proton%20User%20Guide.pdf)    
 <!-- [Proton Pinout Diagram (WIP)]()   -->  
-Proton Pinout Diagram (Coming soon)  
+[Proton Pinout Diagram (Coming soon)](assets/Proton%20Pinout%20Diagram.pdf)
   
 ## Raspberry Pi Resources
 [RP2350 Datasheet](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf)  
