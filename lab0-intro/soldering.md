@@ -182,9 +182,9 @@ Go ahead and put on the **shunt jumpers** on your board's debugger pins.  The pu
     <img src="images/debugger.jpg" style="margin: 1em 0; width: 40vw">
 </div>
 
-By adding the shunt jumpers, you're connecting the debugger's SWCLK, GND and SWD pins to the devboard.  SW stands for Serial Wire, a debugging protocol created by ARM for microcontrollers.  The SWCLK and SWD pins are akin to `clock` and `data` signals that you should recall seeing from ECE 27000, and are controlled by the debugger when it is attached to your PC via the USB-C connector.
+By adding the shunt jumpers, you're connecting the debugger's SWCLK, GND and SWD pins to the pins of the same name on your devboard.  The SWCLK (Serial Wire CLock) and SWD (Serial Wire Data) pins are akin to `clock` and `data` signals that you should recall seeing from ECE 27000, and are used by your computer to communicate with the microcontroller on your board, allowing it to step through your code, set breakpoints, and inspect the values of variables in your code.  
 
-When you create an embedded system, you typically leave off the debugger from your microcontroller, to ensure that the program on the chip cannot be changed or inspected.  This is done for security reasons, and is a common practice in the industry.  Since we are using the debugger to learn about embedded systems, we will be using it throughout the course, but we give you the option to move around the debugger (if you wish to do so) by snapping it off the Proton board.
+The GND pin is used to ensure that the debugger and microcontroller are on the same ground reference, which is critical for proper communication.
 
 ## Admire your work!
 
