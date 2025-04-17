@@ -24,7 +24,7 @@
 ## Instructional Objectives
 - To become familiar with the BHEE 162 laboratory, policies, lab stations, and equipment.
 - To configure your GitHub account for use with GitHub Classroom and add SSH keys for easy access.
-- To get hands-on experience with the Proton development board, its accompanying components, and the Pico Extension IDE in VScode that you will use all semester.
+- To get hands-on experience with the Proton development board, its accompanying components, and PlatformIO IDE in VScode that you will use all semester.
 
 > [!CAUTION]
 > HALT!  
@@ -132,19 +132,19 @@ Once you have soldered headers and placed the shorting plugs on your Proton deve
     <img src="images/bb-layout.jpg" style="margin: 1em 0; width: 20vw; max-width: 400px">
 </div>
 
-Your ECE Mini kit from prior courses has a large, **four-panel** breadboard similar to the one pictured below.  Place the devboard so that it is on the bottom of the second panel with the USB receptacle facing outward, shown below.
+Typically, a microcontroller will be a little hard to get into (and out of) the holes, but you should not have to remove it once it's in there for the rest of the course.  To prevent damage to the board, press down on both ends of the board at once. Do not apply force to anything else, as parts of the board are delicate and may become damaged. When inserting, make sure there are two columns on either side of the development board to leave room to plug in wires. 
 
-<div class="center">
-    <img src="insert-pico.jpg" style="width: 90vw; max-width: 800px">
-</div>
+Next, connect two wires: one from each of the 3V3 pins to the power rails, and one from each of the GND pins to the ground rails of your breadboard, as well as the PGND pins on the debugger.  Use the labels on the pins, but if they're too small for you to read, you can also use this [pinout diagram](https://ece362-purdue.github.io/proton-labs/assets/Proton%20Pinout%20Diagram.pdf).
 
-Typically, a microcontroller will be a little hard to get into the holes, but you should not have to remove it once it's in there. To prevent damage to the board, press down on both ends of the board at once. Do not apply force to anything else, as parts of the board are delicate and may become damaged. When inserting, make sure there are two columns on either side of the development board to leave room to plug in wires. 
+Plug in a USB-C cable from the **debugger** - not the Proton - to your computer.  If the red LED on it doesn't turn on, there are two possibilities:
 
-Next, connect two wires: one from the 3V3(OUT) pin to the power rails, and one from the GND pins to the ground rails of your breadboard.  You can find the pinout for the Proton here: https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf.  We'll use this in a second.
+- It is a brand new debugger with no program saved in flash, in which case it will appear like a flash drive on your computer labeled "RPI-RP2".  Download the latest **debugprobe.uf2** firmware [here](https://github.com/raspberrypi/debugprobe) from the Releases tab, and drag the file into the drive.  This will flash the firmware to the debugger, and the red LED should turn on indicating it was recognized by your computer.
 
-Take a pushbutton and place it at the end of the board.  Connect the bottom left pin to ground, and the bottom right pin to physical pin 30 (**not GP30**), or RUN.  This will be your reset button, and you can use it to reset your Proton to the start of a program without having to unplug and replug it.
+- If no flash drive appears when you plug it in, you have a USB-C cable that is only capable of carrying power, not data.  This is common with a lot of cables.  Try a different USB-C cable, or try a different computer to confirm that it is the cable that is the issue.  If you are using a lab machine, make sure to use a USB port on the back of the machine, as the front ports may not be able to provide enough power to the debugger.
 
-Connect your Proton to your computer using the USB cable provided in your lab kit.  The Proton will power on, and you should see a green LED blink on the board.  This indicates that the board is powered on and ready to go.  (If you borrowed it from another student, it may have another program on it, so don't worry if you see something else happening.)
+Once your debugger's red LED turns on, plug in a second USB-C cable into the Proton board.  You should always see the 5V red indicator and 3.3V green indicator LEDs on the Proton board turn on.  If they do not, immediately pull out the USB-C cable - **there could be a short with how you connected it to your breadboard**.  More likely than not, though, the LEDs are probably just damaged, but ask a TA to confirm.  
+
+If you see "RP2350" appear as a flash drive on your computer when it is connected, your board is fine, and it's just in bootloader mode.  You *could* drop in a UF2 file to flash it, but we don't have a compiled program just yet, so there's no need.  You may also see a green LED in the middle of the board start flashing, in which case your board was already tested and confirmed as working, and you can ignore it.
 
 > [!IMPORTANT]
 > In ECE 36200, you will build upon the existing circuit on the breadboard for each lab, so **do not take parts off your breadboard when you are done with a lab** - including this one!
@@ -153,15 +153,21 @@ Connect your Proton to your computer using the USB cable provided in your lab ki
 > 
 > For every lab, ensure that you have received your checkoffs by checking this page: https://engineering.purdue.edu/ece362/checkoff/
 
-## Step 3: Install VScode and the Pico Extension
+## Step 3: Install VScode and PlatformIO
+
+The way microcontrollers work is by writing a C program, compiling it into a binary file to be run by the specific CPU core on the microcontroller, and then flashing/uploading that binary file into the flash memory on the microcontroller.  When your microcontroller powers on, it loads that program from flash memory.
+
+The method of flashing can be different, however.  A newly fabricated board will obviously have no data in flash memory, which the microcontroller can detect.  If there's no data, the microcontroller will enter **boot mode**, allowing you to upload a new program.  However, to upload a new program, it can be tedious to put the microcontroller into boot mode and then upload a new program over and over again.
+
+Therefore, we have the second part of your Proton board - the debugger.  The debugger is actually **another microcontroller** that is connected to the Proton board, electrically and digitally separate from the Proton.  The debugger allows us to tap into the microcontroller's **debug interface**, which gives us the option to flash a new program to the microcontroller without having to put it into boot mode.  This is done by connecting the debugger to the Proton board using the SWD and SWCLK pins, which you already connected using the shunt jumpers on the top of your board.  The debugger can also be used to step through code, inspect variables, and set breakpoints in your code.
 
 As mentioned above, these labs are entirely doable at home as they are in lab.  For applications that require looking at an oscilloscope, you may want to use an AD2 from the ECE shop in its place at home.  Make it a habit to look ahead at labs so that you know when you may need one.  
 
-**In this lab**, we'll teach you how to install the Pico Extension for Visual Studio Code (VScode) that will allow you to write, compile, and debug code for your microcontroller.  We'll cover how to create a project from scratch, although in subsequent labs we'll provide you with the project.  We'll also show you how to use the debugger to step through your code, and how to use the serial monitor to interact with your microcontroller.
+**In this lab**, we'll teach you how to install PlatformIO for Visual Studio Code (VScode) that will allow you to write, compile, and debug code for your microcontroller.  We'll cover how to create a project from scratch, although in subsequent labs we'll provide you with the project.  We'll also show you how to use the debugger to step through your code, and how to use the serial monitor to interact with your microcontroller.
 
 If you haven't already used it for a prior class, download Visual Studio Code (commonly referred to as VScode) from https://code.visualstudio.com/.  
 
-Once you have downloaded and installed VScode, open it up and click on the Extensions icon on the left side of the window.  Search for the Pico Extension and install the Raspberry Pi Pico Extension.  Once you have installed the extension, reload the VScode window so that the extension starts setting itself up.  Once it's done, click the newly added the Pico Extension logo in the left sidebar.
+Once you have downloaded and installed VScode, open it up and click on the Extensions icon on the left side of the window.  Search for PlatformIO and install the Raspberry Pi Pico Extension.  Once you have installed the extension, reload the VScode window so that the extension starts setting itself up.  Once it's done, click the newly added PlatformIO logo in the left sidebar.
 
 ![pico-ext-install](pico-ext-install.gif)
 
@@ -170,9 +176,9 @@ If it shows the sidebar, it should be good to go!  If it doesn't, you may need t
 > [!IMPORTANT]
 > Show your newly installed VScode and Pico Extension to a TA.  
 
-## Step 4: Configure the Pico Extension for your board
+## Step 4: Configure PlatformIO for your board
 
-In the Pico Extension sidebar that appears, click New C/C++ Project.  In the window that appears, do the following:
+In PlatformIO sidebar that appears, click New C/C++ Project.  In the window that appears, do the following:
 
 - Specify `lab0` as the name.
 - Select `Proton` as the board.
@@ -191,7 +197,7 @@ Finally, click `Create`.  The extension will close, and you'll see a new window 
 
 The first time you create a project, it may take a while to set up the project, so **be patient**.  If it's slow, you can ensure it's working by watching the progress at the bottom of the VScode window where you created the project.  Once the new window appears, you can close the old window.  
 
-If any errors appear, you may need to restart VScode, and/or try to reinstall the Pico extension.  If you still have issues, please ask a TA for help.
+If any errors appear, you may need to restart VScode, and/or try to reinstall PlatformIO.  If you still have issues, please ask a TA for help.
 
 > [!IMPORTANT]
 > Commit the newly created project and push it to your repository now.  Use a descriptive commit message, eg. Step 3 new project.
@@ -319,7 +325,7 @@ In the center-top of your window, you'll see a toolbar with the following button
 
 In your upcoming labs, you will include a code object that gets built along with your C code, typically called "autotest.o".  This provides (in other labs) an autotester that you can use to test individual functions and generate a confirmation code that you will submit with your code.  In this lab, it's simply a shell that executes some functions - just to get you familiar with how it works so you know how to use it for the following labs.  
 
-In this step, we will have you add the autotest file to your the Pico Extension project.  In the other labs, we will provide you with the Pico Extension project with the autotester included.
+In this step, we will have you add the autotest file to your PlatformIO project.  In the other labs, we will provide you with PlatformIO project with the autotester included.
 
 Download the `autotest.o` file [here](../../../raw/main/lab0-intro/autotest.o) and place it in the root directory of your project, alongside the C file.
 
@@ -363,7 +369,7 @@ If you haven't done so already, your TA will hand you a silver sharpie that so t
 
 ## Submit your work to Gradescope
 
-Submit your work to the Lab 0 assignment on Gradescope **before the beginning of your lab section next week**.  Ensure that your the Pico Extension code has been added and pushed in your GitHub repository.  
+Submit your work to the Lab 0 assignment on Gradescope **before the beginning of your lab section next week**.  Ensure that your PlatformIO code has been added and pushed in your GitHub repository.  
 
 ## Lab Station Clean-up
 
