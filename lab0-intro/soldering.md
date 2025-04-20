@@ -103,7 +103,7 @@ Take your board off the breadboard, and take the unbroken double-sided row heade
 > 
 > If you accidentally break off more, you can use a pair of pliers to break off the extra pins.  Just be careful not to break the header itself, as it will be difficult to solder on the board.
 
-Place the headers into the breadboard in the positions indicated below.  You should insert it such that the slightly smaller side should go into the breadboard.  Therefore, we're using the breadboard to ensure proper alignment.
+Place the headers into the breadboard in the positions indicated below.  You should insert it such that the slightly smaller side goes into the breadboard.  This way, we're using the breadboard to ensure proper alignment of the pins to your Proton board.
 
 <div class="center">
     <img src="images/soldering-alignment.png" style="margin: 1em 0; width: 40vw; max-width: 500px">
@@ -147,7 +147,7 @@ Flip your breadboard, and do the same thing with the other side, and the 3 pins 
 By the end, your board should look like this.  If it does, <span style="color: gold">**congratulations!**</span>
 
 <div class="center">
-    <img src="images/solder-final.png" style="margin: 1em 0; width: 80vw">
+    <img src="images/solder-final.jpg" style="margin: 1em 0; width: 80vw">
 </div>
 
 ## Cleaning the board after soldering
