@@ -188,7 +188,7 @@ https://github.com/ece362-purdue/labs/assets/12859429/bc0f16c2-6bfb-4db2-a0a5-1b
 If it shows the sidebar, it should be good to go!  If it doesn't, you may need to restart VScode.  If you still have issues, please ask a TA for help.
 
 > [!IMPORTANT]
-> Show your newly installed VScode and PlatformIO Extension to a TA.  
+> Show your newly installed VScode and PlatformIO to a TA.  
 
 ## Step 4: Create a PlatformIO project
 
@@ -298,7 +298,7 @@ Building .pio/build/proton/firmware.bin
 
 Follow its advice and press any key to close the terminal.  If you see errors, fix your code and try again.  If you see errors that you don't understand, please ask a TA for help.
 
-The firmware.bin file is what gets uploaded to the Proton board.  To upload it, click the "Upload" button (the right arrow icon) in the PlatformIO menu.  This will flash the binary file to the Proton board.  You should see a long dialog that ends in the following:
+The firmware.bin file is what gets uploaded to the Proton board.  To upload it, click the "Upload and Monitor" button (the right arrow icon) in the PlatformIO menu.  This will flash the binary file to the Proton board.  You should see a long dialog that ends in the following after a few seconds:
 
 ```
 ** Programming Finished **
@@ -312,6 +312,13 @@ xPSR: 0xf9000000 pc: 0x00000088 msp: 0xf0000000
 [rp2350.dap.core1] halted due to debug-request, current mode: Thread 
 xPSR: 0xf9000000 pc: 0x00000088 msp: 0xf0000000
 shutdown command invoked
+--- Terminal on COM3 | 115200 8-N-1
+--- Available filters and text transformations: colorize, debug, default, direct, hexlify, log2file, nocontrol, printable, send_on_enter, time
+--- More details at https://bit.ly/pio-monitor-filters
+--- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
+Hello, World!
+Hello, World!
+Hello, World!
 ```
 
 Don't worry about the warnings when uploading - they are normal.  As long as you don't see anything in red, you are in the clear.
@@ -320,22 +327,25 @@ If you see something that says "**Error: unable to find a matching CMSIS-DAP dev
 
 If you see the four colored LEDs on the Proton board turn on and off in sequence, congratulations!  You've successfully flashed your first program to your Proton board.
 
-Now, we're going to learn how to debug by **stepping through** our code.  Set a breakpoint on the `gpio_init_mask` line by clicking in the left margin of the editor window - you'll see a red dot appear.  Then, in the PlatformIO menu, move your cursor down to Quick Access and click Start Debugging.  Alternatively, you can press F5 (or Fn+F5, depending on your keyboard) to start debugging.  This will open the Debug view, which starts at the `ldr r0, =BOOTROM_VTABLE_OFFSET` line in the boot assembly code for the RP2350, which jumps you to the `main` function, at which point you can 
+At the same time, we also see the "Hello, world!" message appear in the **serial monitor**.  This is the output from the `printf` statement in our code.  The serial monitor is a tool that allows us to send and receive data from the microcontroller over the UART interface.  You can use it to send commands to your microcontroller, or to receive data from it.
 
-![debugger](debug-view.png)
+Now, we're going to learn how to debug by **stepping through** our code.  Set a breakpoint on the `gpio_init_mask` line by clicking in the left margin of the editor window - you'll see a red dot appear.  Then, in the PlatformIO menu, move your cursor down to Quick Access and click Start Debugging.  Alternatively, you can press F5 (or Fn+F5, depending on your keyboard) to start debugging.  
 
-There are a lot of things going on in Debug mode that you should understand:
+This will open the Debug view, which starts at the `ldr r0, =BOOTROM_VTABLE_OFFSET` line in the boot assembly code for the RP2350 (you can safely close this `crt0.S` file), which jumps you to the `main` function.  Here is how it should look.
 
-- First, in the top right is a terminal with the OpenOCD process.  When you clicked Debug, it sent your compiled code to be flashed on to your Proton through the Proton debugger.  Instead of "shutting down" as it did earlier, it is now "halted due to debug-request".  Your Proton is dual-core, but your code will only run on one by default.
+![debugger](images/debug-view.png)
+
+There are a lot of things going on in the debug view that you should understand:
+
+- First, in the top right is a terminal with the OpenOCD process.  When you clicked Start Debugging, it sent your compiled code to be flashed on to your Proton through the Proton debugger.  Instead of "shutting down" as it did earlier, it is now "halted due to debug-request".  
 - The Debug Console shows output from `gdb`, which may be familiar to you from prior coding classes.  You have used `gdb` in the past to debug programs as you ran them on your own computer's CPU, but now you are using it to debug a program running on a completely separate computer - your microcontroller.  This is called "remote debugging".
 - On the left sidebar, you have the `Variables` tab.  When you define variables, you can see their values here.  
-- The `Call Stack` tab shows you the current function call stack.  This is useful for understanding how you got to where you are in your code.  In a dual-core configuration, you can see the call stack for both cores.
+- The `Call Stack` tab shows you the current function call stack.  This is useful for understanding how you got to where you are in your code.  In a dual-core configuration, you can see the call stack for both cores.  Your code will only run on **core 0** by default until we tell it otherwise.
 - The `Breakpoints` tab shows you all the breakpoints you have set in your code.  You can enable and disable them here.
-- The `XPeripherals` tab (not `Peripherals`) shows you the state of the peripherals on your microcontroller.  As you start configuring them in next labs, we'll have you look here to see their state and understand how they work.
+- The `Peripherals` tab shows you the state of the peripherals on your microcontroller.  As you start configuring them in next labs, we'll have you look here to see their state and understand how they work.
 
 In the center-top of your window, you'll see a toolbar with the following buttons:
 
-- `Reset device` - this will reset your microcontroller.  You can use this to restart your program from the beginning.
 - `Continue` - this will continue running your program until the next breakpoint.
 - `Pause` - this will pause your program if it's running.
 - `Step over` - this will run the next line of code, but not step into any functions.
@@ -343,6 +353,8 @@ In the center-top of your window, you'll see a toolbar with the following button
 - `Step out` - this will run the rest of the current function and stop at the next line of the calling function.
 - `Restart` - this will restart your program from the beginning, similar to `Reset device`.
 - `Stop` - this will stop your program and disconnect the debugger, at which your Proton will remain halted.
+
+Click the `Step over` button (or press F10) to step over each line.  Once we step over the `gpio_put` lines, you should see the LEDs turn on or off.  
 
 > [!IMPORTANT]
 > Show your TA your working serial connection and debug mode.  Show that you can step over the `printf` lines and the LED output value change lines, and that you can see the Proton LED turn on you step over the `gpio_put(25, 1)` line.  **Do not proceed until you have shown a TA your working debugger.**  Commit all your changes and push it to your repository now.  Use a descriptive commit message that mentions the step number.
