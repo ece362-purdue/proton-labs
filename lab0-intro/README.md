@@ -31,7 +31,15 @@
 >   
 > This is an example of a note designed to get your attention. If you see this, read it carefully.  
 >   
-> **Make sure that you read this document in full. There are two ways in this lab to destroy your development board before you've even had a chance to use it.**  
+> This lab is intended to get you set up with the software you will use for the board, on both your home PC and your lab machine.  To reduce your time wasted on logistical issues, **start this lab at home, as soon as possible**.  Ignore the parts about the board and just get set up with the software as much as you can.
+> 
+> When you come into the lab, you'll be given the lab kit you purchased, including the Proton development board we'll use throughout this course which comes without pin headers.  You'll use the lab time to solder pin headers to your board, and while waiting for a soldering station to open up, work on the software setup on your lab machine.  
+> 
+> This may seem like a lot of work, but it helps you achieve two things:
+> 
+> 1. You will be able to work on the labs at home, and not just in lab.  This is a huge time saver, as you can work on the labs whenever you want, and not just during lab hours.
+> 
+> 2. You'll get the soldering done in lab 0 if you time it right, allowing you to start working on lab 1 from home.  Even if you don't manage to finish in lab, you can complete your soldering in the ECE shop during their open hours from 8:00 AM to 5:00 PM, Monday through Friday.
 
 ## Welcome to ECE 36200!
 
@@ -356,8 +364,14 @@ In the center-top of your window, you'll see a toolbar with the following button
 
 Click the `Step over` button (or press F10) to step over each line.  Once we step over the `gpio_put` lines, you should see the LEDs turn on or off.  
 
+As you step over the `printf` line, you should see the message "Hello, world!" appear in the serial monitor.  If it's closed, you can pull it up again while debugging by clicking the "Monitor" button in the PlatformIO menu, or using the Quick Access menu via Ctrl/Cmd-Shift-P and typing **Serial Monitor**.
+
 > [!IMPORTANT]
-> Show your TA your working serial connection and debug mode.  Show that you can step over the `printf` lines and the LED output value change lines, and that you can see the Proton LED turn on you step over the `gpio_put(25, 1)` line.  **Do not proceed until you have shown a TA your working debugger.**  Commit all your changes and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+> Show your TA that you can step through code and see the output on the serial monitor.  
+> 
+> If you are having issues, please ask a TA for help.
+> 
+> If you had any changes, commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.  Show your TA that you have been pushing commits for each step.
 
 ## Step 7: Run a command shell
 
@@ -365,37 +379,26 @@ In your upcoming labs, you will include a code object that gets built along with
 
 In this step, we will have you add the autotest file to your PlatformIO project.  In the other labs, we will provide you with PlatformIO project with the autotester included.
 
-Download the `autotest.o` file [here](../../../raw/main/lab0-intro/autotest.o) and place it in the root directory of your project, alongside the C file.
+Download the `autotest.o` file [here](../../../raw/main/lab0-intro/autotest.o) and place it in the `src` directory of your project, alongside the C file.
 
 > [!NOTE]
-> To clarify, this is not a real autotester.  It is not responsible for giving you any credit on the lab.  This is just provided to show you how you can use it in future labs.
+> To clarify, this is not a real autotester.  It is not responsible for giving you any credit on this lab.  This is just provided to show you how you can use it in future labs.
 > 
 > Credit for this lab is granted by showing your TA that you have completed all steps in lab or office hours, by pushing your code to the GitHub repository, and submitting your GitHub repository to Gradescope.  **You must submit your work to Gradescope before the beginning of your lab section next week.**
 
-To include the autotester in your project, open the `CMakeLists.txt` file in your project, and change the `add_executable` line as follows:
+To include the autotester in your project, open the `platformio.ini` file in your project, and add the following to `build_src_flags` as follows:
 
-```cmake
-add_executable(lab0 lab0.c ${CMAKE_CURRENT_SOURCE_DIR}/autotest.o)
+```ini
+build_src_flags = -O0 Wl,"$PROJECT_SRC_DIR/autotest.o"
 ```
 
-You can also make a dynamic target that automatically includes any .o or .c files in the project directory as follows. 
+In your `main.c` file, add `autotest();` as a new line underneath `stdio_init_all();`.  This will call the autotester function, which will run the autotester code.  
 
-```cmake
-file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.c ${CMAKE_CURRENT_SOURCE_DIR}/*.o)
-add_executable(lab0 ${SOURCES})
-```
-
-In your `main.c` file, add `autotest();` as a new line at the top of your `main` function.  
-
-Flash this to your microcontroller, and reopen the Serial Terminal as you did in the prior step.  You may see nothing at first - this is normal.  By the time you pull up the serial monitor after the microcontroller has been flashed, the autotester will have already printed text that you did not see.  To see this text, you can press the reset button on your microcontroller, and you should see a "command shell" appear.  
-
-To be able to **type** into the Serial Monitor, you have to switch it to Terminal Mode - unfortunately, the default is to type into the long textbox at the bottom and then hit Enter, which in our opinion is not how these things should work.  In the same row as "Start Monitoring", there is an icon with a ">" symbol that indicates Terminal Mode.  Make sure that's enabled before you start typing into the terminal window.
-
-![terminal.png](terminal.png)
+Flash this to your microcontroller, and reopen the Serial Terminal as you did in the prior step, either with "Upload" and "Monitor" or altogether with "Upload and Monitor".  You may see nothing at first - this is normal.  By the time you pull up the serial monitor after the microcontroller has been flashed, the autotester will have already printed text that you did not see.  To see this text, you can press the reset button on your microcontroller, and you should see a "command shell" appear.  
 
 This "command shell" is where you will type commands to execute code on your microcontroller.  For the rest of your labs, we'll give you commands to test individual functions, but for now, type 'help' to see what commands are available.  You can type 'exit' to leave the shell.
 
-By the end of the embedded systems labs, we'll give you instructions on how to write your own command shell.
+By the end of the embedded systems labs, we'll give you instructions on how to write your own shell like this!
 
 > [!IMPORTANT]
 > Show your TA your working autotester.
