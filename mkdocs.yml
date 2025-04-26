@@ -19,6 +19,9 @@ theme:
         name: Switch to light mode
 extra:
   homepage: https://github.com/ece362-purdue/proton-labs
+  analytics:
+    provider: google
+    property: G-HVM7HR522D
 markdown_extensions:
   - admonition
 extra_css:
