@@ -23,18 +23,11 @@ You should have your components in front of you, as shown below.
     <img src="images/soldering-setup.jpg" style="margin: 1em 0; width: 80vw">
 </div>
 
-Take the single-sided pin header and break it as follows:
-- One 4-pin header
-    - This will be used as the debug and boot pins on the Proton debugger.
-- Three 3-pin headers
-    - One will be used as the UART pins on the Proton debugger.
-    - The other two will be used to connect the debugger to the Proton board, using the 2x3 through-hole pads (holes) on both sides of the line joining the Proton board and the debugger.
-- One 28-pin header
-    - This will populate the holes on the Proton board on one side.
-
 ## Soldering the debug pins
 
-Now, take two of the 3-pin headers, and place them into the Proton board in the 2x3 pin positions as shown below, but **upside down**, and insert the pins into the breadboard so that the board sits upside down on them.  This will allow us to more easily hold the board in place as we start soldering the 2x3 header.  The pictures below show how to do this.  Make sure the longer side goes in the breadboard, and the shorter side sticks up above the board, as shown in the last image.
+Take the single-sided pin header and break it into **two 3-pin headers**.  These will be used to connect the debugger to the Proton board, using the 2x3 through-hole pads (the holes) on both sides of the line joining the Proton board and the debugger.
+
+Take these two 3-pin headers, and place them into the Proton board in the 2x3 pin positions as shown below, but **upside down**, and insert the pins into the breadboard so that the board sits upside down on them.  This will allow us to more easily hold the board in place as we start soldering the 2x3 header.  The pictures below show how to do this.  Make sure the longer side goes in the breadboard, and the shorter side sticks up above the board, as shown in the last image.
 
 <div class="center">
     <img src="images/soldering-debug-pins-1.png" style="margin: 1em 0; width: 25vw; max-width: 500px">
