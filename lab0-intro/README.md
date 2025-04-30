@@ -389,7 +389,7 @@ Download the `autotest.o` file [here](../../../raw/main/lab0-intro/autotest.o) a
 To include the autotester in your project, open the `platformio.ini` file in your project, and add the following to `build_src_flags` as follows:
 
 ```ini
-build_src_flags = -O0 Wl,"$PROJECT_SRC_DIR/autotest.o"
+build_src_flags = -O0 -Wl,"$PROJECT_SRC_DIR/autotest.o"
 ```
 
 In your `main.c` file, add `autotest();` as a new line underneath `stdio_init_all();`.  This will call the autotester function, which will run the autotester code.  
