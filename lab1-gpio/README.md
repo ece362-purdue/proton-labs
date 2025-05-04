@@ -24,7 +24,9 @@
 - To learn how to trigger code execution when an external event occurs.
 
 > [!CAUTION]
-> By now, your breadboard should have been signed with a silver sharpie with your username and the signature of the TA.  If you have not yet done this, please notify a TA and get it signed as soon as possible.  **Failure to do so by lab 2 will result in a zero for the lab currently running in that week.**
+> If you have not already soldered pin headers to your Proton board, please do it ASAP.  There is a step in this lab that requires you to put your Proton down on a breadboard.
+> 
+> Your breadboard should have been signed with a silver sharpie with your username and the signature of the TA.  If you have not yet done this, please notify a TA and get it signed as soon as possible.  **Failure to do so by lab 2 will result in a zero for the lab currently running in that week.**
 > 
 > Keep in mind the food-and-liquids policy of the lab, which is to bring absolutely no food or liquid with you to your lab sessions.  If you must bring it, keep it under the window in the back of BHEE 160.  **Failure to follow this rule will result in a penalty.** 
 > 
@@ -35,17 +37,17 @@ If at any point you need to get checked off, or need to get help, you can add yo
 
 ## General Purpose Input/Output (GPIO)
 
-In this experiment, you will learn how to connect and configure simple input devices (push buttons and keypad) and output devices (LEDs) to your Proton development board. 
+Your microcontroller can be considered a fully functioning computer, much unlike the machine you happen to be reading this on.  A key difference is how your microcontroller interacts with the outside world.  Your laptop has a keyboard, mouse, and screen that allow you to interact with it.  Your microcontroller, however, has **GPIO pins** that allow it to interact with the outside world.  
 
-The basic idea behind GPIO is to interface the microcontroller to external components.  The pins of your microcontroller are, first and foremost, GPIO pins, which means that they can take on one of three functionalities:
+In this experiment, you will learn how to connect and configure simple input devices (push buttons and keypad) and output devices (LEDs) to your Proton development board's GPIO pins. 
+
+GPIO pins on any microcontroller can take on one of three functionalities:
 
 1. The pin can be configured as an **input** that can **read** a voltage level from an external component.  This is useful for reading the state of a button, or the output of a sensor.
 
 2. The pin can be configured as an **output** that can **drive** or output a voltage level to an external component.  This is useful for turning on an LED in series with a resistor, or engaging an actuator.
 
 3. Or, the pin can be used for by another peripheral on your microcontroller entirely.  This is useful for allowing other peripherals on the microcontroller, such as UART, SPI, ADC/DAC, etc. to use the pin for their own purposes.
-
-- Example: in the last lab, you saw a **command shell** in your serial monitor.  This was achieved by configuring GP0 and GP1 to be **UART pins**.   The UART peripheral is what allowed you to see and write back text from/to your program via these pins.  UART is an example of a peripheral that can use the GPIO pins for its own purposes.
 
 This lab will be the first time that you will write code that *configures* a peripheral.  The way a microcontroller works is by writing some code in C that configures the **hardware registers**, which are sections of memory that control the behavior of the microcontroller's CPU core and its peripherals.  The RP2350 microcontroller on your Proton board has a set of hardware registers that control the behavior of the GPIO pins, and you will write code that configures these registers to control the behavior of the pins.
 
@@ -58,9 +60,13 @@ Nearly all of you are coming from ECE 270, where you wrote Verilog to implement 
 Make sure to clone the code repository from GitHub Classroom.  Keep in mind to add, commit and push any changes you make so that your work is accessible from a lab machine. 
 
 > [!CAUTION]
-> **If you have not set up VScode with PlatformIO as described in Lab 0 on BOTH your physical machine and your lab machine, we strongly recommend that you do that now.**  Having two working environments provides you the necessary redundancy to ensure you can still work in case one environment randomly stops working, and you can use `git` to back up your work and seamlessly transition to the other machine.  Please do not assume this will not happen to you, because it absolutely can.
+> **If you have not set up VScode with PlatformIO as described in Lab 0 on BOTH your physical machine and your lab machine, you should do that now.**  
+> 
+> Having two working environments provides you the necessary redundancy to ensure you can still work in case one environment randomly stops working, using `git` to keep your work in the cloud and seamlessly transition to the other machine.  
+> 
+> **Please do not assume this will not happen to you, because it absolutely can.**
 
-In addition, a precompiled autotest object has been incorporated into the template folder.  You can utilize it to test the subroutines (another word for functions).  To run the autotest, uncomment the `autotest()` call in the `main` function and click "Flash Project (USB)".  You will click this option to flash your newly received Proton for the first time.  For subsequent flashes, you can use "Flash Project (SWD)" with the Debug Probe (included in your kit) to save time.
+In addition, a precompiled autotest object has been incorporated into the template folder.  You can utilize it to test the subroutines (another word for functions).  To run the autotest, uncomment the `autotest()` call in the `main` function and click "Upload and Monitor".  Make sure that your debugger is connected via USB, that the shunt jumpers connecting the debugger to your Proton board are in place, and the the Proton board is also connected via USB.
 
 If you are on Windows, take care to select the correct COM port in the Serial Monitor window.  
 
@@ -71,7 +77,7 @@ If you don't see anything after the serial port connection is established, press
 You should see a prompt similar to the following:
 
 ```text
-GPIO Lab Test Suite for Pico 2
+GPIO Lab Test Suite
 Type 'help' to learn commands.
 
 > 
@@ -88,20 +94,11 @@ You can then type `help` to learn what commands you can use to test a certain su
 
 In ECE 36200, unlike prior courses, you will build on the **same** circuit in each lab.  This allows you to build up a full development board that will help you more easily prototype designs with a variety of external components.  **Therefore, it is very important that you follow the layout we provide in the lab manual.**  This will make it easier for you to debug your circuit, and for your TAs to help you debug your circuit.  It will also ensure you have space for all your components as long as you follow the layout.  **TAs will not help with complex wiring if it does not follow the required layout.**
 
-At this point, you should have only the Proton development board and a reset pushbutton on your breadboard.  In this lab, we'll add two pushbuttons to the left of the reset button, LEDs on the lowest breadboard in series with current-limiting resistors, and the keypad towards the top of the breadboard.  This schematic shows the required layout for the lab:
+At this point, you should have only the Proton development board on your breadboard.  In this lab, we'll add two pushbuttons to the left of the reset button, LEDs on the lowest breadboard in series with current-limiting resistors, and the keypad towards the top of the breadboard.  This schematic shows the required layout for the lab:
 
 ![lab1-schem.png](lab1_schem.png)
 
-To match the pin numbers on the schematic, the pinout for your Proton can be found [here](https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf).  We **strongly recommend** you bookmark links like these for quicker access.  It is possible to create a bookmark folder in your browser and add links to datasheets, the lab manual, and other resources you use frequently.  This will save you time in the long run.
-
-**Be careful as you match the pin numbers while wiring your circuit** - the numbers on the schematic are the GPIO numbers, **not** the physical pin numbers.  For example, when connecting the left pushbutton on the schematic to the Pico 2, you will connect it to GP20, not physical pin 20.  This is because in the code, the GPIO numbers are how we reference the pins.  There's also pins like RUN, VBUS, VSYS, GND that aren't GPIO pins, so you can't use them in your code.
-
-> [!TIP]
-> The original Proton board from Raspberry Pi does not etch the pin numbers on the physical board, which is not great when you're ensuring the correct pins are connected.  If you take a closer look at the pins on the board, you'll notice that the GPIO pins have **circular castellations** whereas the ground pins have **square castellations**.  Use those to guide you by starting your pin counting from one of them rather than from the end so that it's less tedious.  The pinout diagram shows this as well:
-> 
-> ![castellations](castellations.png)
-> 
-> Another idea is to tape small pieces of paper to the wires you connect with the pin number written on them, making future connections easier to make.
+To match the pin numbers on the schematic, look at your Proton board and connect the pins accordingly.
 
 ## Step 1: Read the Datasheet
 
@@ -109,7 +106,7 @@ The first step to understanding any microcontroller is to read the datasheet.  T
 
 The Proton board is, strictly speaking, not actually the microcontroller - it is a **development board** on which you have an RP2350A microcontroller, which is the black square chip in the center of your Proton board.  This chip is what holds your microprocessor cores and peripherals.  The flash memory chip that sits above RP2350 is what receives and holds your program when you click "Flash Project" in VScode.  When you press the reset button, or provide power to your board, the RP2350 chip reads the program from this flash memory and executes it.  That code can then be made to interact with the peripherals on the RP2350 chip, and for this lab in particular, configure and control the GPIO pins on the RP2350, which are "broken out" to the physical pins you can see on your board.
 
-Therefore, when we want to understand the internals of the microcontroller we wish to work with, we want to look up datasheets for "RP2350", not "Pico 2".  
+Therefore, when we want to understand the internals of the microcontroller we wish to work with, we want to look up datasheets for "RP2350", not "Proton".  
 
 The datasheet for the RP2350 microcontroller can be found [here](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf).  You can gain a basic introduction to your RP2350-based Proton by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).
 
@@ -141,14 +138,15 @@ Your answers should start with `sio_hw` or `io_bank0_hw`, which are the SDK-prov
 ## Step 2: Configure output pins for LEDs
 
 > [!WARNING]
-> We're now entering your first coding assignment, so it is worth mentioning at this stage - **do not use AI/LLM tools to auto-generate this code**.  **If a TA observes you using Copilot/ChatGPT or similar tools in lab, you will be subject to academic dishonesty penalties**.  The purpose of the labs is to teach you how to use your microcontroller and understand it at its lowest level, and using one of these tools is tantamount to collaboration with another person, and will be treated as such.  
+> We're now entering your first coding assignment, so it is worth mentioning at this stage - **do not use AI/LLM tools to auto-generate this code**.  **If a TA observes you using Copilot/ChatGPT or similar tools in lab, you will be subject to academic dishonesty penalties and disciplinary action**.  
+> 
+> Aside from the fact that it is academically dishonest to lift code from another source, the purpose of the labs is to teach you how to use your microcontroller and understand it at its lowest level.  Copying code from someone else (a person or an LLM) is going to handicap your ability to parse, analyze and apply information from multiple sources - critical to implementing new designs and debugging them.
 >
-> Please take this rule seriously because you will have a lab practical that asks you to write code for your board **without access to the Internet**.
+> In the short term, you should take this rule seriously because you will have a lab practical that asks you to write code for your board **without access to the Internet**.  If you use an LLM throughout the labs, the effect will be that you will not be able to prove that you learned anything from the labs.
 >
-> You'll be allowed to use whatever you want on the course project, but for now, we need to make sure you are learning the material.
 
 > [!WARNING]
-> At this stage, make sure your Debug Probe is connected to the debug and UART pins of your Pico 2, as described [here](https://www.raspberrypi.com/documentation/microcontrollers/debug-probe.html).  Add a `printf` after `stdio_init_all()` and turn on the Serial Monitor in VScode to ensure that you are receiving data from the Proton via the probe.
+> At this stage, make sure your Debug Probe is connected to the debug and UART pins of your Proton, as described [here](https://www.raspberrypi.com/documentation/microcontrollers/debug-probe.html).  Add a `printf` after `stdio_init_all()` and turn on the Serial Monitor in VScode to ensure that you are receiving data from the Proton via the probe.
 
 Implement the function `init_outputs` to configure GPIO pins 16, 17, 18, 25 (also called GP16, GP17, GP18, GP25) as outputs.  You do not need to change any other properties (slew rate, drive strength, etc).  
 
@@ -178,7 +176,7 @@ Therefore, you should add one more line to your `init_outputs` function.
 pads bank0 -> io register array[16] &= ~PADS_BANK0_GPIO0_ISO_BITS; // Clear the ISO bit for pin 16. Also, do this for 17, 18 and 25
 ```
 
-*Why didn't you just tell me this earlier?*  Your instructor made the same mistake while learning about the Pico 2, and this is a good example of what they had to do to debug their code when it didn't work as expected, which was to **use the SDK functions to find what was missing**, and then to **dive into the datasheet to understand why the missing line was necessary**.
+*Why didn't you just tell me this earlier?*  Your instructor made the same mistake while learning about the Proton, and this is a good example of what they had to do to debug their code when it didn't work as expected, which was to **use the SDK functions to find what was missing**, and then to **dive into the datasheet to understand why the missing line was necessary**.
 
 Hopefully, this will make your LEDs turn on.  If they still don't, verify that your wiring is correct by testing it with the SDK functions, which should always work assuming correct wiring.  
 
