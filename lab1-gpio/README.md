@@ -130,7 +130,7 @@ So, what we're going to do is **dive** into what this function does.  When you h
 
 The animation below shows how you can *nest-dive* into the functions that make up `gpio_init` as well, down to the register level.  
 
-<video src="https://rawcdn.githack.com/ece362-purdue/proton-labs/ae050a9d9d131ba74f93fb56e6cace5e21d0b35f/lab1-gpio/function-dive-1.mp4"></video>
+https://github.com/user-attachments/assets/081f1251-55cd-4d20-8b06-419479307833
 
 Now, based on your function diving work into `gpio_init` and the list of SIO registers relevant to GPIO control in 3.1.11, specify the registers you will need to configure the Bank 0 GPIO pins on the RP2350.  To initialize a pin, you have to do the following:
 
@@ -150,6 +150,7 @@ Your answers should start with `sio_hw` or `io_bank0_hw`, which are the SDK-prov
 ## Step 2: Configure output pins for LEDs
 
 > [!WARNING]
+
 > We're now entering your first coding assignment, so it is worth mentioning at this stage - **do not use AI/LLM tools to auto-generate this code**.  **If a TA observes you using Copilot/ChatGPT or similar tools in lab, you will be subject to academic dishonesty penalties and disciplinary action**.  
 > 
 > Aside from the fact that it is academically dishonest to lift code from another source, the purpose of the labs is to teach you how to use your microcontroller and understand it at its lowest level.  Copying code from someone else (a person or an LLM) is going to handicap your ability to parse, analyze and apply information from multiple sources - critical to implementing new designs and debugging them.
