@@ -70,7 +70,11 @@ In addition, a precompiled autotest object has been incorporated into the templa
 
 If you are on Windows, take care to select the correct COM port in the Serial Monitor window.  
 
-If you are on Linux (eg. a lab machine) and want to see the output in a separate window from VScode, you can also launch a serial connection in a separate window by clicking "Upload" only, and then typing `screen /dev/ttyACM0 115200` into a terminal.  To exit `screen`, press Ctrl-A, backslash (\\) and then 'y'.  **You should not have to do this if you use the Serial Monitor in PlatformIO.** 
+If you are on Linux, the port will be `/dev/ttyACM0` or `/dev/ttyUSB0`.  
+
+If you are on Mac, the port will be `/dev/cu.usbmodemXXXX` where `XXXX` is a number.  
+
+On Mac or Linux, you can find the port by comparing the outputs of running `ls /dev/tty*` in a terminal window before and after plugging in your board.  The new device that appears is your board.
 
 If you don't see anything after the serial port connection is established, press the Reset pushbutton you wired in lab 0 to see the introductory text from `autotest`.  Try typing something, and you should see the characters appear.  That should confirm the connection is working as intended.
 
@@ -86,29 +90,37 @@ Type 'help' to learn commands.
 You can then type `help` to learn what commands you can use to test a certain subroutine.  You will use this to demo your implementation and wiring to the TAs.
 
 > [!TIP]
-> If you're getting tired of having to click through menus to click "Flash Project (SWD)", start getting used to **keyboard shortcuts**.  It's easier to press Ctrl-Shift-P and Enter to quickly rerun your last command.
+> If you're getting tired of having to click through menus to click "Upload and Monitor", start getting used to **keyboard shortcuts**.  After you type it the first time, it's easier to press Ctrl-Shift-P and Enter to quickly rerun your last command.
 > 
-> Quirks like these make programming easier.  If you feel like a process is *arduous*, there is very likely an easier way to do it.  (This is an example of [Occam's Razor](https://en.wikipedia.org/wiki/Occam's_razor).)  Google should always be your first recourse.  If you can't find anything, ask a TA or your peers for these quick hacks to make yourself more productive.
+> You can also set up keyboard shortcuts to quickly run "Upload and Monitor" (usually Ctrl-Alt-U) or "Start Debugging" (usually F5).
+> 
+> Quirks like these make programming easier.  If you feel like a process is *arduous*, there is very likely an easier way to do it.  (This is an example of [Occam's Razor](https://en.wikipedia.org/wiki/Occam's_razor).)  Google should always be your first recourse, particularly the documentation for PlatformIO, VScode, and/or the Raspberry Pi docs.  If you can't find anything, ask a TA or your peers for these quick hacks to make yourself more productive.
 
 ## Step 0.2: Wire and organize your breadboard
 
 In ECE 36200, unlike prior courses, you will build on the **same** circuit in each lab.  This allows you to build up a full development board that will help you more easily prototype designs with a variety of external components.  **Therefore, it is very important that you follow the layout we provide in the lab manual.**  This will make it easier for you to debug your circuit, and for your TAs to help you debug your circuit.  It will also ensure you have space for all your components as long as you follow the layout.  **TAs will not help with complex wiring if it does not follow the required layout.**
 
-At this point, you should have only the Proton development board on your breadboard.  In this lab, we'll add two pushbuttons to the left of the reset button, LEDs on the lowest breadboard in series with current-limiting resistors, and the keypad towards the top of the breadboard.  This schematic shows the required layout for the lab:
+At this point, you should have only the Proton development board on your breadboard.  In this lab, we'll add the keypad in the row above the Proton board, making space for wiring.  See the diagram below.
 
 ![lab1-schem.png](lab1_schem.png)
 
-To match the pin numbers on the schematic, look at your Proton board and connect the pins accordingly.
+![lab1-image.png](lab1_image.png)
+
+There are two sets of resistors in the schematic.  The 8 1k ohm resistors are used to limit the current through the keypad, so you don't accidentally damage the keypad.  
+
+The 4 10k ohm resistors are implemented with the 5-pin yellow **resistor comb**, which allows us to easily add a resistor at every point on the breadboard, except for pin 1, which is connected to ground.  These are very useful for implementing a lot of **pull-down resistors** at once, which is a fix needed for a bug in the RP2350 that causes the ROW GPIO pins, configured as inputs, to float when they are not connected to anything.  Your resistor comb's pin 1 is identified by a black dot on the side of the comb.  
+
+Use the pin numbers on your Proton board to determine which pins to connect the resistors to.  The picture above shows how best to connect the 5-pin resistor comb to your Proton board.  If you prefer another method, that's up to you.
 
 ## Step 1: Read the Datasheet
 
-The first step to understanding any microcontroller is to read the datasheet.  This is a universal *first step* that we want you to remember for not just microcontrollers, but various parts that you will interface to in the future.  
+The first step to understanding any microcontroller is to read the datasheet.  This is a universal *first step* that we want you to remember for not just microcontrollers, but various parts that you will interface to in the future.  Every single lab will have this first step.
 
-The Proton board is, strictly speaking, not actually the microcontroller - it is a **development board** on which you have an RP2350A microcontroller, which is the black square chip in the center of your Proton board.  This chip is what holds your microprocessor cores and peripherals.  The flash memory chip that sits above RP2350 is what receives and holds your program when you click "Flash Project" in VScode.  When you press the reset button, or provide power to your board, the RP2350 chip reads the program from this flash memory and executes it.  That code can then be made to interact with the peripherals on the RP2350 chip, and for this lab in particular, configure and control the GPIO pins on the RP2350, which are "broken out" to the physical pins you can see on your board.
+The Proton board is, strictly speaking, not actually the microcontroller itself - it is a **development board** on which you have an RP2350B microcontroller, which is the black square chip in the center of your Proton board.  This chip is what holds your microprocessor cores and peripherals.  The 8-pin W25Q128JVS flash memory chip above the RP2350 is what receives and stores your program when you click "Upload" in VScode.  When you press the reset button, or provide power to your board, the RP2350 chip reads the program from this flash memory and executes it.  That code can then be made to interact with the peripherals on the RP2350 chip, and for this lab in particular, configure and control the GPIO pins on the RP2350.
 
-Therefore, when we want to understand the internals of the microcontroller we wish to work with, we want to look up datasheets for "RP2350", not "Proton".  
+Therefore, when we want to understand the internals of the microcontroller we wish to work with, we want to look up datasheets for "RP2350", not "Proton".  Bookmark the [Proton datasheets page](https://ece362-purdue.github.io/proton-labs/datasheets/) to be your starting point, where we link the various Raspberry Pi pages that you will find helpful in understanding and utilizing the RP2350 microcontroller.
 
-The datasheet for the RP2350 microcontroller can be found [here](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf).  You can gain a basic introduction to your RP2350-based Proton by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).
+We'll start by gaining a basic introduction to your RP2350-based Proton by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).
 
 Next, read [Chapter 9: GPIO](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A585%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D) as well as [Chapter 3.1.3: GPIO Control](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A41%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C707.498%2Cnull%5D) under SIO.
 
