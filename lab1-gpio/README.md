@@ -120,17 +120,17 @@ The Proton board is, strictly speaking, not actually the microcontroller itself 
 
 Therefore, when we want to understand the internals of the microcontroller we wish to work with, we want to look up datasheets for "RP2350", not "Proton".  Bookmark the [Proton datasheets page](https://ece362-purdue.github.io/proton-labs/datasheets/) to be your starting point, where we link the various Raspberry Pi pages that you will find helpful in understanding and utilizing the RP2350 microcontroller.
 
-We'll start by gaining a basic introduction to your RP2350-based Proton by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).
+You can gain a basic introduction to your RP2350 chip by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).  You may have to scroll down to the next page.
 
-Next, read [Chapter 9: GPIO](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A585%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D) as well as [Chapter 3.1.3: GPIO Control](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A41%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C707.498%2Cnull%5D) under SIO.
+Next, read [Chapter 9: GPIO](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A587%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D) as well as [Chapter 3.1.3: GPIO Control](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A41%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C707.498%2Cnull%5D) under SIO.
 
-You may also want to dive into the "convenience" functions that the Pico SDK provides.  In your C file, inside main, try writing `gpio_init` as an example.  VScode's autocomplete will kick in and tell you what this function does.  If you were using the Proton as a hobbyist, you can call this function, let it configure your pins, and forget about it forever.  
+Under the Programmer's Model sections, identify functions that the Pico SDK provides, e.g. `gpio_init`.  Type `gpio_init(21);` into VScode inside the `init_inputs` function, and note how the editor highlights the function.  Now, if we were hobbyists, we would copy in the functions from the datasheet and call it a day.  But as learners in a 300-level computer engineering course, we do things a little differently.  If you want to be **effective** as an embedded systems engineer, you need to understand the register level at which your microcontroller operates.  In a nutshell - every function changes some hardware register in the microcontroller, causing a change in the behavior of either the CPU or the peripherals.  Understanding how those functions work is key to being able to debug your code at the register level when it doesn't work as expected.
 
-However, we're computer engineers (or persons taking a 300-level computer engineering course)!  So, what we're going to do is **dive** into what this function does in terms of the hardware registers defined on RP2350.  When VScode highlights the function, that means that you can access the definition for it.  Hold down the Ctrl (or Cmd on Mac) button and click on `gpio_init` to see where it is defined.  This takes you to the `gpio.c` file, where you'll see that `gpio_init` does three of the things we asked you to figure out above - set the direction of the pin, **put** the value 0 into it (which sets the pin's value to 0), and configures the pin's function to be SIO.  If you **dive** into those functions, you can see (hopefully) the very same C code you just came up with!  
+So, what we're going to do is **dive** into what this function does.  When you hover your cursor over the function and VScode highlights it, that means that you can access the definition for it.  Hold down either the Ctrl/Cmd/Alt button and click on `gpio_init` to see where it is defined (you'll determine the right button if your cursor changes to the one you see when you click a hyperlink).  This takes you to the `gpio.c` file, where you'll see the code for `gpio_init`, and how it configures a pin to be an input, initializes the pin to a logic 0 (which is redundant for an input), and sets the function for the pin to be SIO.
 
-The animation below shows how you can *dive* into the function to see what it does.  This is critical to understanding how your microcontroller, at the lowest possible level, does what you need it to do.
+The animation below shows how you can *nest-dive* into the functions that make up `gpio_init` as well, down to the register level.  
 
-![function-dive.gif](function-dive.gif)
+https://raw.githack.com/ece362-purdue/proton-labs/main/lab1-gpio/function-dive-1.mp4
 
 Now, based on your function diving work into `gpio_init` and the list of SIO registers relevant to GPIO control in 3.1.11, specify the registers you will need to configure the Bank 0 GPIO pins on the RP2350.  To initialize a pin, you have to do the following:
 
@@ -143,7 +143,7 @@ Now, based on your function diving work into `gpio_init` and the list of SIO reg
 Your answers should start with `sio_hw` or `io_bank0_hw`, which are the SDK-provided structs that define hardware registers that, in turn, control the GPIO pins.  (You can even *dive* into `sio_hw`/`io_bank0_hw` to see the memory addresses they are defined at, and compare that to your datasheet!)
 
 > [!IMPORTANT]
-> Show your C code for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
+> Show your answers for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
 > 
 > Avoid the urge to ask others (AI/LLMs are included in "others") for answers.  These questions are specifically designed to get you used to looking at the datasheet for information, and for *you* to understand the microcontroller's specific configuration.
 
