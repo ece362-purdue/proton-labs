@@ -130,7 +130,7 @@ So, what we're going to do is **dive** into what this function does.  When you h
 
 The animation below shows how you can *nest-dive* into the functions that make up `gpio_init` as well, down to the register level.  
 
-https://rawcdn.githack.com/ece362-purdue/proton-labs/ae050a9d9d131ba74f93fb56e6cace5e21d0b35f/lab1-gpio/function-dive-1.mp4
+<video src="https://rawcdn.githack.com/ece362-purdue/proton-labs/ae050a9d9d131ba74f93fb56e6cace5e21d0b35f/lab1-gpio/function-dive-1.mp4"></video>
 
 Now, based on your function diving work into `gpio_init` and the list of SIO registers relevant to GPIO control in 3.1.11, specify the registers you will need to configure the Bank 0 GPIO pins on the RP2350.  To initialize a pin, you have to do the following:
 
