@@ -9,8 +9,8 @@
 | 0.1 | Set up your environment |   |
 | 0.2 | Wire and organize your breadboard |   |
 | 1 | Read the datasheet | 50* |
-| 2 | Configure output pins for LEDs | 10 |
-| 3 | Configure input pins for pushbuttons | 10 |
+| 2 | Configure output pins for LEDs | 15 |
+| 3 | Configure input pins for pushbuttons | 15 |
 | 4 | Configure and poll a keypad | 20 |
 | 5 | Confirm your checkoffs before leaving | * |
 | &nbsp; | Total: | 100 |
