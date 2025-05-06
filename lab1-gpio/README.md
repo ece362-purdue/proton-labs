@@ -8,15 +8,15 @@
 |------|-------------|--------|
 | 0.1 | Set up your environment |   |
 | 0.2 | Wire and organize your breadboard |   |
-| 1 | Read the datasheet | 30* |
-| 2 | Configure output pins for LEDs | 20 |
-| 3 | Configure input pins for pushbuttons | 20 |
-| 4 | Configure and poll a keypad | 30 |
-| 5 | In-Lab Checkoff Step | 20* |
+| 1 | Read the datasheet | 50* |
+| 2 | Configure output pins for LEDs | 10 |
+| 3 | Configure input pins for pushbuttons | 10 |
+| 4 | Configure and poll a keypad | 20 |
+| 5 | Confirm your checkoffs before leaving | * |
 | &nbsp; | Total: | 100 |
 <br>
 
-\* - You must get your whole lab checked off before the end of your lab section to avoid a late penalty of 20%.
+\* - If either your checkoffs or your Gradescope submission are made after the lab section, a 20% penalty is levied on the final score.
 
 ## Instructional Objectives
 - To learn how to find relevant information in a microcontroller datasheet.
@@ -68,6 +68,8 @@ Make sure to clone the code repository from GitHub Classroom.  Keep in mind to a
 
 In addition, a precompiled autotest object has been incorporated into the template folder.  You can utilize it to test the subroutines (another word for functions).  To run the autotest, uncomment the `autotest()` call in the `main` function and click "Upload and Monitor".  Make sure that your debugger is connected via USB, that the shunt jumpers connecting the debugger to your Proton board are in place, and the the Proton board is also connected via USB.
 
+We recommend leaving `autotest()` commented out until you actually need it - it adds about 20 KB of code to your program, which can take a long time to upload.  Uncomment it when you need to test a step, or need to generate a confirmation code to get checked off.
+
 If you are on Windows, take care to select the correct COM port in the Serial Monitor window.  
 
 If you are on Linux, the port will be `/dev/ttyACM0` or `/dev/ttyUSB0`.  
@@ -102,9 +104,9 @@ In ECE 36200, unlike prior courses, you will build on the **same** circuit in ea
 
 At this point, you should have only the Proton development board on your breadboard.  In this lab, we'll add the keypad in the row above the Proton board, making space for wiring.  See the diagram below.
 
-![lab1-schem.png](lab1_schem.png)
+![lab1-schem.png](images/lab1_schem.png)
 
-![lab1-image.png](lab1_image.png)
+![lab1-image.png](images/lab1_image.png)
 
 There are two sets of resistors in the schematic.  The 8 1k ohm resistors are used to limit the current through the keypad, so you don't accidentally damage the keypad.  
 
@@ -132,137 +134,79 @@ The animation below shows how you can *nest-dive* into the functions that make u
 
 https://github.com/user-attachments/assets/081f1251-55cd-4d20-8b06-419479307833
 
-Now, based on your function diving work into `gpio_init` and the list of SIO registers relevant to GPIO control in 3.1.11, specify the registers you will need to configure the Bank 0 GPIO pins on the RP2350.  To initialize a pin, you have to do the following:
+See the animation above, and use that technique to dive into the three constituent functions of `gpio_init` to determine what registers are being modified, and note them down.  A register takes the form `peripheral->registername`, for example `sio_hw->gpio_in`.  Here, the peripheral that controls the GPIO pins is `sio_hw`, and `gpio_in` is the register that returns the high/low state of the GPIO pins, with each bit of the register indicating a different pin.
 
-1. (5 points) Configure the pin function to be SIO.  In C code, how do you set a specific GPIO pin as an SIO pin?
-    - This one's a little complicated, so we'll just tell you where to look.  Type `gpio_set_function`, and *dive* into it to see what register it modifies to set the function of the pin.
-2. (10 points) Configure the pin as an input or output.  Depending on the purpose, you may have to write values in different registers, so specify both.  In C code, how do you set a specific GPIO pin as an input or output?
-3. (10 points) If the pin is an output, configure the pin to drive high or low.  Depending on the value, you may have to write values in different registers, so specify both.  In C code, how do you set a specific GPIO pin as an input or output?  In C code, how do you set a specific GPIO pin to drive high or low?
-4. (5 points) In C code, what register do you need to read to check the state of a specific pin?
+1. (15 points) What four registers are used to set the direction of a GPIO pin?  When is one pair of registers used over the other?  Show your TA where you found this information after diving through the `gpio_init` function.  Give an example of a value for `mask` that would configure GP21 as an input, and GP22 as an output.  Note that `PICO_USE_GPIO_COPROCESSOR` is not defined and that the total number of GPIOs on the RP2350B is 48.
 
-Your answers should start with `sio_hw` or `io_bank0_hw`, which are the SDK-provided structs that define hardware registers that, in turn, control the GPIO pins.  (You can even *dive* into `sio_hw`/`io_bank0_hw` to see the memory addresses they are defined at, and compare that to your datasheet!)
+2. (5 points) What third register would you check to confirm if a GPIO pin was configured as an input or output?  Show your TA how you arrived at your answer.  (Hint: the registers above are write-only, so you can't read them back to check if pins were configured correctly.)
+
+3. (5 points) What pair of registers are used to set the value of a GPIO pin (i.e. high/low, logic 1/0)?  Show your TA how you arrived at your answer.
+
+4. (5 points) What register can be used to read the value of a GPIO pin, regardless of whether it is configured as an input or output?  Show your TA how you arrived at your answer.
+
+5. (20 points) What three registers are modified when setting the function for a GPIO pin?  What is the function number for SIO?  Show your TA how you arrived at your answers.  (Hint: you can find the number for SIO by diving into the `gpio_function_t` enum in the relevant function.)
+
+> [!HINT]
+> The registers you find should start with `sio_hw` or `io_bank0_hw`, which are the SDK-provided structs that define hardware registers that, in turn, control the GPIO pins.  (You can even *dive* into `sio_hw`/`io_bank0_hw` to see the memory addresses they are defined at, and compare that to your datasheet!)
+> 
+> The C/C++ SDK documented [here](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf) will give you the full list of available API functions that you can *dive* into.  E.g. for GPIO SDK functions, look under the `hardware_gpio` subsection in Section 4 > Hardware APIs.  Use Ctrl-F to jump to it faster.
 
 > [!IMPORTANT]
 > Show your answers for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
 > 
-> Avoid the urge to ask others (AI/LLMs are included in "others") for answers.  These questions are specifically designed to get you used to looking at the datasheet for information, and for *you* to understand the microcontroller's specific configuration.
+> You are **not allowed** to use AI/LLM to find these answers.  These questions are specifically designed to get you used to looking at the datasheet and SDK for information, and for *you* to understand the microcontroller's specific configuration.  AI becomes helpful when you first understand what you need to look for when you're using a second new microcontroller, and not the first time that you are learning how a microcontroller works, and sometimes not always - especially if the microcontroller is new enough that your favorite LLM hasn't been updated on how it works.
 
 ## Step 2: Configure output pins for LEDs
 
-> [!WARNING]
-
+> [!CAUTION]
 > We're now entering your first coding assignment, so it is worth mentioning at this stage - **do not use AI/LLM tools to auto-generate this code**.  **If a TA observes you using Copilot/ChatGPT or similar tools in lab, you will be subject to academic dishonesty penalties and disciplinary action**.  
 > 
 > Aside from the fact that it is academically dishonest to lift code from another source, the purpose of the labs is to teach you how to use your microcontroller and understand it at its lowest level.  Copying code from someone else (a person or an LLM) is going to handicap your ability to parse, analyze and apply information from multiple sources - critical to implementing new designs and debugging them.
 >
-> In the short term, you should take this rule seriously because you will have a lab practical that asks you to write code for your board **without access to the Internet**.  If you use an LLM throughout the labs, the effect will be that you will not be able to prove that you learned anything from the labs.
->
+> In the short term, you should take this rule seriously because you will have a lab practical that asks you to write code for your board **without access to the Internet**.  If you use an LLM throughout the labs, you will really struggle on the practical when you won't have access to it.
 
-> [!WARNING]
-> At this stage, make sure your Debug Probe is connected to the debug and UART pins of your Proton, as described [here](https://www.raspberrypi.com/documentation/microcontrollers/debug-probe.html).  Add a `printf` after `stdio_init_all()` and turn on the Serial Monitor in VScode to ensure that you are receiving data from the Proton via the probe.
+Implement the function `init_outputs` to configure GPIO pins 22, 23, 24, 25 (also called GP22, GP23, GP24, GP25) as outputs.  You do not need to change any other properties (slew rate, drive strength, etc).  Use the three functions you found in `gpio_init` to do this for each of the pins, or use your answers from above and write the code directly in terms of the registers you found.  (The latter method is more efficient than the other, but you can choose whichever you prefer.)
 
-Implement the function `init_outputs` to configure GPIO pins 16, 17, 18, 25 (also called GP16, GP17, GP18, GP25) as outputs.  You do not need to change any other properties (slew rate, drive strength, etc).  
+GP22-GP25 are the four user LEDs just beneath the buttons on your Proton board, closer to the debugger.
 
-GP25 is the onboard LED on your Proton - you do not have to do any additional wiring for that.
+In your `main` function, call `init_outputs`, and then start an infinite loop that does two things: 
 
-The key requirement of this function is that you must not use the convenience functions `gpio_set_dir` or `gpio_init`.  Instead, your function must directly set and clear values in the corresponding registers that you determined above under the `sio_hw` struct.  What you should do instead is look at the definitions of those functions, and write your code in terms of the lowest level registers that they modify.  
+1. Turn ON each LED from GP22-GP25 in sequence, with a 500 ms delay between each LED. 
 
-An example - if we wanted to configure GP25 as an output, you would write code similar to the pseudocode below:
+2. Turn OFF each LED from GP22-GP25 in sequence, with a 500 ms delay between each LED. 
 
-```C
-sio -> output enable set register = 1 << 25; // Turn on the output enable for the pin
-sio -> clear register = 1 << 25; // Initializes the pin to logic 0
-iobank0 -> io control register[25] = (SIO function number) << (position of the bit that controls the function-select for bank0, gpio0 in iobank0)
-```
+Does this sound too easy?  Here's the catch - **you need to do this without using any of the SDK functions except `sleep_ms`**.  It is actually easier to do so, and doesn't involve any loops.  Don't worry, we'll go back to the SDK functions in the next lab, but you may find that you prefer this method of directly modifying registers as an optimal technique.  
 
-This provides you a consistent format for how you should modify each register.  Some registers are **Write-Only**, so you would write a 1 to achieve some effect, but then you can't read what you previously put into that register.  For those registers, we directly assign the value without reading the prior value first.  All the registers referenced above are examples of Write-Only registers.
+Hint: instead of using `gpio_put` for every one of the four LEDs, you can just write `0xF` by a certain offset to a certain register to turn on all four LEDs in one go, with no loops.
 
-Adapt this code for pins 16, 17, 18 where you should have wired up to LEDs and resistors at this point, as well as for 25 connected to the onboard green LED, and call the function in `main`, followed by three lines to turn on each LED (in the same format as when you cleared them, but using a different register to **set** them).  Run "Upload and Monitor" from PlatformIO or by typing it into the command palette (Ctrl/Cmd-Shift-P), and check that the LEDs turn on.
+You can use the `sleep_ms` function to implement sleep.  What `sleep_ms` does is set a timer in the microcontroller that counts down from the specified number of milliseconds, and when it reaches 0, it **interrupts** the CPU (which enters a sleep state) and wakes it up.  You can dive into the function yourself to see how it works.
 
-They won't turn on.  Try it again.  That still didn't work!  Why is that?  
+Your LEDs should turn on and off in sequence, like this (animated to make it easier to see):
 
-If we dive again into `gpio_set_function`'s definition in `gpio.c`, we will see the line that sets the function of the pin, but perhaps you missed the line that says `hw_clear_bits...`.  This is an example of a weird quirk unique to the RP2350 that we have to work around, and is the reason that the manufacturer provides an SDK, so that we don't have to think about it.  Again, as engineers, it's worth thinking about, so look up "Pad Isolation Latches" in the RP2350 datasheet to see why this line is necessary, in particular, the note about "clearing the ISO bit".
-
-Therefore, you should add one more line to your `init_outputs` function.  
-
-```c
-pads bank0 -> io register array[16] &= ~PADS_BANK0_GPIO0_ISO_BITS; // Clear the ISO bit for pin 16. Also, do this for 17, 18 and 25
-```
-
-*Why didn't you just tell me this earlier?*  Your instructor made the same mistake while learning about the Proton, and this is a good example of what they had to do to debug their code when it didn't work as expected, which was to **use the SDK functions to find what was missing**, and then to **dive into the datasheet to understand why the missing line was necessary**.
-
-Hopefully, this will make your LEDs turn on.  If they still don't, verify that your wiring is correct by testing it with the SDK functions, which should always work assuming correct wiring.  
-
-```c
-gpio_init(16);
-gpio_set_dir(16, GPIO_OUT);
-gpio_put(16, 1);    // repeat for 17,18,25
-```
-
-If it works, carefully compare your `init_outputs` function to the internal code for the SDK functions, and fix any differences.
-
-If it still doesn't work, there's a wiring issue.  Check the polarity of your LEDs, whether your grounds are properly connected, and that the resistors are connected to the LEDs and the **correct** GPIO pins.
+<img src="images/leds.gif" alt="LEDs turning on and off in sequence" width="400"/>
 
 > [!IMPORTANT]
 > Demonstrate to your TA that your code passes the `init_outputs` test in `autotest`, and that the LEDs turn on in sequence.  Answer their questions and show them your code.  
 > 
-> For full credit, your `init_keypad` function must not use any of the SDK functions (`gpio_init`, etc.) and must only directly modify registers.  
-> 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
-
-> [!NOTE]
-> The eagle-eyed among you may notice that we ignored the `hw_write_masked` line after the comment "Set input enable on, output disable off" in `gpio_set_function` in our code.  Sometimes, we don't need everything that the SDK suggests, unless of course something goes wrong!  This was the sort of thing we determined was unnecessary by pure experimentation.
-> 
-> We can also tell this line is unnecessary because it enables the input circuitry for the pin, which we don't necessarily need.  However, we'll need this for the next step...
 
 ## Step 3: Configure input pins for pushbuttons
 
-*Whew*, that was a lot of work to configure outputs!  Thankfully, configuring inputs is mostly *symmetric* to how we configured outputs.  
+Configuring inputs is mostly *symmetric* to how we configured outputs.  
 
-The process for configuring GP20, which should be connected to the left pushbutton, with the SDK functions is as follows:
+In `init_inputs`, write code to configure GP20 and GP21 as inputs.  This should look very similar to what you did above, with a few differences.  Keep in mind that there is no need to set the value of an input pin to 0 or 1 - it just reads the value of the pin.
 
-```c
-gpio_init(20);
-gpio_set_dir(20, GPIO_IN);
-```
+In `main`, comment out the infinite loop you wrote earlier for `init_outputs`, but leave the call to the function uncommented.  Write below that function call.
 
-Duplicate your `init_outputs` function and rename it to `init_inputs`.  Modify it to configure GP20 and GP21 as inputs.  Your function should do the following for **both** GPIO pins:
+Call `init_inputs` in your `main` function, and do the following to test your pushbuttons.  In an infinite loop:
 
-```c
-// Disable the output enable for the pin.
-sio -> output enable clear register = 1 << GPIO_NUM; 
-// Connect the pin to the SIO peripheral.
-iobank0 -> io control register[GPIO_NUM] = (SIO function number) << (position of the bit that controls the function-select for bank0, gpio0 in iobank0)
-```
+1. If the left pushbutton (GP20) is pressed, turn on all the LEDs (GP22-GP25).
+2. **Otherwise**, if the right pushbutton (GP21) is pressed, turn off all the LEDs (GP22-GP25).
+3. Add a 10 ms sleep between each iteration of the loop.
 
-In case you missed the note from the previous step, you need one additional line to set the IE bits in the same io control register. Figure out what register it modifies and assign the correct value to set the IE bits in the register corresponding to GP20 and 21.  The line will look something like this:
+As you did before, **you need to do this without using any of the SDK functions** except `sleep_ms`.  It is actually easier to do so, and doesn't involve any loops.
 
-```c
-pads bank0 -> io register array[20] |= PADS_BANK0_GPIO0_IE_BITS; // Set the IE bit for pin 20, do this for 21 and 22 as well
-```
-
-Then, add the line to clear the ISO bits for GP20 and GP21.  This is the same line as in the previous step, but for pins 20, 21, and 22.
-
-Call `init_inputs` in your `main` function, and add the following code to test your pushbuttons.  Read this carefully as this is an example of how you can manipulate registers with bit shifting and masking to achieve the desired effect.
-
-```c
-// Start an infinite loop (yes, this is valid C!)
-for(;;) {
-    // Read the value of the pushbuttons by:
-    //   1. Reading the value of the GPIO input value register
-    //   2. "Masking" the value to only keep the bits corresponding to the pushbuttons at GP20 and GP21.
-    //   3. Shift it right so that the value is either 0, 1 (right is pressed), 2 (left is pressed), 3 (both are pressed).
-    uint32_t val = ((sio_hw->gpio_in & (3 << 20)) >> 20);
-    // If any button is pressed, turn on the corresponding LEDs RED (GP16) or YELLOW (GP17).
-    // Shift left by 16 so that 0/1/2/3 becomes 0x00000/0x10000/0x20000/0x30000
-    // which turns on the corresponding LED(s) when we assign it to gpio_set.
-    if (val)
-        sio_hw->gpio_set = val << 16;
-    // Otherwise, turn off GP16 and GP17.
-    else
-        sio_hw->gpio_clr = 3 << 16;
-}
-```
+Upload your code and test it.  Pressing the left pushbutton should turn on all the LEDs, and pressing the right pushbutton should turn them off.  If you press both buttons at the same time, the left button should take priority.
 
 > [!IMPORTANT]
 > Demonstrate to your TA that your code passes the `init_inputs` test in `autotest`, and that pressing the left pushbutton turns on the red LED at GP16 and vice-versa with the right pushbutton and the yellow LED at GP17.  Answer their questions and show them your code.  
@@ -275,34 +219,40 @@ for(;;) {
 
 The keypad is your most important key-entry mechanism that you'll likely encounter.  It's a matrix of rows and columns, where each keypress connects a row to a column.  With each lab, we'll improve on the code that will poll the keypad for button presses, but for this lab, we'll keep it simple and do it directly in the main C code.
 
-Using the code you've now written above, configure the following pins as follows in the function `init_keypad`:
-- GP6, GP7, GP8, GP9 as outputs
-- GP10, GP11, GP12, GP13 as inputs
+**Double-check your keypad wiring from Step 0.2!**
 
-Call it in the `main` function, and then write the following loop below the `init_keypad` call:
+![lab1-schem.png](images/lab1_schem.png)
+
+Configure the following pins as follows in the function `init_keypad`:
+- GP2, GP3, GP4, GP5 as inputs to the rows
+- GP6, GP7, GP8, GP9 as outputs to the columns
+
+After `init_inputs`, comment out the infinite while loop we added.  Call `init_keypad` in the `main` function, and then implement the following pseudocode below the `init_keypad` call:
 
 ```C
 int COLS[] = {6, 7, 8, 9};  // COL4=GP6, COL3=GP7, COL2=GP8, COL1=GP9
-int ROWS[] = {2, 3, 4, 5};  // ROW4=GP10, ROW3=GP11, ROW2=GP12, ROW1=GP13
-while(true) {
-    loop i = 1, 2, 3, 4 {
-        set ith column to be 1 using the SIO gpio_set register (see the COLS array)
+int ROWS[] = {2, 3, 4, 5};  // ROW4=GP2, ROW3=GP3, ROW2=GP12, ROW1=GP13
+while (true) {
+    loop i = 0, 1, 2, 3 {
+        set pin at COLS[i] to be 1
         sleep for 10 ms using "sleep_ms"
-        read the ith row using the SIO gpio_in register
-        if the ith row is 0, turn OFF the corresponding LED using the SIO gpio_set register
-        else, turn ON the corresponding LED using the SIO gpio_set register
-        turn off the ith column using the SIO gpio_clr register
+        read the value of the pin at ROWS[i]
+        if pin at ROWS[i] is 0, turn OFF the corresponding LED (e.g. if i == 0, turn OFF GP25. if i == 3, turn OFF GP22)
+        else, turn ON the corresponding LED
+        turn off pin at COLS[i]
     }
 }
 ```
 
-Note the `sleep_ms` line - this is needed to ensure that when we drive a logic 1 to the pin, the current "settles" before we read the row pins, so that we can get a reliable reading.
+Again, you need to do this without using any of the SDK functions except `sleep_ms`.  
+
+Note the `sleep_ms` line - this is needed to ensure that when we drive a logic 1 to the pin, the current "settles" before we read the row pins, so that we can get a reliable reading.  However, this does mean that there is at least a 40 ms delay between two detections of the same keypress.  Try playing with the sleep duration to see how it affects your keypad's responsiveness.
 
 Students often get confused at this step - if you'd like a visualization of what's supposed to happen when reading the keypad, here's a flowchart.  Each key on the diagonal should turn on one LED, and their associated positions are shown on the diagram:
 
-![keypad_diagram](Keypad_abridged.png)
+![keypad_diagram](images/Keypad_abridged.png)
 
-So, holding 1 should turn on the LED at GP16, holding 5 should turn on the LED at GP17, etc.
+So, holding 1 should turn on the LED at GP22 (red), holding 5 should turn on the LED at GP23 (yellow), holding 9 should turn on the LED at GP24 (green), and holding D should turn on the LED at GP25 (blue).  Holding multiple keys should turn on multiple corresponding LEDs.  If you press a key and the LED does not turn on, check your wiring and make sure that `init_outputs` is still being called in your `main` function.
 
 > [!IMPORTANT]
 > Demonstrate to your TA that your code passes the `init_keypad` test in `autotest`, and that pressing 1/5/9/D turns on the corresponding LEDs on your board.  Answer their questions and show them your code.  
@@ -316,7 +266,7 @@ So, holding 1 should turn on the LED at GP16, holding 5 should turn on the LED a
 > [!CAUTION]
 In ECE 362, you must do two things to achieve full credit on a lab:
 1. **Demonstrate all steps you were able to complete to your TA**.  You are expected to verify that you got checked off here: https://engineering.purdue.edu/ece362/checkoff/  The last step is a penalty step and must have been given full credit to avoid a lab penalty.
-2. Run `verify` in `autotest` to generate your confirmation code.  Make sure to first set your username in the `main.c` file.  Save the confirmation code ONLY into a new file called "confirmation.txt" in the root of your repository.  **Double-check that your confirmation code is accepted on Gradescope and that it gives you the points you earned**, **because we will not change scores** after the lab is due for missing or mistakenly-typed confirmation codes.
+2. Run `verify` in `autotest` to generate your confirmation code.  Make sure to first set your username in the `main.c` file.  Save the confirmation code ONLY into a new file called "confirmation.txt" in the root of your repository.  **Double-check that your confirmation code is accepted on Gradescope and that it gives you the points you earned**, **because we will not change scores** for missing or mistakenly-typed confirmation codes after the lab is due.
 
 Failure to get checked off for all completed work (as per the confirmation code) will result in a 20% penalty.  Getting checked off is for necessary physical verification by your TAs that you did your work on your own breadboard.
 
