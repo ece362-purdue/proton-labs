@@ -167,7 +167,7 @@ See the animation above, and use that technique to dive into the three constitue
 
 Implement the function `init_outputs` to configure GPIO pins 22, 23, 24, 25 (also called GP22, GP23, GP24, GP25) as outputs.  You do not need to change any other properties (slew rate, drive strength, etc).  Use the three functions you found in `gpio_init` to do this for each of the pins, or use your answers from above and write the code directly in terms of the registers you found.  (The latter method is more efficient than the other, but you can choose whichever you prefer.)
 
-GP22-GP25 are the four user LEDs just beneath the buttons on your Proton board, closer to the debugger.
+GP22-GP25 are the four user LEDs just beneath the "21" and "26" buttons on your Proton board, closer to the debugger.
 
 In your `main` function, call `init_outputs`, and then start an infinite loop that does two things: 
 
@@ -181,7 +181,7 @@ Hint: instead of using `gpio_put` for every one of the four LEDs, you can just w
 
 You can use the `sleep_ms` function to implement sleep.  What `sleep_ms` does is set a timer in the microcontroller that counts down from the specified number of milliseconds, and when it reaches 0, it **interrupts** the CPU (which enters a sleep state) and wakes it up.  You can dive into the function yourself to see how it works.
 
-Your LEDs should turn on and off in sequence, like this (animated to make it easier to see):
+Your LEDs should turn on and off like a Johnson counter (animated to make it easier to see):
 
 <img src="images/leds.gif" alt="LEDs turning on and off in sequence" width="400"/>
 
@@ -194,22 +194,25 @@ Your LEDs should turn on and off in sequence, like this (animated to make it eas
 
 Configuring inputs is mostly *symmetric* to how we configured outputs.  
 
-In `init_inputs`, write code to configure GP20 and GP21 as inputs.  This should look very similar to what you did above, with a few differences.  Keep in mind that there is no need to set the value of an input pin to 0 or 1 - it just reads the value of the pin.
+> [!TIP]
+> With your breadboard facing you such that the Proton board's USB is on the right, and the debugger's USB cable goes out to the top of your breadboard, the "left" pushbutton is the one connected to GP26, and the "right" pushbutton is the one connected to GP21.  You can also read the labels next to the buttons to confirm.
+
+In `init_inputs`, write code to configure GP21 and GP26 as inputs.  This should look very similar to what you did above, with a few differences.  Keep in mind that there is no need to set the value of an input pin to 0 or 1 - it just reads the value of the pin.
 
 In `main`, comment out the infinite loop you wrote earlier for `init_outputs`, but leave the call to the function uncommented.  Write below that function call.
 
 Call `init_inputs` in your `main` function, and do the following to test your pushbuttons.  In an infinite loop:
 
-1. If the left pushbutton (GP20) is pressed, turn on all the LEDs (GP22-GP25).
-2. **Otherwise**, if the right pushbutton (GP21) is pressed, turn off all the LEDs (GP22-GP25).
+1. If the pushbutton on GP21 is pressed, turn on all the LEDs (GP22-GP25).
+2. **Otherwise**, if the pushbutton on GP26 is pressed, turn off all the LEDs (GP22-GP25).
 3. Add a 10 ms sleep between each iteration of the loop.
 
 As you did before, **you need to do this without using any of the SDK functions** except `sleep_ms`.  It is actually easier to do so, and doesn't involve any loops.
 
-Upload your code and test it.  Pressing the left pushbutton should turn on all the LEDs, and pressing the right pushbutton should turn them off.  If you press both buttons at the same time, the left button should take priority.
+Upload your code and test it.  Pressing GP21 should turn on all the LEDs, and pressing GP26 should turn them all off.  If you press both buttons at the same time, the "21" button should take priority.
 
 > [!IMPORTANT]
-> Demonstrate to your TA that your code passes the `init_inputs` test in `autotest`, and that pressing the left pushbutton turns on the red LED at GP16 and vice-versa with the right pushbutton and the yellow LED at GP17.  Answer their questions and show them your code.  
+> Demonstrate the behavior described above to your TA, and show that you are passing the `init_inputs` test in autotest.  Answer their questions and show them your code.  
 > 
 > For full credit, your `init_inputs` function must not use any of the SDK functions (`gpio_init`, etc.) and must only directly modify registers.  
 >
