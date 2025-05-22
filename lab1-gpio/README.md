@@ -49,11 +49,33 @@ GPIO pins on any microcontroller can take on one of three functionalities:
 
 3. Or, the pin can be used for by another peripheral on your microcontroller entirely.  This is useful for allowing other peripherals on the microcontroller, such as UART, SPI, ADC/DAC, etc. to use the pin for their own purposes.
 
-This lab will be the first time that you will write code that *configures* a peripheral.  The way a microcontroller works is by writing some code in C that configures the **hardware registers**, which are sections of memory that control the behavior of the microcontroller's CPU core and its peripherals.  The RP2350 microcontroller on your Proton board has a set of hardware registers that control the behavior of the GPIO pins, and you will write code that configures these registers to control the behavior of the pins.
+This lab will be the first time that you will write code that *configures* a peripheral.  The way setting up a microcontroller works is by writing some code that configures the **hardware registers** - sections of memory that control the behavior of the microcontroller's CPU core and/or its peripherals.  The RP2350 microcontroller on your Proton board has a set of hardware registers that control the behavior of the GPIO pins, and you will write code that configures these registers to control the behavior of the pins.
+
+For the RP2350 specifically, the registers will look like this:
+
+```c
+peripheral_hw->registername
+```
+
+So the output of the GPIO pins, controlled by the SIO peripheral, is this 32-bit register:
+
+```c
+sio_hw->gpio_out
+```
+
+where each bit of the register corresponds to a different GPIO pin.  The GPIO pins are numbered from 0 to 47, but since registers are only 32 bits, `gpio_out` only corresponds to GP0 (least significant bit) to GP31 (most significant bit).  Therefore, bit 0 of the register corresponds to GPIO pin 0, bit 1 corresponds to GPIO pin 1, and so on.  For GPIOs higher than 31, there is the `sio_hw->gpio_hi_out` register.
+
+> [!NOTE]
+> *Why not just have one register for all 48 GPIO pins?*  
+> OR *What does it mean to say that the RP2350 is a 32-bit microcontroller?*
+> 
+> The RP2350 CPU cores are **32-bit**, which means the largest register they can operate on in a single "cycle" is 32 bits.  You may see functions that imply they can change 64 bits of data at a time, but if you dive into it, it's just writing to two 32-bit registers, e.g. `gpio_put_all64`.
 
 Therefore, to configure a pin to act as an output to drive current to some external component, you will need to write code that modifies specific registers in memory to do so.  Raspberry Pi offers an API with functions that would do all this for you, but in this course, you will dive into the functions to see what registers they are changing.  We do this so that you understand how your microcontroller works at the lowest level, and how to debug your code when it doesn't work as expected.  Therefore, **do not use online examples unless otherwise directed.**
 
-Nearly all of you are coming from ECE 270, where you wrote Verilog to implement hardware.  Think of this course as a continuation of that, in that your microcontroller is the overall **top module** that instantiates the various peripherals as **submodules**.  When you flash your microcontroller with a program, the instructions contained in that program can be used to change the values of the registers in those peripherals/submodules.  This is how we program a microcontroller to implement an overall embedded system.
+Nearly all of you are coming from ECE 270, where you wrote Verilog to implement hardware.  This course is a continuation of that, in that your microcontroller is the overall **top module** that instantiates the various peripherals as **submodules**.  
+
+When you flash your microcontroller with a program, the instructions executed by the CPU/top module in that program can be used to change the values of the registers in those peripherals/submodules.  This is how we will implement an **embedded system**.
 
 ## Step 0.1: Set up your environment
 
@@ -120,6 +142,8 @@ The first step to understanding any microcontroller is to read the datasheet.  T
 
 The Proton board is, strictly speaking, not actually the microcontroller itself - it is a **development board** on which you have an RP2350B microcontroller, which is the black square chip in the center of your Proton board.  This chip is what holds your microprocessor cores and peripherals.  The 8-pin W25Q128JVS flash memory chip above the RP2350 is what receives and stores your program when you click "Upload" in VScode.  When you press the reset button, or provide power to your board, the RP2350 chip reads the program from this flash memory and executes it.  That code can then be made to interact with the peripherals on the RP2350 chip, and for this lab in particular, configure and control the GPIO pins on the RP2350.
 
+![flash and power](images/flash-power.png)
+
 Therefore, when we want to understand the internals of the microcontroller we wish to work with, we want to look up datasheets for "RP2350", not "Proton".  Bookmark the [Proton datasheets page](https://ece362-purdue.github.io/proton-labs/datasheets/) to be your starting point, where we link the various Raspberry Pi pages that you will find helpful in understanding and utilizing the RP2350 microcontroller.
 
 You can gain a basic introduction to your RP2350 chip by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).  You may have to scroll down to the next page.
@@ -136,7 +160,7 @@ https://github.com/user-attachments/assets/081f1251-55cd-4d20-8b06-419479307833
 
 See the animation above, and use that technique to dive into the three constituent functions of `gpio_init` to determine what registers are being modified, and note them down.  A register takes the form `peripheral->registername`, for example `sio_hw->gpio_in`.  Here, the peripheral that controls the GPIO pins is `sio_hw`, and `gpio_in` is the register that returns the high/low state of the GPIO pins, with each bit of the register indicating a different pin.
 
-1. (15 points) What four registers are used to set the direction of a GPIO pin?  When is one pair of registers used over the other?  Show your TA where you found this information after diving through the `gpio_init` function.  Give an example of a value for `mask` that would configure GP21 as an input, and GP22 as an output.  Note that `PICO_USE_GPIO_COPROCESSOR` is not defined and that the total number of GPIOs on the RP2350B is 48.
+1. (15 points) What four `sio_hw` registers are used to set the direction of a GPIO pin?  When is one pair of registers used over the other?  Show your TA where you found this information after diving through the `gpio_init` function.  Give an example of a value for `mask` that would configure GP21 as an input, and GP22 as an output.  Note that `PICO_USE_GPIO_COPROCESSOR` is not defined and that the total number of GPIOs on the RP2350B is 48.
 
 2. (5 points) What third register would you check to confirm if a GPIO pin was configured as an input or output?  Show your TA how you arrived at your answer.  (Hint: the registers above are write-only, so you can't read them back to check if pins were configured correctly.)
 
