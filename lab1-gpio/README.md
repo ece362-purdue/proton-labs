@@ -100,7 +100,7 @@ If you are on Mac, the port will be `/dev/cu.usbmodemXXXX` where `XXXX` is a num
 
 On Mac or Linux, you can find the port by comparing the outputs of running `ls /dev/tty*` in a terminal window before and after plugging in your board.  The new device that appears is your board.
 
-If you don't see anything after the serial port connection is established, press the Reset pushbutton you wired in lab 0 to see the introductory text from `autotest`.  Try typing something, and you should see the characters appear.  That should confirm the connection is working as intended.
+If you don't see anything after the serial port connection is established, press the Reset pushbutton to see the introductory text from `autotest`.  Try typing something, and you should see the characters appear.  That should confirm the connection is working as intended.
 
 You should see a prompt similar to the following:
 
@@ -168,7 +168,9 @@ See the animation above, and use that technique to dive into the three constitue
 
 4. (5 points) What register can be used to read the value of a GPIO pin, regardless of whether it is configured as an input or output?  Show your TA how you arrived at your answer.
 
-5. (20 points) What three registers are modified when setting the function for a GPIO pin?  What is the function number for SIO?  Show your TA how you arrived at your answers.  (Hint: you can find the number for SIO by diving into the `gpio_function_t` enum in the relevant function.)
+5. (15 points) What three registers are modified when setting the function for a GPIO pin?  What is the function number for SIO?  Show your TA how you arrived at your answers.  (Hint: you can find the SIO function number by diving into the `gpio_function_t` enum in the relevant function.)
+
+6. (5 points) In the function that sets the function for a GPIO pin, there is code specifically for the RP2350 (`#if !PICO_RP2040`) that has the comment "// Remove pad isolation now that the correct peripheral is in control of the pad".  Read Section 9.7 to understand what a "pad" is, and why you need to remove the isolation latch.  Show the relevant paragraph to your TA and discuss it so you understand it.
 
 > [!HINT]
 > The registers you find should start with `sio_hw` or `io_bank0_hw`, which are the SDK-provided structs that define hardware registers that, in turn, control the GPIO pins.  (You can even *dive* into `sio_hw`/`io_bank0_hw` to see the memory addresses they are defined at, and compare that to your datasheet!)

@@ -337,7 +337,11 @@ If you see the four colored LEDs on the Proton board turn on and off in sequence
 
 At the same time, we also see the "Hello, world!" message appear in the **serial monitor**.  This is the output from the `printf` statement in our code.  The serial monitor is a tool that allows us to send and receive data from the microcontroller over the UART interface.  You can use it to send commands to your microcontroller, or to receive data from it.
 
-Now, we're going to learn how to debug by **stepping through** our code.  Set a breakpoint on the `gpio_init_mask` line by clicking in the left margin of the editor window - you'll see a red dot appear.  Then, in the PlatformIO menu, move your cursor down to Quick Access and click Start Debugging.  Alternatively, you can press F5 (or Fn+F5, depending on your keyboard) to start debugging.  
+A critical function to any microcontroller development environment is to be able to **reset** your code so that you can start it again from the beginning.  On our Proton board, this is achieved with the Reset pushbutton.  Your RP2350 can be reset by pressing this button which connects a pin called RUN on your RP2350 micro, to ground.  The active-low RUN signal will then cause the RP2350 to fully reset and start executing code from the boot address.  The same thing happens when you unplug and replug your Proton board - a **power-on reset** (POR) occurs in that case.
+
+Try holding the Reset button - you'll see that the micro doesn't run code until you let go of the button.  You might recall this behavior from ECE 270, where you had `rst`/reset ports in your submodules.  It's the exact same thing here!
+
+Now, we're going to learn how to debug by **stepping through** our code, line by line, similar to how you debugged C in ECE 264.  Set a breakpoint on the `gpio_init_mask` line by clicking in the left margin of the editor window - you'll see a red dot appear.  Then, in the PlatformIO menu, move your cursor down to Quick Access and click Start Debugging.  Alternatively, you can press F5 (or Fn+F5, depending on your keyboard) to start debugging.  
 
 This will open the Debug view, which starts at the `ldr r0, =BOOTROM_VTABLE_OFFSET` line in the boot assembly code for the RP2350 (you can safely close this `crt0.S` file), which jumps you to the `main` function.  Here is how it should look.
 
