@@ -10,9 +10,9 @@
 | 0.2 | Read about interrupts |   |
 | 1 | Read the datasheet | 30 |
 | 2 | Configure external interrupts | 20 |
-| 3 | Configure Platform Timer interrupts | 20 |
-| 4 | Configure doorbell interrupts | 30 |
-| 5 | In-Lab Checkoff Step | 20* |
+| 3 | Configure keypad interrupts | 30 |
+| 4 | Configure FIFO interrupts | 20 |
+| 5 | Confirm your checkoffs before leaving | * |
 | &nbsp; | Total: | 100 |
 <br>
 
@@ -34,13 +34,13 @@ There's three types of interrupts we can explore that's common to most microcont
     - You might use a timer interrupt to periodically sample a sensor or update a display.
     - You might use a UART interrupt to signal that a new character has been received on a serial line, or that the transmission is complete and the UART is ready for a new character to be transmitted.
 
-3. With the RP2350 microcontroller, we have a very interesting **third** type of interrupt: **doorbell interrupts**!  If you hadn't noticed, your Proton has two pairs of ARM and RISC-V CPU cores that you can use (only one pair can be active at any time), and this lab gives you an opportunity to explore how to use them.  Doorbell interrupts are a way for one CPU core to signal the other CPU core that it has something important to do, and the other core will stop what it's doing and execute the corresponding ISR.  This is a very powerful feature that you can use to offload tasks from one core to another, or to signal that a task is complete.
+3. With the RP2350 microcontroller, we have a very interesting **third** type of interrupt: **FIFO interrupts**!  If you hadn't noticed, your Proton has two pairs of ARM and RISC-V CPU cores that you can use (only one pair can be active at any time), and this lab will give you an opportunity to use them.  FIFO interrupts are a way for one CPU core to send messages to the other CPU core, which will stop what it is doing and handle that message appropriately.  This is a very powerful feature that you can use to offload tasks from one core to another, or to signal that a task is complete.
 
 ## Instructional Objectives
 - To understand the concept of interrupts.
 - To learn how to configure an external interrupt on the RP2350 microcontroller.
 - To learn how to configure a platform timer interrupt on the RP2350 microcontroller.
-- To learn how to configure a doorbell interrupt on the RP2350 microcontroller.
+- To learn how to configure a inter-processor FIFO interrupt on the RP2350 microcontroller.
 
 > [!IMPORTANT]
 > Similar to 270, 362 labs should be started at home, and checked off in lab.  **Do not wait to start your lab in your lab section, or you will not finish.**  You must be **checked off for all steps in lab** to receive full credit.
@@ -108,9 +108,6 @@ So, what interrupts are available?  Scroll down to [Section 3.2](https://datashe
 - "Cross-core FIFO interrupts: SIO_IRQ_FIFO and SIO_IRQ_FIFO_NS (Section 3.1.5)"
     - Also called "mailboxes", these are used to send ordered messages between the two cores.
     - We'll use this in Step 4.
-- "Cross-core doorbell interrupts: SIO_IRQ_BELL and SIO_IRQ_BELL_NS (Section 3.1.6)"
-    - These are used to signal the other core that it has *something* to do, but doesn't necessarily have to be ordered or contain other data like the mailbox interrupt.
-    - We will use these in Step 4.
 - "GPIO interrupts: IO_IRQ_BANK0, IRQ_IO_BANK0_NS, IO_IRQ_QSPI, IO_IRQ_QSPI_NS (Section 9.5)"
     - When an **external** (GPIO pin) interrupt occurs, the GPIO pins can be configured to generate an interrupt signal that can be sent to the CPU cores, which are also configured to handle those interrupts.
     - If an ISR is called, it is very important to **acknowledge** the interrupt, otherwise it will keep firing over and over again, even if the interrupt condition is no longer true.
@@ -126,7 +123,7 @@ Make sure you did the reading in Step 0.2, and then read the following sections 
 [Chapter 3.2: Interrupts](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A85%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C361.924%2Cnull%5D)
 
 1. To enable interrupts from a specific source, we need to know the IRQ number.  What is the IRQ number for the non-secure GPIO interrupts from Bank 0?
-2. What is/are the IRQ number(s) for the non-secure cross-core doorbell interrupt(s)?  Are there different IRQ numbers for both active cores?
+2. What is/are the IRQ number(s) for the non-secure cross-core FIFO interrupt(s)?  Are there different IRQ numbers for both active cores?
 3. Is it possible for one interrupt handler to **interrupt** another interrupt handler?  How do the cores know which interrupt handler is allowed to interrupt another one, i.e. which registers specify this order on the ARM and RISC-V cores?
 
 [Chapter 9.5: GPIO Interrupts](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A594%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C564.608%2Cnull%5D)
@@ -137,10 +134,10 @@ Make sure you did the reading in Step 0.2, and then read the following sections 
 7. What is the name of the register in which we should **acknowledge** the interrupt?
     - If you don't do this as the first line of your ISR, the interrupt will keep firing over and over again, even if the interrupt condition is no longer true.
 
-[Chapter 3.1.6: Doorbells](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A45%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C147.15%2Cnull%5D)
+[Chapter 3.1.5: Inter-processor FIFOs (Mailboxes)](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A45%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C682.714%2Cnull%5D)
 
-7. Which register should you write to to trigger the opposite core's doorbell non-secure interrupt?
-8. Could a processor core ring its own doorbell?  
+7. The RP2350 has two FIFOs, one incoming, one outgoing.  What register should a core write to to send a message via the outgoing FIFO?
+8. What register should a core read from to receive a message from the incoming FIFO?  
 
 You'll notice that there's not any information about **configuring** or **enabling** an interrupt before we can use it, like we did with GPIO pins in the previous lab.  We don't know this yet by just looking at the datasheet, so we'll have to wait until the corresponding step here to find out.  Datasheets can be weird like that...
 
@@ -158,8 +155,6 @@ You'll notice that there's not any information about **configuring** or **enabli
 > In "Sleep", the clocks are still running to various peripherals (especially ones that could receive communication from another device, which we'll get to in later labs), and the CPU is still running, but the CPU is halted.  In the "Dormant" state, the clocks are stopped to all peripherals, and the CPU is halted.  
 > 
 > When we start implementing external interrupts, the only thing we're expecting to change is a GPIO pin, so it's safe to turn off all clocks.  This is especially useful for battery-powered devices, where you want to save as much power as possible.
-> 
-> However, for the doorbell interrupts, we still need an active clock signal since the CPU cores still need that to function, so we'll use the "Sleep" state in that case!  
 
 > [!IMPORTANT]
 > Show your answers for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
@@ -173,6 +168,8 @@ You'll notice that there's not any information about **configuring** or **enabli
 
 In this step, you will configure an external interrupt on your Proton board that will wake our microcontroller from the DORMANT state.  We'll configure it so that when you press GP21, the microcontroller will enter the DORMANT state, and pressing GP26 will wake it up from that state.
 We'll also configure the interrupt to toggle the green LED on GP25 on and off.
+
+Uncomment the `#define STEP1` line in `main.c`, and ensure that `#define STEP2` and `#define STEP3` are still commented out.  
 
 Copy in the `init_inputs` and `init_outputs` functions you implemented in lab 1 so that the GPIO pins for the pushbuttons and user LEDs are configured correctly.  There are already function calls for them in `main`.
 
@@ -225,9 +222,11 @@ Pressing GP26 should cause the Proton to wake up from the dormant state, execute
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-### Step 3: Configure external interrupts on the keypad
+### Step 3: Configure external interrupts from the keypad
 
 Copy in the `init_keypad` function you implemented in lab 1 so that the GPIO pins for the keypad are configured correctly.  
+
+Uncomment the `#define STEP2` line in `main.c`, and ensure that `#define STEP1` and `#define STEP3` are commented out.  
 
 You may recall from the last lab that we implemented a loop to poll the keypad for a keypress.  We did this by selecting a column pin, driving it to a logic high, and then checking the row pins to see if any of them were pulled low.
 
@@ -242,7 +241,8 @@ In the function `init_keypad_irq`:
 To implement the ISR, we need to keep in mind that `keypad_isr` could get called for any button press (and row pin going high), so we need to know two things to figure out the button:
 
 1. Which column pin is currently being driven high?
-    - The function `drive_column` needs to be implemented to do this.  In this function, drive high the pin indicated by the value of the global variable `col`, and drive all other column pins low.  For example if `col` is 0, drive GP6 high and GP7, GP8, GP9 low.  After doing so, increment `col` by 1.  If `col` is 3, set `col` back to 0.  Sleep for 25 milliseconds to allow the row pins to settle before checking them.  This is important to ensure we have enough time to let the current reach the row pins if a button was pressed.
+    - The function `drive_column` needs to be implemented to do this.  In this function, drive high the pin indicated by the value of the global variable `col`, and drive all other column pins low.  For example if `col` is 0, drive GP6 high and GP7, GP8, GP9 low.  After doing so, increment `col` by 1.  If `col` is 3, set `col` back to 0.  
+    - At the end of the `drive_column` function, sleep for 25 milliseconds to allow the row pins to settle before checking them.  This is important to ensure we have enough time to let the current reach the row pins if a button was pressed.
     - The value of `col` will therefore tell us which column is active.
 
 2. Which row pin is currently being pulled high?
@@ -262,69 +262,65 @@ Upload and monitor in PlatformIO.  Hopefully, pressing a button on your keypad s
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-### Step 4: Configure doorbell interrupts
+### Step 4: Configure FIFO interrupts
 
 > [!WARNING]
-> Multi-core programming may not be covered in lecture.  If there are any doubts as to how this works, ask your **lab** instructor to clarify them.
+> Multi-core programming may not be covered in lecture.  If there are any doubts as to how this works, ask your lab instructor to clarify them.
 
-Now for the fun part!  We're going to offload the column driving function to the second core on your Proton, while having the first core keep track of whether a button was pressed or released.  This is perhaps far too simplistic, but as computation scales, you may find it useful to dedicate one core to handling computation and the other to handling all the external stimuli/responses.  
+Now for the fun part!  We're going to offload the keypad polling to the second core on your RP2350, and have it notify the first core when a key is pressed, letting it use that information without having it also check the keypad!  This is a simplistic example of how you can dedicate one core to handling computation while receiving messages from the other core, which handles all external stimuli/responses.  
 
-Your Proton has a total of four cores, two ARM-based, and two RISC-V-based.  ARM and RISC-V are examples of **instruction set architectures**, or different formats of machine code.  That means that ARM cores can't execute RISC-V programs, and vice-versa.  
+Your Proton's RP2350 has a total of four cores, two ARM-based, and two RISC-V-based.  ARM and RISC-V are examples of **instruction set architectures**, or different formats of machine code.  That means that ARM cores can't execute RISC-V programs, and vice-versa.  
 
-> At the time of writing (May 2025), we have not yet built in support for compiling to RISC-V in PlatformIO.  If this is really needed, you can use the [Pico SDK](https://github.com/raspberrypi/pico-sdk) directly from Raspberry Pi.
+> At the time of writing (May 2025), we have not yet built in support for compiling to RISC-V in PlatformIO.  If you really need this for some reason, like the project, you can use the [Pico SDK](https://github.com/raspberrypi/pico-sdk) directly from Raspberry Pi.
 
 On the Proton specifically, the ARM cores carry a lot more functionality like floating-point computations and security features at the cost of having to license the instruction set from ARM, while the RISC-V cores are free and open source (you can even see the Verilog used to make them [here](https://github.com/Wren6991/Hazard3)) and are meant more for academic experimentation.  For the embedded labs, we'll just use the default ARM cores to simplify things.
 
-In this step, we'll do the following on the two cores:
-- Core 0 will set up core 1, and 
+So here's what we're going to do:
 
-![dual-core](images/dual-core.png)
+1. Core 0, the "main" core, will configure core 1 to set up the column driving and keypad interrupts.  When it receives a message from core 1 with a key press, it will print out that event (for the time being).
 
-This diagram shows the various interaction methods between the cores on the bus fabric, so that the CPU cores can access things like:
-- Their own and each other's CPUID (typically just 0 and 1)
-- 4x32-byte FIFO queue for each core to pass messages.
-- 32 hardware spinlocks for each core to lock shared resources in memory.
-- 8 doorbell interrupts "each way" for the cores to signal the other core to do something.
-- The RISC-V Platform Timer we configured in Step 3.
+2. Core 1, when it starts, will handle the column driving and keypad interrupts, and send a message to core 0 when a key is pressed.  It will also be responsible for driving the column pins high and low.
+
+The diagram below shows the interaction between the keypad GPIO pins, the two cores, and the FIFO interrupts.  The code at the top shows which cores will execute which functions, although all the functions belong to the same uploaded program.  
+
+![fifo.drawio](images/fifo.drawio.png)
 
 The "Secure/Non-Secure SIO" refers to the ability to have secure and non-secure memory regions on the Proton, where "secured" code has access to the secure peripherals and memory regions, and the non-secure world has access to the rest.  We won't worry about this for the most part - we're only using the Non-Secure SIO anyway.  
 
-At the top, each core **loads** the same instructions from memory, so our code needs to tell the individual cores to do different things.  [Section 5.3](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A377%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C511.598%2Cnull%5D) describes how the non-primary second core can be started with a different block of code.
+[Section 5.3](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A378%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C511.598%2Cnull%5D) describes how the processor core is started.  In this section, you'll want to identify three key SDK functions.
 
-Comment out `init_timer_irq` and complete the following functions as follows:
+1. Which function is used to start the second core with a specific function that acts as the `main` function for that core?
+2. Which function is used to send a message to the second core?
+3. Which function is used to receive a message from the second core?
 
-- `init_gpio_doorbell_irq` - does exactly the same thing as `init_gpio_irq`, except it adds `core0_gpio_callback` as the ISR.
-- `core0_gpio_callback` - triggers a doorbell interrupt on the opposite core.  You have to assign a specific value to a certain register that we discussed in Step 1 to "raise an interrupt on the opposite core".
-- `core1_main` - this is the main function for the second core.  In it:
-    - Configure GP25 as an output as you did earlier (make sure not to do it in the core 0 `main` as well!).
-    - Add `core1_led_callback` as the ISR for when a doorbell interrupt occurs.  The IRQ number for the doorbell interrupt is the same as the one you found in Step 1.  Don't forget to enable the interrupt as well!
-    - Add the infinite loop from `main` that executes the `wfi` instruction and sleeps 1 ms after waking.
-- `core1_led_callback` - when the doorbell interrupt fires, toggle the LED on GP25.
+Make sure to comment out the `#define STEP1` and `#define STEP2` lines, and uncomment the `#define STEP3` line. 
 
-In `main` which runs on core 0, call `init_gpio_doorbell_irq`, and then use the `multicore_launch_core1` function to start `core1_main` on core 1.  Flash your program to your Proton, and press the left pushbutton on your breadboard.  If the LED has already turned on, it may be that the interrupt fired immediately, so press the button again to see the LED toggle on and off... which won't work!  
+Under `main`, scroll down to the STEP3 stanza, and replace the `// TODO` comments with the respective functions in order to: 
 
-Try pressing Reset to see if that fixes it, and that should properly recognize the pushbutton at a logic 0, so when you press the Right pushbutton, it turns on the LED, but it doesn't seem to turn off!  Notice, however, that is slightly dimmer than usual... that is a hint that your callback function is being called over and over again, even though we're not pressing a pushbutton.  Why is that?
+1. Launch the function `init_fifo_irq` on core 1.  Core 1 will then execute this function as its main function.
 
-If we look back at the datasheet under [Section 3.1.6: Doorbells](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A44%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C147.15%2Cnull%5D), we see that in order to raise a doorbell interrupt, we write to an OUT_SET register, but it seems that we missed that the opposite core also needs to write the same value to an IN_CLR register!  Add this line to `core1_led_callback`, and you should now be able to toggle the LED on and off with the left pushbutton.  (You may have to press Reset after flashing over SWD for this to work properly).
+2. Pop a value from the multicore FIFO queue and store it in the global variable `key`.  The function you use should **block** until an element appears in the FIFO queue.  The next line should then print that received value to the Serial Monitor.  Since the function is blocking, it will wait until core 1 sends a message before continuing.  This is how we can synchronize the two cores.
 
-Congratulations on running your first multi-core interruptible embedded program!
+Next, implement `init_fifo_irq` to run the exact same code as the STEP2 stanza - call `init_keypad_irq` and in an infinite loop, call `drive_column`.  Thus, we move the keypad polling code to core 1, letting core 0 handle the printing of the key value when it's received.
+
+Upload and monitor your code.  You should see the same output as before, but now the keypad polling is being done on core 1, while core 0 is waiting for key presses from core 1 and printing them out as it receives them.
+
+Congratulations on writing and running your first dual-core interruptible embedded program!
 
 > [!IMPORTANT]
-> Show your implementation to your TA.  Show the LED turning on and off when you press the left pushbutton, and the LED turning on when you press the right pushbutton.  
-> 
-> Show your TA that your code runs on different cores by starting the debugger with a breakpoint in `core1_led_callback`, and show that the function is being executed by core 1 in the Call Stack view in the debugger. 
+> Show your TA that your code runs on different cores by starting the debugger with a breakpoint in `drive_column`, and show that the function is being executed by core 1 in the Call Stack view in the debugger.  
 >
-> Show that you pass the `doorbell` test in the test suite by typing `doorbell` in the Serial Monitor.
+> Show that you pass the (not very comprenhensive) `fifo` test in the test suite by typing `fifo` in the Serial Monitor.
 > 
 > You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-### Step 5: In-Lab Checkoff Step
+### Step 5: Confirm your checkoffs before leaving
 
 > [!CAUTION]
 > Make sure you got checked off here: https://engineering.purdue.edu/ece362/checkoff/
 > 
 > Make sure to upload your confirmation code and verify that it is accepted by Gradescope.  You will know it is accepted if you get the points from Gradescope.
 > 
-> Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs, that your confirmation code was accepted on Gradescope before logging out and leaving for the day.
+> Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs and that your confirmation code was accepted on Gradescope before logging out and leaving for the day.
