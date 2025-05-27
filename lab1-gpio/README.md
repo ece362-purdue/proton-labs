@@ -290,7 +290,7 @@ So, holding 1 should turn on the LED at GP22 (red), holding 5 should turn on the
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.  
 
-## Step 5: In-Lab Checkoff Step
+## Step 5: Confirm your checkoffs before leaving
 
 > [!CAUTION]
 In ECE 362, you must do two things to achieve full credit on a lab:
