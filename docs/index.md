@@ -30,6 +30,10 @@ Purdue Proton is an educational RP2350B devboard with a detachable debug probe i
 
 *Purchase links will be made available once boards have been finalized.*
 
+If you are not at Purdue, but would like to register your interest in purchasing one or more boards, please fill out [this form](https://forms.gle/XMFKNietPEQpbKfP8).
+
+If you are at Purdue, please contact the [lab-coordinator-in-charge for ECE 36200](mailto:niraj@purdue.edu) to obtain a board.
+
 ## Schematics, Pinouts, and Datasheets
 
 You can find the schematics, pinouts, and datasheets for the Purdue Proton [here](datasheets.md).
