@@ -9,9 +9,9 @@
 | 0.1 | Set up your environment |   |
 | 0.2 | Read about interrupts |   |
 | 1 | Read the datasheet | 30 |
-| 2 | Configure external interrupts | 20 |
-| 3 | Configure keypad interrupts | 30 |
-| 4 | Configure FIFO interrupts | 20 |
+| 2 | Configure external interrupts from pushbuttons | 20 |
+| 3 | Configure external interrupts from the keypad | 30 |
+| 4 | Configure FIFO interrupts between processor cores | 20 |
 | 5 | Confirm your checkoffs before leaving | * |
 | &nbsp; | Total: | 100 |
 <br>
@@ -34,7 +34,8 @@ There's three types of interrupts we can explore that's common to most microcont
     - You might use a timer interrupt to periodically sample a sensor or update a display.
     - You might use a UART interrupt to signal that a new character has been received on a serial line, or that the transmission is complete and the UART is ready for a new character to be transmitted.
 
-3. With the RP2350 microcontroller, we have a very interesting **third** type of interrupt: **FIFO interrupts**!  If you hadn't noticed, your Proton has two pairs of ARM and RISC-V CPU cores that you can use (only one pair can be active at any time), and this lab will give you an opportunity to use them.  FIFO interrupts are a way for one CPU core to send messages to the other CPU core, which will stop what it is doing and handle that message appropriately.  This is a very powerful feature that you can use to offload tasks from one core to another, or to signal that a task is complete.
+3. With the RP2350 microcontroller, we have a very interesting **third** type of interrupt: **multicore interrupts**!  If you hadn't noticed, your Proton has two pairs of ARM and RISC-V CPU cores that you can use (only one pair can be active at any time), and this lab will give you an opportunity to use them.  Multicore interrupts are a way for one CPU core to send messages/notifications to the other CPU core, which will stop what it is doing and handle that message appropriately.  In this lab, we'll utilize the hardware FIFO queues between the two cores, allowing them to push and pop messages to each other.
+    - You might use the multicore FIFO interrupt to send data that takes a long time to compute, e.g. the Fast Fourier Transform of audio signal(s) sampled on GPIO pin(s), to the other core so that it can incorporate the received data into a "image framebuffer" that is being continuously displayed on a screen, like an audio visualizer.
 
 ## Instructional Objectives
 - To understand the concept of interrupts.
@@ -60,8 +61,7 @@ Type 'help' to learn commands.
 
 You can then type `help` to learn what commands you can use to test a certain subroutine.  You will use this to demo your implementation and wiring to the TAs.
 
-> [!IMPORTANT]
-> For this lab, we'll use the ARM Cortex-M33 cores on the microcontroller, since it is a lot easier to work with.  Your project is already configured to do this.  This is important to note for step 2.
+If the text doesn't appear when you click "Upload and Monitor", ensure that `autotest()` is uncommented in `main.c`.
 
 ### Step 0.2: Read about interrupts
 
@@ -106,7 +106,7 @@ As for interrupts, we see a bus called "System Interrupts" that connects to all 
 So, what interrupts are available?  Scroll down to [Section 3.2](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A85%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C361.924%2Cnull%5D), and you'll see two of the types we'll use in this lab:
 
 - "Cross-core FIFO interrupts: SIO_IRQ_FIFO and SIO_IRQ_FIFO_NS (Section 3.1.5)"
-    - Also called "mailboxes", these are used to send ordered messages between the two cores.
+    - Also called "mailboxes", these are used to send ordered messages from one CPU core to the other.
     - We'll use this in Step 4.
 - "GPIO interrupts: IO_IRQ_BANK0, IRQ_IO_BANK0_NS, IO_IRQ_QSPI, IO_IRQ_QSPI_NS (Section 9.5)"
     - When an **external** (GPIO pin) interrupt occurs, the GPIO pins can be configured to generate an interrupt signal that can be sent to the CPU cores, which are also configured to handle those interrupts.
@@ -136,32 +136,37 @@ Make sure you did the reading in Step 0.2, and then read the following sections 
 
 [Chapter 3.1.5: Inter-processor FIFOs (Mailboxes)](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A45%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C682.714%2Cnull%5D)
 
-7. The RP2350 has two FIFOs, one incoming, one outgoing.  What register should a core write to to send a message via the outgoing FIFO?
-8. What register should a core read from to receive a message from the incoming FIFO?  
+7. What kind of data structure is the mailbox FIFO on the RP2350?  You might recall this from a previous course (or look it up if you forgot).  
+8. How many `char` values could the FIFO hold?
+    - Hint: Each `char` is 8 bits wide.
 
 You'll notice that there's not any information about **configuring** or **enabling** an interrupt before we can use it, like we did with GPIO pins in the previous lab.  We don't know this yet by just looking at the datasheet, so we'll have to wait until the corresponding step here to find out.  Datasheets can be weird like that...
 
 [Chapter 6.5.3: DORMANT State](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A489%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C223.738%2Cnull%5D)
 
-9. The best use case for interrupts is to wake the CPU from a low power state when an event occurs, to minimize power consumption.  As explained in that section, the DORMANT power state of the RP2350 turns off nearly everything on the microcontroller until an external interrupt occurs.  What register should you write to in order to enter the DORMANT state, and what value should we write?  
+9. The best use case for interrupts is to wake the CPU from a low power state when an event occurs, to minimize power consumption.  As explained in that section, the DORMANT power state of the RP2350 turns off nearly everything on the microcontroller (by turning off one critical component) until an external interrupt occurs.  What register should you write to in order to enter the DORMANT state, and what value should we write?  
     - Hint: We are using the crystal oscillator for the clock source.
     - Hint: The function `_go_dormant` described in [6.5.6.2. DORMANT](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A491%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C438.442%2Cnull%5D) of the datasheet calls a function that writes to this register.  Find that function (you may have to go to the code example linked) that does this and see what register it writes to, what value is written, and note the loop it runs before it returns.  
         - That loop ensures the crystal and PLL (and therefore your clock frequency) are stable before re-entering your code.
 10. To enable waking from the DORMANT state by a **specific** GPIO pin interrupt, what register do you need to write to?  
 
 > [!NOTE]
-> *Why use the "Dormant" state over the regular "Sleep" state?*
+> *How is the "Dormant" state different from the regular "Sleep" state?*
 > 
-> In "Sleep", the clocks are still running to various peripherals (especially ones that could receive communication from another device, which we'll get to in later labs), and the CPU is still running, but the CPU is halted.  In the "Dormant" state, the clocks are stopped to all peripherals, and the CPU is halted.  
+> In "Sleep", the clocks are still running to various peripherals (especially ones that could receive communication from another device, which we'll get to in later labs), and the CPU is still running, but the CPU is halted.  In the "Dormant" state, the clocks are stopped to all peripherals, and the CPU is halted.  This drops the power consumption to a minimum, but it also means that the CPU won't respond to any interrupts until it wakes up again.  This is why we need to configure an external interrupt to wake the CPU from the DORMANT state.
+> 
+> This works by turning off the crystal oscillator (XOSC), which is attached to pins XOSC_IN and XOSC_OUT on the RP2350 chip, as shown below.  The diagram below, from [Section 8: Clocks](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A513%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D), shows us how the chip **derives** different clock frequencies from the crystal oscillator.
 > 
 > When we start implementing external interrupts, the only thing we're expecting to change is a GPIO pin, so it's safe to turn off all clocks.  This is especially useful for battery-powered devices, where you want to save as much power as possible.
+
+![xosc](images/xosc.png)
 
 > [!IMPORTANT]
 > Show your answers for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
 > 
 > Avoid the urge to ask others (AI/LLMs are included in "others") for answers.  These questions are specifically designed to get you used to looking at the datasheet for information, and for *you* to understand the microcontroller's specific configuration.
 
-### Step 2: Configure external interrupts on pushbuttons
+### Step 2: Configure external interrupts from pushbuttons
 
 > [!NOTE]
 > At this stage, make sure your Debug Probe is connected to the debug and UART pins of your Proton board, which you should already have in place from lab 1.  If wired and configured correctly, and you have autotest uncommented, you should see text appear in the Serial Monitor when you click "Upload and Monitor".  If the text doesn't appear, press the Reset button and check again.
@@ -173,7 +178,7 @@ Uncomment the `#define STEP1` line in `main.c`, and ensure that `#define STEP2` 
 
 Copy in the `init_inputs` and `init_outputs` functions you implemented in lab 1 so that the GPIO pins for the pushbuttons and user LEDs are configured correctly.  There are already function calls for them in `main`.
 
-After `init_keypad();` in `main`, there is a call to `init_gpio_irq`, which we'll implement as instructed below, along with a few other functions.  You can use either the SDK functions or directly write to registers.
+Next, implement `init_gpio_irq` as instructed below, along with a few other functions.  You can use either the SDK functions or directly write to registers.
 
 1. First, turn on GP22-GP25 (the user LEDs) so that they are all on when the program starts.  This is done in `init_outputs()`, which is already called in `main`.  This is how we'll know if the microcontroller is in the DORMANT state or not.
 2. Configure GP21 such that when a **rising edge** occurs on it, the function `gp21_isr` is called.  
@@ -183,7 +188,7 @@ After `init_keypad();` in `main`, there is a call to `init_gpio_irq`, which we'l
     - We've found that using the SDK function `gpio_set_irq_enabled_with_callback` does not work when you're also trying to wake from DORMANT sleep.  Use `gpio_add_raw_irq_handler` and `gpio_set_irq_enabled` instead - make sure you call them in the right order.
     - `gp26_isr` should **acknowledge two interrupts** - the DORMANT wake event, and the regular rising edge interrupt - and turn on GP22-GP25.
 
-So, in all, you should have implemented the following functions:
+In summary, you should implement the following functions:
 1. `init_gpio_irq` - configure GP21 and GP26 as described above and turn GP22-GP25 on.
 2. `gp21_isr` - acknowledge the interrupt, turn off all user LEDs GP22-GP25, and enter the DORMANT state.
 3. `gp26_isr` - acknowledge the DORMANT wake event and the rising edge interrupt, and turn on GP22-GP25.
@@ -206,12 +211,7 @@ Click "Upload and Monitor", and wait until you see "Hello world" printed out eve
 
 Pressing GP21 on your breadboard should cause the Proton to enter the dormant state, execute the ISR, and turn off all user LEDs.
 
-Pressing GP26 should cause the Proton to wake up from the dormant state, execute the ISR, and turn on all user LEDs.  If you press GP21 again, it should turn off all user LEDs and you can restart the process. 
-
-> [!TIP]
-> You can even measure the current draw of your Proton board when you do this!  
-> 
-> To do this, unplug the USB cable from your Proton board, configure a power supply to output 5V, connect the positive lead to the 5V pin and the negative lead to the GND pin, and turn on the supply.  You should be able to see the board start up at around 27 mA.  Pressing GP21 should cause the current draw to drop to around 6-7 mA, and pressing GP26 should cause the current draw to go back up to around 27 mA.  This is a great way to see how much power your microcontroller is using when it's in the DORMANT state (assuming you don't have too many other things drawing power!)
+Pressing GP26 should cause the Proton to wake up from the dormant state, execute the ISR, and turn on all user LEDs, and start printing "Hello world" again.  If you press GP21 again, it should turn off all user LEDs and you can restart the process. 
 
 > [!IMPORTANT]
 > Show your implementation to your TA, including the LED turning on and off when you press the pushbutton, and the debugger being able to exit the dormant state when you click Pause.  
@@ -221,6 +221,11 @@ Pressing GP26 should cause the Proton to wake up from the dormant state, execute
 > You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+
+> [!TIP]
+> You can even measure the current draw of your Proton board when you do this!  
+> 
+> To do this, unplug the USB cable from your Proton board, configure a power supply to output 5V, connect the positive lead to the 5V pin and the negative lead to the GND pin, and turn on the supply.  You should be able to see the board start up at around 27 mA.  Pressing GP21 should cause the current draw to drop to around 6-7 mA, and pressing GP26 should cause the current draw to go back up to around 27 mA.  This is a great way to see how much power your microcontroller is using when it's in the DORMANT state (assuming you don't have too many other things drawing power!)
 
 ### Step 3: Configure external interrupts from the keypad
 
@@ -238,11 +243,11 @@ In the function `init_keypad_irq`:
 
 2. Enable the interrupt for GPIO pins 2 through 5 using `gpio_set_irq_enabled` on a rising edge trigger.  Unfortunately, there's no "mask" function (that we could find) to enable all four pins at once, so you might want to utilize a loop or just call the function four times.
 
-To implement the ISR, we need to keep in mind that `keypad_isr` could get called for any button press (and row pin going high), so we need to know two things to figure out the button:
+To implement the ISR, we need to keep in mind that `keypad_isr` could get called for any button press (and row pin going high), so we need to know two things to figure out what button was just pressed:
 
 1. Which column pin is currently being driven high?
-    - The function `drive_column` needs to be implemented to do this.  In this function, drive high the pin indicated by the value of the global variable `col`, and drive all other column pins low.  For example if `col` is 0, drive GP6 high and GP7, GP8, GP9 low.  After doing so, increment `col` by 1.  If `col` is 3, set `col` back to 0.  
-    - At the end of the `drive_column` function, sleep for 25 milliseconds to allow the row pins to settle before checking them.  This is important to ensure we have enough time to let the current reach the row pins if a button was pressed.
+    - The function `drive_column` needs to be implemented to do this.  In this function, drive high the pin indicated by the value of the global variable `col`, and drive all other column pins low.  For example if `col` is 0, drive GP6 high and GP7, GP8, GP9 low.  After doing so, sleep for 25 milliseconds **first**, and increment `col` by 1.  If `col` is 3, set `col` back to 0.  
+    - The sleep is important to ensure we have enough time to let the current flow from the driven column pin into the row pins if a button is pressed.
     - The value of `col` will therefore tell us which column is active.
 
 2. Which row pin is currently being pulled high?
@@ -250,6 +255,11 @@ To implement the ISR, we need to keep in mind that `keypad_isr` could get called
     - Look in the C/C++ SDK documentation for a function that would tell you the **current interrupt status for a given GPIO pin**.  This function will return a bitmask of the current set of events currently pending for the GPIO pin (since we have not yet **acknowledged** the interrupt, as we did in Step 2).  
     - In the ISR, check the interrupt status for all the row pins.  If we find one that has a pending event, we know that that is the row pin that was pressed.  Using this knowledge of `col` and the pressed row pin, we can now determine which key was pressed.  
     - The global variable `keymap` is an array of the key values for each button.  Use the row and column numbers to calculate the correct index, put the value of the key in the global variable `key`, and print it out to the Serial Monitor with `printf`.  
+
+In summary, you should implement the following functions:
+1. `init_keypad_irq` - configure the GPIO pins 2 through 5 to trigger an interrupt on a rising edge, and call `keypad_isr` when that happens. 
+2. `drive_column` - drive the column pin indicated by the global variable `col` high and all other column pins low.  Sleep for 25 milliseconds.  Increment `col` mod 4 after driving the pin.
+3. `keypad_isr` - acknowledge the interrupt, call `drive_column` to drive the next column pin, check the row pins for a high signal, and print out the key that was pressed.
 
 Upload and monitor in PlatformIO.  Hopefully, pressing a button on your keypad should print out that key on your Serial Monitor.
 
@@ -262,20 +272,20 @@ Upload and monitor in PlatformIO.  Hopefully, pressing a button on your keypad s
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-### Step 4: Configure FIFO interrupts
+### Step 4: Configure FIFO interrupts between processor cores
 
 > [!WARNING]
 > Multi-core programming may not be covered in lecture.  If there are any doubts as to how this works, ask your lab instructor to clarify them.
 
-Now for the fun part!  We're going to offload the keypad polling to the second core on your RP2350, and have it notify the first core when a key is pressed, letting it use that information without having it also check the keypad!  This is a simplistic example of how you can dedicate one core to handling computation while receiving messages from the other core, which handles all external stimuli/responses.  
+Now for the fun part!  We're going to offload the column pin driving to poll the keypad to the second core on your RP2350, and have it notify the first core when a key is pressed, letting it use that information without having it also check the keypad!  This is a simplistic example of how you can dedicate one core to handling computation while receiving messages from the other core, which handles all external stimuli/responses.  
 
-Your Proton's RP2350 has a total of four cores, two ARM-based, and two RISC-V-based.  ARM and RISC-V are examples of **instruction set architectures**, or different formats of machine code.  That means that ARM cores can't execute RISC-V programs, and vice-versa.  
+Your Proton's RP2350 microcontroller has a total of four cores, two ARM-based, and two RISC-V-based.  ARM and RISC-V are examples of **instruction set architectures**, or different formats of machine code.  That means that ARM cores can't execute RISC-V programs, and vice-versa.  
 
 > At the time of writing (May 2025), we have not yet built in support for compiling to RISC-V in PlatformIO.  If you really need this for some reason, like the project, you can use the [Pico SDK](https://github.com/raspberrypi/pico-sdk) directly from Raspberry Pi.
 
 On the Proton specifically, the ARM cores carry a lot more functionality like floating-point computations and security features at the cost of having to license the instruction set from ARM, while the RISC-V cores are free and open source (you can even see the Verilog used to make them [here](https://github.com/Wren6991/Hazard3)) and are meant more for academic experimentation.  For the embedded labs, we'll just use the default ARM cores to simplify things.
 
-So here's what we're going to do:
+In this step, we're going to do the following:
 
 1. Core 0, the "main" core, will configure core 1 to set up the column driving and keypad interrupts.  When it receives a message from core 1 with a key press, it will print out that event (for the time being).
 
@@ -295,6 +305,16 @@ The "Secure/Non-Secure SIO" refers to the ability to have secure and non-secure 
 
 Make sure to comment out the `#define STEP1` and `#define STEP2` lines, and uncomment the `#define STEP3` line. 
 
+In `keypad_isr`, add the following stanza to replace the `printf` statement that prints the key value:
+
+```c
+#ifdef STEP3
+    // TODO: add the function to push the key value 
+#else
+    printf("Pressed: %c\n", key);
+#endif
+```
+
 Under `main`, scroll down to the STEP3 stanza, and replace the `// TODO` comments with the respective functions in order to: 
 
 1. Launch the function `init_fifo_irq` on core 1.  Core 1 will then execute this function as its main function.
@@ -310,7 +330,9 @@ Congratulations on writing and running your first dual-core interruptible embedd
 > [!IMPORTANT]
 > Show your TA that your code runs on different cores by starting the debugger with a breakpoint in `drive_column`, and show that the function is being executed by core 1 in the Call Stack view in the debugger.  
 >
-> Show that you pass the (not very comprenhensive) `fifo` test in the test suite by typing `fifo` in the Serial Monitor.
+> Show that you pass the (not very comprenhensive) `fifo` test in the test suite by typing `fifo` in the Serial Monitor.  Due to issues with properly resetting core 1, you may have to reset the microcontroller before running the test.  Therefore, before you run `verify` to generate a confirmation code, make sure to reset the microcontroller by pressing the Reset button on the Proton board first.
+> 
+> Confirmation code generation can take a while, so be patient.  If it takes more than 2 minutes, try resetting the microcontroller again and running the test suite again, or contact course staff as soon as possible.
 > 
 > You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
 > 
