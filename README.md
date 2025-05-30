@@ -1,4 +1,4 @@
-# ECE 36200 Lab Experiments (Purdue Proton, RP2350B Development Board)
+# ECE 36200 Lab Experiments (Purdue Proton)
 
 > [!CAUTION]
 > **Work in progress.  Contents of these lab experiments may change closer to the start of the semester.**
@@ -7,9 +7,9 @@ Each link below takes you to the README.md file for each lab, so you don't have 
 
 If you're looking for the code template associated with each lab, it (necessarily) changes every semester.  Look for the associated Piazza post made for each lab, which should be pinned, to get the corresponding GitHub Classroom link.  
 
-If you are not currently enrolled in ECE 36200 but wish to access the code templates for academic purposes (e.g. senior design courses), contact the lab coordinator in charge.
+If you are not currently enrolled in ECE 36200 but wish to access the code templates for academic purposes (e.g. senior design courses), contact [the lab coordinator](mailto:niraj@purdue.edu) in charge.
 
-References for the Pico 2 and parts, such as datasheets and specifications, are still being constructed.
+Resources for the Purdue Proton, and other parts used in the kit, can be found [here](https://bit.ly/purdue-proton/).
 
 ## Lab Experiments
 
@@ -30,4 +30,4 @@ Embedded:
 [Lab - I2C](lab-i2c/README.md)  
 -->
 
-ECE 36200 Pico 2 Lab Experiments © 2025 by Purdue University, Niraj Menon is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+ECE 36200 Lab Experiments (Purdue Proton) © 2025 by Purdue University, Niraj Menon is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
