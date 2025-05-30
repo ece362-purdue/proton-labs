@@ -17,7 +17,7 @@
 | 3.2 | Implement `read_rows` | 10 |
 | 3.3 | Implement `update_history` | 15 |
 | 4 | Play a game |  |
-| 5 | In-Lab Checkoff Step | 20* |
+| 5 | Confirm your checkoffs before leaving | * |
 | &nbsp; | Total: | 100 |
 <br>
 
@@ -127,7 +127,7 @@ Read [Section 8.1: Clock Overview](https://datasheets.raspberrypi.com/rp2350/rp2
 
 Now, for the timers.  On the Pico 2, we have the following ones:
 
-1. RISC-V Platform Timer: We used this last lab to generate a 1 Hz clock signal.  It is a 64-bit timer whose value is accessible through `MTIME`, and is compared against `MTIMECMP` to generate an interrupt.  By default, it uses the `tick` clock as a prescaled input to generate its own clock signal.
+1. RISC-V Platform Timer: It is a 64-bit timer whose value is accessible through `MTIME`, and is compared against `MTIMECMP` to generate an interrupt.  By default, it uses the `tick` clock as a prescaled input to generate its own clock signal.
 
 2. Always-on (AON) Timer: This is a 32-bit timer that is always on regardless of power states, and is connected to the LPOSC to save power.  Since it is always on, it is useful for generating interrupts at a very low frequency, such as once per second, to check if the Pico 2 should wake up from a low-power state.  We'll leave this alone for now, but you can read [Section 12.10](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A1194%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C250.994%2Cnull%5D) in the datasheet.
 
@@ -383,11 +383,11 @@ Keep in mind that button presses will be registered very slowly since it is in t
 > [!IMPORTANT]
 > Nothing to demonstrate for this step.
 
-### Step 5: In-Lab Checkoff Step
+### Step 5: Confirm your checkoffs before leaving
 
 > [!CAUTION]
 > Make sure you got checked off here: https://engineering.purdue.edu/ece362/checkoff/
 > 
 > Make sure to upload your confirmation code and verify that it is accepted by Gradescope.  You will know it is accepted if you get the points from Gradescope.
 > 
-> Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs, that your confirmation code was accepted on Gradescope before logging out and leaving for the day.
+> Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs and that your confirmation code was accepted on Gradescope before logging out and leaving for the day.

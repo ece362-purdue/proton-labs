@@ -9,7 +9,7 @@ If you're looking for the code template associated with each lab, it (necessaril
 
 If you are not currently enrolled in ECE 36200 but wish to access the code templates for academic purposes (e.g. senior design courses), contact [the lab coordinator](mailto:niraj@purdue.edu) in charge.
 
-Resources for the Purdue Proton, and other parts used in the kit, can be found [here](https://bit.ly/purdue-proton/).
+Resources for the Purdue Proton, and other parts used in the kit, can be found [here](https://bit.ly/purdue-proton).
 
 ## Lab Experiments
 

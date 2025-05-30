@@ -11,7 +11,7 @@
 | 1 | Read the datasheet | 30 |
 | 2 | Configure external interrupts from pushbuttons | 20 |
 | 3 | Configure external interrupts from the keypad | 30 |
-| 4 | Configure FIFO interrupts between processor cores | 20 |
+| 4 | Configure mailbox FIFO interrupts between processor cores | 20 |
 | 5 | Confirm your checkoffs before leaving | * |
 | &nbsp; | Total: | 100 |
 <br>
@@ -137,7 +137,7 @@ Make sure you did the reading in Step 0.2, and then read the following sections 
 [Chapter 3.1.5: Inter-processor FIFOs (Mailboxes)](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A45%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C682.714%2Cnull%5D)
 
 7. What kind of data structure is the mailbox FIFO on the RP2350?  You might recall this from a previous course (or look it up if you forgot).  
-8. How many `char` values could the FIFO hold?
+8. How many `char` values could one mailbox hold?
     - Hint: Each `char` is 8 bits wide.
 
 You'll notice that there's not any information about **configuring** or **enabling** an interrupt before we can use it, like we did with GPIO pins in the previous lab.  We don't know this yet by just looking at the datasheet, so we'll have to wait until the corresponding step here to find out.  Datasheets can be weird like that...
@@ -174,7 +174,7 @@ You'll notice that there's not any information about **configuring** or **enabli
 In this step, you will configure an external interrupt on your Proton board that will wake our microcontroller from the DORMANT state.  We'll configure it so that when you press GP21, the microcontroller will enter the DORMANT state, and pressing GP26 will wake it up from that state.
 We'll also configure the interrupt to toggle the green LED on GP25 on and off.
 
-Uncomment the `#define STEP1` line in `main.c`, and ensure that `#define STEP2` and `#define STEP3` are still commented out.  
+Uncomment the `#define STEP1` line at the top of `main.c`, and ensure that `#define STEP2` and `#define STEP3` are still commented out.  
 
 Copy in the `init_inputs` and `init_outputs` functions you implemented in lab 1 so that the GPIO pins for the pushbuttons and user LEDs are configured correctly.  There are already function calls for them in `main`.
 
@@ -205,9 +205,9 @@ In summary, you should implement the following functions:
 >
 > These errors are usually indicated by OpenOCD failures while running Upload and Monitor, e.g. `openocd init failed` or `openocd: Failed to connect to target`.  If you see this, try the above steps to get back into BOOTSEL mode.
 
-After the `init_gpio_irq` call in `main`, you'll see an infinite loop that prints out "Hello world" every second.  This is an example of some "work" that the CPU is normally doing while it's not in the DORMANT state.
+After the `init_gpio_irq` call in `main` underneath the `#ifdef STEP1` stanza, you'll see an infinite loop that prints out "Hello world" every second.  This is an example of some "work" that the CPU is normally doing while it's not in the DORMANT state.
 
-Click "Upload and Monitor", and wait until you see "Hello world" printed out every second.  If it doesn't print, ensure the UART pins are still connected correctly from lab 0 and 1.  Ideally, you should route those connecting wires **underneath** your Proton board, as there is no reason to remove them.
+Run "Upload and Monitor", and wait until you see "Hello world" printed out every second.  If it doesn't print, ensure the UART pins are still connected correctly from lab 0 and 1.  Ideally, you should route those connecting wires **underneath** your Proton board, as there is no reason to remove them.
 
 Pressing GP21 on your breadboard should cause the Proton to enter the dormant state, execute the ISR, and turn off all user LEDs.
 
@@ -225,13 +225,13 @@ Pressing GP26 should cause the Proton to wake up from the dormant state, execute
 > [!TIP]
 > You can even measure the current draw of your Proton board when you do this!  
 > 
-> To do this, unplug the USB cable from your Proton board, configure a power supply to output 5V, connect the positive lead to the 5V pin and the negative lead to the GND pin, and turn on the supply.  You should be able to see the board start up at around 27 mA.  Pressing GP21 should cause the current draw to drop to around 6-7 mA, and pressing GP26 should cause the current draw to go back up to around 27 mA.  This is a great way to see how much power your microcontroller is using when it's in the DORMANT state (assuming you don't have too many other things drawing power!)
+> To do this, unplug the USB cable from your Proton board, configure a power supply to output 5V, connect the positive lead to the 5V pin and the negative lead to the GND pin, and turn on the supply.  You should be able to see the board start up at around 27 mA (each LED draws only about 1 mA).  Pressing GP21 should cause the current draw to drop to around 6-7 mA, and pressing GP26 should cause the current draw to go back up to around 27 mA.  This is a great way to see how much power your microcontroller is using when it's in the DORMANT state (assuming you don't have too many other things drawing power!)
 
 ### Step 3: Configure external interrupts from the keypad
 
 Copy in the `init_keypad` function you implemented in lab 1 so that the GPIO pins for the keypad are configured correctly.  
 
-Uncomment the `#define STEP2` line in `main.c`, and ensure that `#define STEP1` and `#define STEP3` are commented out.  
+Uncomment the `#define STEP2` line at the top of `main.c`, and ensure that `#define STEP1` and `#define STEP3` are commented out.  
 
 You may recall from the last lab that we implemented a loop to poll the keypad for a keypress.  We did this by selecting a column pin, driving it to a logic high, and then checking the row pins to see if any of them were pulled low.
 
@@ -272,10 +272,10 @@ Upload and monitor in PlatformIO.  Hopefully, pressing a button on your keypad s
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-### Step 4: Configure FIFO interrupts between processor cores
+### Step 4: Configure mailbox FIFO interrupts between processor cores
 
 > [!WARNING]
-> Multi-core programming may not be covered in lecture.  If there are any doubts as to how this works, ask your lab instructor to clarify them.
+> Multi-core programming may not be covered in-depth in lecture, but the process below to get you started should account for that.  If there are any doubts as to how this works, ask your lab instructor to clarify them.
 
 Now for the fun part!  We're going to offload the column pin driving to poll the keypad to the second core on your RP2350, and have it notify the first core when a key is pressed, letting it use that information without having it also check the keypad!  This is a simplistic example of how you can dedicate one core to handling computation while receiving messages from the other core, which handles all external stimuli/responses.  
 
@@ -303,13 +303,13 @@ The "Secure/Non-Secure SIO" refers to the ability to have secure and non-secure 
 2. Which function is used to send a message to the second core?
 3. Which function is used to receive a message from the second core?
 
-Make sure to comment out the `#define STEP1` and `#define STEP2` lines, and uncomment the `#define STEP3` line. 
+Make sure to comment out the `#define STEP1` and `#define STEP2` lines at the top of `main.c`, and uncomment the `#define STEP3` line. 
 
 In `keypad_isr`, add the following stanza to replace the `printf` statement that prints the key value:
 
 ```c
 #ifdef STEP3
-    // TODO: add the function to push the key value 
+    // TODO: add the function to push the key value into the mailbox FIFO 
 #else
     printf("Pressed: %c\n", key);
 #endif
