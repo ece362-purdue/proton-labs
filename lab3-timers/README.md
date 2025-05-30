@@ -34,16 +34,18 @@
 
 Make sure to clone the code repository from GitHub Classroom.  Keep in mind to add, commit and push any changes you make so that your work is accessible from a lab machine. 
 
-Open the template in VScode and with your Debug Probe connected to your Pico 2, click "Flash Project (SWD)".  Open the Serial Monitor to see the output of your program, and press the Reset button so that it prints out again.  You should now see the following:
+Open the template in VScode and with your Debug Probe connected to your Proton, click "Upload and Monitor".  Open the Serial Monitor to see the output of your program, and press the Reset button so that it prints out again.  You should now see the following:
 
 ```text
-Timers Lab Test Suite for Pico 2
+Timers Lab Test Suite
 Type 'help' to learn commands.
 
 > 
 ```
 
 You can then type `help` to learn what commands you can use to test a certain subroutine.  You will use this to demo your implementation and wiring to the TAs.
+
+If the text doesn't appear when you click "Upload and Monitor", ensure that `autotest()` is uncommented in `main.c`.
 
 ### Step 0.2: Wire and organize your breadboard
 
