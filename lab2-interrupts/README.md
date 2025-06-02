@@ -181,9 +181,9 @@ Copy in the `init_inputs` and `init_outputs` functions you implemented in lab 1 
 Next, implement `init_gpio_irq` as instructed below, along with a few other functions.  You can use either the SDK functions or directly write to registers.
 
 1. First, turn on GP22-GP25 (the user LEDs) so that they are all on when the program starts.  This is done in `init_outputs()`, which is already called in `main`.  This is how we'll know if the microcontroller is in the DORMANT state or not.
-2. Configure GP21 such that when a **rising edge** occurs on it, the function `gp21_isr` is called.  
+2. Configure GP21 such that when a **rising edge** occurs on it, the function `gp21_isr` is called.  Use the function `gpio_set_irq_enabled_with_callback`.
     - `gp21_isr`, when called, should **acknowledge the interrupt**, turn off all user LEDs GP22-GP25, and enter the DORMANT state.
-    - At this stage, your RP2350 will not respond to any other stimulus (other than GP26) until it wakes up.  **This includes being able to upload code, because your crystal oscillator is now turned off!**  If you need to get out of this state and GP26 isn't working, press the Reset button, which will restart the microcontroller, and subsequently the oscillator.
+    - Once this is implemented and you press GP21, your RP2350 will not respond to any other stimulus (other than GP26) until it wakes up.  **This includes being able to upload code, because your crystal oscillator is now turned off!**  If you need to get out of this state and GP26 isn't working, press the Reset button, which will restart the oscillator, and subsequently the microcontroller.
 3. Configure GP26 to wake the microcontroller from the DORMANT state, and to execute `gp26_isr` on the rising edge (yes, you can do two events on the same edge!).  You should not have to set the callback ISR when entering DORMANT mode.
     - We've found that using the SDK function `gpio_set_irq_enabled_with_callback` does not work when you're also trying to wake from DORMANT sleep.  Use `gpio_add_raw_irq_handler` and `gpio_set_irq_enabled` instead - make sure you call them in the right order.
     - `gp26_isr` should **acknowledge two interrupts** - the DORMANT wake event, and the regular rising edge interrupt - and turn on GP22-GP25.
