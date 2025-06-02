@@ -184,7 +184,7 @@ Next, implement `init_gpio_irq` as instructed below, along with a few other func
 2. Configure GP21 such that when a **rising edge** occurs on it, the function `gp21_isr` is called.  
     - `gp21_isr`, when called, should **acknowledge the interrupt**, turn off all user LEDs GP22-GP25, and enter the DORMANT state.
     - At this stage, your RP2350 will not respond to any other stimulus (other than GP26) until it wakes up.  **This includes being able to upload code, because your crystal oscillator is now turned off!**  If you need to get out of this state and GP26 isn't working, press the Reset button, which will restart the microcontroller, and subsequently the oscillator.
-3. Configure GP26 to wake the microcontroller from the DORMANT state on a rising edge, and to execute `gp26_isr` on the falling edge (yes, you can do both on the same pin!).  You should not have to set the callback ISR when entering DORMANT mode.
+3. Configure GP26 to wake the microcontroller from the DORMANT state, and to execute `gp26_isr` on the rising edge (yes, you can do two events on the same edge!).  You should not have to set the callback ISR when entering DORMANT mode.
     - We've found that using the SDK function `gpio_set_irq_enabled_with_callback` does not work when you're also trying to wake from DORMANT sleep.  Use `gpio_add_raw_irq_handler` and `gpio_set_irq_enabled` instead - make sure you call them in the right order.
     - `gp26_isr` should **acknowledge two interrupts** - the DORMANT wake event, and the regular rising edge interrupt - and turn on GP22-GP25.
 
