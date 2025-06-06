@@ -239,11 +239,8 @@ Now, let's get started on the display.  You should understand by now that to dis
 
 To see the multiplexing effect in real time, run `check_wiring` on the autotest object you were provided.  The way it works is by quickly pushing out eight 11-bit values successively, with a delay in between each value to ensure the digit is lit for long enough that you can see it.  
 
-Now, let's try to implement this in code.
 
 
-
-![7seg](7seg.gif)
 
 > [!IMPORTANT]
 > Show your working display to your TA to earn points for this step.  You must have the display cycling through the characters in `message`, and the decimal point shifting through each digit every 0.25 seconds.  If you have any issues, ask your TA for help.
