@@ -8,14 +8,9 @@
 |------|-------------|--------|
 | 0.1 | Set up your environment |   |
 | 0.2 | Wire and organize your breadboard |   |
-| 1 | Read the datasheet | 20 |
-| 2 | Use a multiplexed display |   |
-| 2.1 | Implement `print_7seg` | 10 |
-| 2.2 | Implement `init_7seg_timer` and `seg7_timer_isr` | 20 |
-| 3 | Implement keypad scanning |   |
-| 3.1 | Implement `drive_column` | 5 |
-| 3.2 | Implement `keypad_read_rows` | 10 |
-| 3.3 | Implement `update_history` | 15 |
+| 1 | Read the datasheet | 40 |
+| 2 | Implement keypad scanning | 30 |
+| 3 | Use the multiplexed display | 30 |
 | 4 | Play a game |  |
 | 5 | Confirm your checkoffs before leaving | * |
 | &nbsp; | Total: | 100 |
@@ -169,10 +164,10 @@ We're also going to significantly change how we read the keypad, moving away fro
 The offset implements the "delay" we had last lab, but now we can use that delay to do other things in the meantime, such as triggering another interrupt to update a display or read sensors.
 
 The two alarms will do the following:
-    - One will drive the columns of the keypad, driving only one column at a time.
-    - The other will read the rows of the keypad, and do one of two things:
-        - If a key was pressed for the first time, we will update a global 16-element array `state` that keeps track of the current key pressed, and push the event into a global queue struct `kev`.
-        - If a key was released for the first time, we will update `state` to reflect that as well, and push the event into a global queue struct `kev`.
+- One will drive the columns of the keypad, driving only one column at a time.
+- The other will read the rows of the keypad, and do one of two things:
+    - If a key was pressed for the first time, we will update a global 16-element array `state` that keeps track of the current key pressed, and push the event into a global queue struct `kev`.
+    - If a key was released for the first time, we will update `state` to reflect that as well, and push the event into a global queue struct `kev`.
 
 Two things to explain from that:
 - You have a 16-element array of `bool` elements called `state`.  This corresponds to the `keymap` character array that translates the row and column pins to characters.  In `state`, if an element is `true`, it means that the corresponding key is currently pressed, and vice-versa if it is `false`.  You will update this `state` array in `keypad_isr`.
@@ -185,33 +180,43 @@ You can see the definitions for these variables and functions in `keypad.h`, whi
 
 Now that we have a basic understanding of how to do this, in `keypad.c`, implement the following functions:
 
-1. `keypad_init_pins`: This function initializes the GPIO pins for the keypad.  It should set GP2-GP5 as outputs (for driving the columns) and GP6-GP9 as inputs (for reading the rows).  The function should also set the pull-up resistors on the input pins to ensure that they read high when no button is pressed.  This should do the same thing as `init_keypad` from labs 1 and 2.
+#### 2.1. `keypad_init_pins`  
 
-2. `keypad_init_timer`: In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `keypad_drive_column`, and enable that interrupt.  Then, initialize TIMER0 to fire alarm 1 after 1.10 seconds to call `keypad_isr`, and enable that interrupt as well.  
-    - Look for the Programmer's Model section and/or the C/C++ SDK if you need help figuring out how to do this.
+This function initializes the GPIO pins for the keypad.  It should set GP2-GP5 as outputs (for driving the columns) and GP6-GP9 as inputs (for reading the rows).  The function should also set the pull-up resistors on the input pins to ensure that they read high when no button is pressed.  This should do the same thing as `init_keypad` from labs 1 and 2.
 
-3. `keypad_read_rows`: This is a one-liner.  Return a single 4-bit value of the current state of GP2-GP5, which are the row pins.  For example, if GP3,GP4 is high but GP2,GP5 are low, then the return value of this function must be 6 (or 4'b0110).
+#### 2.2. `keypad_init_timer`  
 
-4. `keypad_drive_column`: We're going to change this a little bit.
-    - First, make sure to acknowledge the interrupt for ALARM0 on TIMER0.
-    - Increment the value of `col` first.  
-        - We initialized `col` to -1 to account for this so that we scan COL3 (GP6) first.
-        - Ensure that `col` wraps around to 0 after 3 - your columns pins are from GP6 to GP9.
-    - With the newly changed value of `col`, drive the selected column GPIO pin high, and drive all others low.
-        - You can do this in a single statement with the SIO `gpio_togl` register, which atomically toggles GPIO pins in a single write.  Remember that if statements, for loops, etc. add a lot of unnecessary instruction execution to interrupt handlers, and you want to keep those short n' sweet!  Handlers should do their job quickly and return to the main program as soon as possible.
-    - Finally, set the timer's counter to trigger ALARM0 again in 25 ms.  This will allow the timer to fire again in 25 ms, creating a repeating alarm.
+In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `keypad_drive_column`, and enable that interrupt.  Then, initialize TIMER0 to fire alarm 1 after 1.10 seconds to call `keypad_isr`, and enable that interrupt as well.  
+- Look for the Programmer's Model section and/or the C/C++ SDK if you need help figuring out how to do this.
 
-5. `keypad_isr`: We're going to change this a lot.  In the last lab, we used interrupts on each row pin.  However, that may not be very effective when we want to press buttons across multiple columns.  With this two-alarm approach, we can get pretty close.
-    - First, acknowledge the interrupt for ALARM1 on TIMER0.
-    - Get the current row pin values by calling `keypad_read_rows`.
-    - For each of the row pins that are high, indicating that a button is pressed, check if the corresponding bit in `state` is low (indicating that the button was not pressed before).  If it is low, then we have a new key press.
-        - If so, set the corresponding bit in `state` to high.  
-            - Calculate the index as the same offset you use to index into `keymap`, which gives you the character corresponding to each row and column, and whose value is `"DCBA#9630852*741"`.  See the diagram below to recall the mapping of the row and column pins to the `keymap` array.
-        - Push the event into the `kev` queue using `key_push`.  The "event" must be a 9-bit value containing the pressed state (1) and the ASCII value of the key pressed.  The 1-bit pressed state is the 9th bit, and the ASCII value is the lower 8 bits.  For example, if the key pressed was "5", then the value pushed into the queue should be `9'b100110101`, which is 5 in ASCII (53) with the "pressed" bit set to 1.  (Note how we account for 9 bits by making the argument type for `key_push` 16 bits with `uint16_t`.)
-    - For each of the row pins that are low, indicating that a button is released, check if the corresponding bit in `state` is high (indicating that the button was pressed before).  If it is high, then we have a key release.
-        - If so, set the corresponding bit in `state` to low.  
-        - Push the event into `kev`.  For example, if the key released was "5", then the value pushed into the queue should be `9'b000110101`, which is 5 in ASCII (53) with the "pressed" bit set to 0.
-    - Make sure to reset ALARM1 so that the timer will fire it again in 25 ms.
+#### 2.3. `keypad_read_rows`  
+
+This is a one-liner.  Return a single 4-bit value of the current state of GP2-GP5, which are the row pins.  For example, if GP3,GP4 is high but GP2,GP5 are low, then the return value of this function must be 6 (or 4'b0110).
+
+#### 2.4. `keypad_drive_column`  
+
+We're going to change this a little bit.
+- First, make sure to acknowledge the interrupt for ALARM0 on TIMER0.
+- Increment the value of `col` first.  
+    - We initialized `col` to -1 to account for this so that we scan COL3 (GP6) first.
+    - Ensure that `col` wraps around to 0 after 3 - your columns pins are from GP6 to GP9.
+- With the newly changed value of `col`, drive the selected column GPIO pin high, and drive all others low.
+    - You can do this in a single statement with the SIO `gpio_togl` register, which atomically toggles GPIO pins in a single write.  Remember that if statements, for loops, etc. add a lot of unnecessary instruction execution to interrupt handlers, and you want to keep those short n' sweet!  Handlers should do their job quickly and return to the main program as soon as possible.
+- Finally, set the timer's counter to trigger ALARM0 again in 25 ms.  This will allow the timer to fire again in 25 ms, creating a repeating alarm.
+
+#### 2.5. `keypad_isr`  
+
+We're going to change this a lot.  In the last lab, we used interrupts on each row pin.  However, that may not be very effective when we want to press buttons across multiple columns.  With this two-alarm approach, we can get pretty close.  
+- First, acknowledge the interrupt for ALARM1 on TIMER0.  
+- Get the current row pin values by calling `keypad_read_rows`.  
+- For each of the row pins that are high, indicating that a button is pressed, check if the corresponding bit in `state` is low (indicating that the button was not pressed before).  If it is low, then we have a new key press.  
+    - If so, set the corresponding bit in `state` to high.  
+        - Calculate the index as the same offset you use to index into `keymap`, which gives you the character corresponding to each row and column, and whose value is `"DCBA#9630852*741"`.  See the diagram below to recall the mapping of the row and column pins to the `keymap` array.  
+    - Push the event into the `kev` queue using `key_push`.  The "event" must be a 9-bit value containing the pressed state (1) and the ASCII value of the key pressed.  The 1-bit pressed state is the 9th bit, and the ASCII value is the lower 8 bits.  For example, if the key pressed was "5", then the value pushed into the queue should be `9'b100110101`, which is 5 in ASCII (53) with the "pressed" bit set to 1.  (Note how we account for 9 bits by making the argument type for `key_push` 16 bits with `uint16_t`.)  
+- For each of the row pins that are low, indicating that a button is released, check if the corresponding bit in `state` is high (indicating that the button was pressed before).  If it is high, then we have a key release.  
+    - If so, set the corresponding bit in `state` to low.    
+    - Push the event into `kev`.  For example, if the key released was "5", then the value pushed into the queue should be `9'b000110101`, which is 5 in ASCII (53) with the "pressed" bit set to 0.  
+- Make sure to reset ALARM1 so that the timer will fire it again in 25 ms.  
 
 Here's the keypad pinout again to help you visualize the connections.  You should have GP9 to GP2 connected to COL1 to ROW4 respectively.
 
@@ -237,13 +242,62 @@ Now, let's get started on the display.  You should understand by now that to dis
 1. The top three bits are the select lines for the 74HC138 3-to-8 decoder to select one of the eight digits, and;
 2. The bottom eight bits are the decimal point and seven segments of the chosen digit display.
 
-To see the multiplexing effect in real time, run `check_wiring` on the autotest object you were provided.  The way it works is by quickly pushing out eight 11-bit values successively, with a delay in between each value to ensure the digit is lit for long enough that you can see it.  
+To see the multiplexing effect again in real time, run `check_wiring` on the autotest object you were provided.  
 
+In this step, we'll implement an alarm on TIMER1 that will fire every 3 milliseconds to display a message on the 7-segment displays.  Open the file `display.c`, and you'll see that we've provided you with some important variables:
 
+1. `msg` - An array of 8 characters that will hold the seven-segment representation of the characters to display.  Initially, it contains the seven-segment representation of "01234567", which is what we will display first.
 
+2. `font` - An array whose indices correspond to the ASCII values of characters, and whose values are the seven-segment representation of those characters.  For example, `font['0']` is the seven-segment representation of "0", which is `8'b01101111`.  You can use this array to convert ASCII values to their seven-segment representation.  The actual values are in `font.S`, which is provided to you.
+
+3. `index` - A global integer that keeps track of which 7-segment display to show a value on.  When we configure our timer interrupt to fire every 3 milliseconds to display some value on a specific digit, this variable will be incremented until 7, at which point it will wrap around to 0.  This way, we can cycle through all eight displays. 
+
+With these variables, go ahead and implement the following functions in `display.c`:
+
+#### 3.1: `display_init_pins`  
+Initialize pins GP10-GP20 as outputs.  GP20-GP18 are connected to the select lines for the 74HC138 decoder which chooses one of the eight displays, and GP17-GP10 will be the data lines for the TLC59211PWR sink driver, connected to the shared seven-segment pins between all eight displays.  This should do the same thing as `init_7seg` from labs 1 and 2.
+
+#### 3.2: `display_init_timer`  
+Initialize TIMER1 to fire ALARM0 after 3 milliseconds, at which point the interrupt will call `display_isr` when triggered.  Make sure to enable the interrupt for ALARM0 on TIMER1.
+
+#### 3.3: `display_print`  
+This takes an array of "key-events" from the keypad, transforms them into the seven-segment representation, and stores them in the local `msg` character array.  We'll push the characters out to the display from `msg`, hence the transformation.  
+
+Recall from Step 2 that a key-event is a 9-bit value with the pressed state in the 9th bit and the ASCII value of the key pressed in the lower 8 bits.  So, if we have the following key-events passed to `display_print`:
+
+```
+9'b100110101  // "5" pressed
+9'b000110101  // "5" released
+... // 6 more key-events
+```
+
+Then the values in `msg` would be as follows:
+
+```
+8'b11101101  // 7-segment representation of "5" with decimal point on
+8'b01101101  // 7-segment representation of "5" with decimal point off
+... // 6 more characters
+```
+
+You can use the global `font` array to convert ASCII values to the seven-segment representation.
+
+#### 3.4: `display_isr`  
+This is where the magic happens!  In this function, do the following:
+- Acknowledge the interrupt for ALARM0 on TIMER1.
+- Set the value of GP20-GP10 to a new 10-bit value where the provided global variable `index` is used to select the seven-segment display to turn on, and the value of `msg[index]` is used to determine which segments to light up.  `msg` is an array of 8 characters that initially contains the seven-segment representation of "01234567" - you can see this at the top of the file.
+- Increment `index` by 1, and wrap around to 0 after 7.  (Can you do this without an if statement or modulus?  Hint: think in binary.)
+- Make TIMER1 ALARM0 fire the interrupt again in 3 milliseconds.
+
+Now, look back at `main.c`.  Uncomment the `STEP3` define at the top of the file while commenting out the STEP2 one, and run your code with `autotest` commented out.  We've given you code that calls the keypad and display initialization functions, and then calls `display_print` with the `kev` queue to display the characters pressed on the keypad.
+
+Until you press buttons on the keypad, you should see the display cycling through the characters in `msg`, which is initially "01234567".  Press **and hold** a button, and you'll see the display clear, and the pressed button value appear with the decimal point lit up on the rightmost digit.  Let go of the button, and the same digit will appear, but with the decimal point off.  The display will shift left as you press more buttons.
+
+Try holding down multiple buttons (not in the same row) and note how you can see the display reflect exactly the characters pressed, as well as the same release events in the same order that you perform them!
 
 > [!IMPORTANT]
-> Show your working display to your TA to earn points for this step.  You must have the display cycling through the characters in `message`, and the decimal point shifting through each digit every 0.25 seconds.  If you have any issues, ask your TA for help.
+> Show your working keypad and display to your TA to earn points for this step.  You must have the display cycling through the characters in `message`, and the decimal point shifting through each digit every 0.25 seconds.  If you have any issues, ask your TA for help.
+> 
+> Uncomment `autotest` and run `display` in the autotest console to check for any errors.
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
@@ -251,10 +305,10 @@ To see the multiplexing effect in real time, run `check_wiring` on the autotest 
 
 That was a long lab, so you deserve a game after all that hard work!  
 
-Remove `show_keys`, and replace it with `game()` in `main`, after `init_keypad_timer`, and you'll be able to play a game that may be familiar to you from ECE 27000.  As a reminder:
+Comment out the `STEP3` define in `main.c`, and uncomment the `STEP4` define.  This will call the `game()` function that will allow you to play a game that may be familiar to you from ECE 270.  As a reminder, here's the instructions:
 
 - Your lunar lander starts at 4500 ft above the moon with 800 units of gas.
-- Press A for altitude, B for velocity, C for gas, and D to view thrust.  0-9 changes thrust.
+- Press A for altitude, B for gas, and D to view velocity.  0-9 changes thrust.
 - The lander immediately starts picking up speed due to gravity, so its velocity will decrease (entering negative values) as it falls.
 - Press "0" to let it pick up a velocity of around -100 ft/s, then press "5".
 - Wait until altitude reaches 1800 ft to set the thrust to 9 to counteract the velocity.
