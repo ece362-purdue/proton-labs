@@ -187,6 +187,7 @@ This function initializes the GPIO pins for the keypad.  It should set GP2-GP5 a
 #### 2.2. `keypad_init_timer`  
 
 In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `keypad_drive_column`, and enable that interrupt.  Then, initialize TIMER0 to fire alarm 1 after 1.10 seconds to call `keypad_isr`, and enable that interrupt as well.  
+- One hard requirement that we have for how you set the handler is that you set it as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.
 - Look for the Programmer's Model section and/or the C/C++ SDK if you need help figuring out how to do this.
 
 #### 2.3. `keypad_read_rows`  
@@ -258,10 +259,12 @@ With these variables, go ahead and implement the following functions in `display
 Initialize pins GP10-GP20 as outputs.  GP20-GP18 are connected to the select lines for the 74HC138 decoder which chooses one of the eight displays, and GP17-GP10 will be the data lines for the TLC59211PWR sink driver, connected to the shared seven-segment pins between all eight displays.  This should do the same thing as `init_7seg` from labs 1 and 2.
 
 #### 3.2: `display_init_timer`  
-Initialize TIMER1 to fire ALARM0 after 3 milliseconds, at which point the interrupt will call `display_isr` when triggered.  Make sure to enable the interrupt for ALARM0 on TIMER1.
+Initialize TIMER1 to fire ALARM0 after 3 milliseconds, at which point the interrupt will call `display_isr` when triggered.  Make sure to enable the interrupt for ALARM0 on TIMER1.  Again, set `display_isr` as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.
 
 #### 3.3: `display_print`  
 This takes an array of "key-events" from the keypad, transforms them into the seven-segment representation, and stores them in the local `msg` character array.  We'll push the characters out to the display from `msg`, hence the transformation.  
+
+This function should be similar to the `display_char_print` we've provided you, which takes a regular string of characters and displays that on the 7-segment display.  You just need to add in the transformation for the decimal point.
 
 Recall from Step 2 that a key-event is a 9-bit value with the pressed state in the 9th bit and the ASCII value of the key pressed in the lower 8 bits.  So, if we have the following key-events passed to `display_print`:
 
