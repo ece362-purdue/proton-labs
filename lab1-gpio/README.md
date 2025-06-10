@@ -194,7 +194,7 @@ See the animation above, and use that technique to dive into the three constitue
 > 
 > Aside from the fact that it is academically dishonest to lift code from another source, the purpose of the labs is to teach you how to use your microcontroller and understand it at its lowest level.  Copying code from someone else (a person or an LLM) is going to handicap your ability to parse, analyze and apply information from multiple sources - critical to implementing new designs and debugging them.
 >
-> In the short term, you should take this rule seriously because you will have a lab practical that asks you to write code for your board **without access to the Internet**.  If you use an LLM throughout the labs, you will really struggle on the practical when you won't have access to it.
+> In the short term, you should take this rule seriously because you will have a lab practical that asks you to write code for your board **without access to the Internet**.  If you use an LLM throughout the labs or collaborate with others, you will really struggle on the practical when you won't have access to it.
 
 Implement the function `init_outputs` to configure GPIO pins 22, 23, 24, 25 (also called GP22, GP23, GP24, GP25) as outputs.  You do not need to change any other properties (slew rate, drive strength, etc).  Use the three functions you found in `gpio_init` to do this for each of the pins, or use your answers from above and write the code directly in terms of the registers you found.  (The latter method is more efficient than the other, but you can choose whichever you prefer.)
 
