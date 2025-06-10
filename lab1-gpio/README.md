@@ -177,7 +177,7 @@ See the animation above, and use that technique to dive into the three constitue
 
 7. (5 points) In the function that sets the function for a GPIO pin, there is code specifically for the RP2350 (`#if !PICO_RP2040`) that has the comment "// Remove pad isolation now that the correct peripheral is in control of the pad".  Read Section 9.7 to understand what a "pad" is, and why you need to remove the isolation latch.  Show the relevant paragraph to your TA and discuss it so you understand it.  
 
-> [!HINT]  
+> [!TIP]  
 > The registers you find should start with `sio_hw` or `io_bank0_hw`, which are the SDK-provided structs that define hardware registers that, in turn, control the GPIO pins.  (You can even *dive* into `sio_hw`/`io_bank0_hw` to see the memory addresses they are defined at, and compare that to your datasheet!)  
 > 
 > The C/C++ SDK documented [here](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf) will give you the full list of available API functions that you can *dive* into.  E.g. for GPIO SDK functions, look under the `hardware_gpio` subsection in Section 4 > Hardware APIs.  Use Ctrl-F to jump to it faster.
@@ -208,9 +208,10 @@ In your `main` function, call `init_outputs`, and then start an infinite loop th
 
 Does this sound too easy?  Here's the catch - **you need to do this without using any of the SDK functions except `sleep_ms`**.  It is actually easier to do so, and doesn't involve any loops.  Don't worry, we'll go back to the SDK functions in the next lab, but you may find that you prefer this method of directly modifying registers as an optimal technique.  
 
-Hint: instead of using `gpio_put` for every one of the four LEDs, you can just write `0xF` by a certain offset to a certain register to turn on all four LEDs in one go, with no loops.
-
-You can use the `sleep_ms` function to implement sleep.  What `sleep_ms` does is set a timer in the microcontroller that counts down from the specified number of milliseconds, and when it reaches 0, it **interrupts** the CPU (which enters a sleep state) and wakes it up.  You can dive into the function yourself to see how it works.
+> [!TIP]
+> Instead of using `gpio_put` for every one of the four LEDs, you can just write `0xF` by a certain offset to a certain register to turn on all four LEDs in one go, with no loops.
+> 
+> You can use the `sleep_ms` function to implement sleep.  What `sleep_ms` does is set a timer in the microcontroller that counts down from the specified number of milliseconds, and when it reaches 0, it **interrupts** the CPU (which enters a sleep state) and wakes it up.  You can dive into the function yourself to see how it works.
 
 Your LEDs should turn on and off like a Johnson counter (animated to make it easier to see):
 
