@@ -175,10 +175,10 @@ See the animation above, and use that technique to dive into the three constitue
 
 6. (5 points) What is the function number for SIO?  Show your TA how you arrived at your answers.  (Hint: you can find the SIO function number by diving into the `gpio_function_t` enum in the relevant function.)
 
-7. (5 points) In the function that sets the function for a GPIO pin, there is code specifically for the RP2350 (`#if !PICO_RP2040`) that has the comment "// Remove pad isolation now that the correct peripheral is in control of the pad".  Read Section 9.7 to understand what a "pad" is, and why you need to remove the isolation latch.  Show the relevant paragraph to your TA and discuss it so you understand it.
+7. (5 points) In the function that sets the function for a GPIO pin, there is code specifically for the RP2350 (`#if !PICO_RP2040`) that has the comment "// Remove pad isolation now that the correct peripheral is in control of the pad".  Read Section 9.7 to understand what a "pad" is, and why you need to remove the isolation latch.  Show the relevant paragraph to your TA and discuss it so you understand it.  
 
-> [!HINT]
-> The registers you find should start with `sio_hw` or `io_bank0_hw`, which are the SDK-provided structs that define hardware registers that, in turn, control the GPIO pins.  (You can even *dive* into `sio_hw`/`io_bank0_hw` to see the memory addresses they are defined at, and compare that to your datasheet!)
+> [!HINT]  
+> The registers you find should start with `sio_hw` or `io_bank0_hw`, which are the SDK-provided structs that define hardware registers that, in turn, control the GPIO pins.  (You can even *dive* into `sio_hw`/`io_bank0_hw` to see the memory addresses they are defined at, and compare that to your datasheet!)  
 > 
 > The C/C++ SDK documented [here](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf) will give you the full list of available API functions that you can *dive* into.  E.g. for GPIO SDK functions, look under the `hardware_gpio` subsection in Section 4 > Hardware APIs.  Use Ctrl-F to jump to it faster.
 
