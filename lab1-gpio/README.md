@@ -266,7 +266,7 @@ After `init_inputs`, comment out the infinite while loop we added.  Call `init_k
 
 ```C
 int COLS[] = {6, 7, 8, 9};  // COL4=GP6, COL3=GP7, COL2=GP8, COL1=GP9
-int ROWS[] = {2, 3, 4, 5};  // ROW4=GP2, ROW3=GP3, ROW2=GP12, ROW1=GP13
+int ROWS[] = {2, 3, 4, 5};  // ROW4=GP2, ROW3=GP3, ROW2=GP4, ROW1=GP5
 while (true) {
     loop i = 0, 1, 2, 3 {
         set pin at COLS[i] to be 1
