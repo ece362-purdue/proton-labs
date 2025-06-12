@@ -137,7 +137,7 @@ If you want to solder your headers outside of lab, you may do so, but make sure 
 > [!NOTE]
 > If you're waiting to solder, you obviously don't have to put your Proton on the breadboard just yet.  Continue following from step 3 to set up your environment.
 
-At this point, you should have soldered headers and placed the shorting plugs on your Proton development board.  Before we put back on the breadboard, we're going to connect two wires on the breadboard from **GP0** and **GP1** to the **RX** and **TX** pins respectively on the Proton board.  The way we'll do this is by routing it **under** the board, since you won't need to move those wires once they're in place.  This will make future wiring much easier.
+At this point, you should have soldered headers and placed the shorting plugs on your Proton development board.  Before we put the Proton board back on the breadboard, we're going to connect two wires on the breadboard from **GP0** and **GP1** to the **RX** and **TX** pins respectively on the Proton board.  The way we'll do this is by routing it **under** the board, since you won't need to move those wires once they're in place.  This will make future wiring much easier.
 
 <div class="center">
     <img src="images/uart-pinout.png" style="margin: 1em 0; width: 45vw; max-width: 500px">
