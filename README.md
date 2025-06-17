@@ -19,9 +19,9 @@ Embedded:
 [Lab 1 - GPIO](lab1-gpio/README.md)  
 [Lab 2 - Interrupts](lab2-interrupts/README.md)  
 [Lab 3 - Timers](lab3-timers/README.md)  
+[Lab 4 - ADC and DMA](lab4-adc-dma/README.md)  
 
 <!-- 
-[Lab 4 - ADC and DMA](lab4-adc-dma/README.md)  
 [Lab 5 - PWM](lab5-pwm/README.md)  
 [Lab 6 - SPI](lab6-spi/README.md)  
 [Lab 7 - USART](lab7-usart/README.md)   
