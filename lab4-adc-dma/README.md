@@ -12,7 +12,7 @@
 | 2 | Perform a single-shot sample conversion | 20 |
 | 3 | Perform free-running sample conversions | 20 |
 | 4 | Configure the DMA to automate ADC sample conversions | 35 |
-| 5 | In-Lab Checkoff Step | 20* |
+| 5 | In-Lab Checkoff Step | * |
 | &nbsp; | Total: | 100 |
 <br>
 
