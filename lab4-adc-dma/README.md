@@ -55,7 +55,7 @@ Wire it as follows:
 
 To find the pin that can be used with ADC's Channel 5, we need to look at the pinout for the RP2350 chip in its datasheet, which we can find on this page [here](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A19%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C406.15356%2Cnull%5D).  Look for the GPIO number that would be most likely associated with Channel 5 of the ADC, find it on your Proton board, and connect that to the output of your potentiometer.
 
-Normally, we find the function associated with GPIO functions in the **GPIO Functions Table** that's just below this page, but for some reason the ADC isn't listed there, so we use the chip pinout instead.  (Here's an example of a thing that *should* be documented here, but just isn't, requiring you to look around the datasheet to find it.)  You might want to keep this in mind when you're looking up pins for other peripherals like SPI, PWM, I2C etc. as opposed to the ADC.
+Normally, we find the function associated with GPIO functions in the **GPIO Functions Table** that's just below this page, but for some reason the ADC isn't listed there, so we use the chip pinout instead.  (Here's an example of a thing that *should* be documented here, but just isn't, requiring you to look around the datasheet to find it.  Another place to find it would be the ADC peripheral description further down in the datasheet.)  You might want to keep this in mind when you're looking up pins for other peripherals like SPI, PWM, I2C etc. as opposed to the ADC.
 
 ### Step 1: Read the datasheet
 
@@ -109,13 +109,21 @@ Read [Section 12.6: DMA](https://datasheets.raspberrypi.com/rp2350/rp2350-datash
 > 
 > Therefore, **keep track of the sources you used to find the answers**, and keep in mind that the only acceptable sources are the RP2350 datasheets, SDK functions, or register manipulations found as a result of diving into those functions.
 
-Use the Hardware APIs documentation (detailed in the Raspberry Pi Pico extension menu) to configure the ADC to **perform a single-shot conversion** on Channel 5.  You'll need to appropriately configure the pin associated with the channel, which can be done with functions in the ADC Hardware API as well, but you will be asked to explain what registers they modify, so keep track of those.
+Use the Hardware APIs documentation (detailed in the Raspberry Pi Pico extension menu) to configure the ADC to **perform a single-shot conversion** on ADC Channel 5.  You'll need to appropriately configure the pin associated with the channel, which can be done with functions in the ADC Hardware API as well, but you will be asked to explain what registers they modify, so keep track of those.
 
 Implement the functon `init_adc` in your code file, and call it in `main` to configure the ADC on Channel 5.
 
 Implement the function `read_adc` that will **start** a single-shot conversion, wait for the ADC to be ready again, and then return the ADC result.
 
-In `main`,  we call both these functions for you, read the result, print it to the console, and sleep for 100 ms before calling `read_adc` again.  Upload and monitor your code, and turning the potentiometer should show a value between 0 and 4095 printed to the console.  (Remember to comment out the call to `autotest()` in `main` so that you can see the output.)
+If not already uncommented, uncomment the STEP2 define at the top of the `main.c` file to run the portion of `main` relevant to this step.  In `main`,  we call both these functions for you, read the result, print it to the console, and sleep for 100 ms before calling `read_adc` again.  Upload and monitor your code, and turning the potentiometer should show a value between 0 and 4095 printed to the console.  (Remember to comment out the call to `autotest()` in `main` so that you can see the output.)
+
+Once it works, based on your code and the function implementations, answer the following questions:
+
+2.1: What register(s) did you change to configure a GPIO pin to be used as an ADC input?
+2.2: What register(s) did you change to configure the ADC to use Channel 5 for sampling? 
+2.3: What bit did you set to start a single-shot conversion?  What bit did you check to see if the conversion was complete and the ADC was ready again?
+
+Note that for the ADC values to print out to the console, we're only using a carriage return (`\r`) to overwrite the previous value, followed by a **flush** of the standard output stream, `stdout`.  This is done to avoid printing a new line every time, which would make the output unreadable.  We'll tackle this more in the UART lab.
 
 > [!IMPORTANT]
 > Show your TA that turning the potentiometer varies the value printed to your Serial Monitor within the range 0-4095.  (If it's a bit lower than 4095, that's okay - the potentiometer or breadboard connections may not be perfect.)
@@ -130,9 +138,9 @@ In `main`,  we call both these functions for you, read the result, print it to t
 
 Now, let's start taking away the work from the CPU.  We'll now configure the ADC to **automatically** perform a new conversion every time a conversion finishes, saving the result into a certain register, which we'll read from in a loop.  This eliminates the need to tell the ADC to do a conversion every time in our loop, and lets us focus on simply copying the data out of the register.  This is very useful for when you need to sample a fast-changing signal (like a waveform) at a significantly higher rate, rather than just reading a potentiometer value.
 
-Implement the function `init_adc_freerun` in your `main.c` to configure the GPIO pin for ADC Channel 5 accordingly (similar to what you did before) and start freerunning conversions on the ADC after enabling it.
+Implement the function `init_adc_freerun` in your `main.c` to configure the GPIO pin for ADC Channel 5 accordingly (similar to what you did before) and start freerunning conversions on the ADC **after** enabling it.
 
-In your `main` function, `init_adc_freerun` will be called, and an infinite loop will print out the value from the ADC's value register continuously, with a 100ms sleep in between prints.
+Comment out the STEP2 define at the top of `main.c` and uncomment the STEP3 define. In your `main` function, `init_adc_freerun` will be called, and an infinite loop will print out the value from the ADC's value register continuously, with a 100ms sleep in between prints.
 
 Once it works, based on your code and the function implementations, answer the following questions:
 
@@ -160,28 +168,28 @@ Now, let's take away even more work from the CPU.  We'll configure the DMA to au
 
 This method is very useful for when you do need to sample at a high rate, but you don't want to consume CPU time waiting to check that a new ADC sample is ready, reading it, and then doing something with it.  This may seem small now, but when you have to create a larger sophisicated project that needs to do more things, you'll appreciate any ways to offload work from the CPU.
 
-Understanding DMA can quite confusing, especially given how large the API functions can get, so we'll explain what needs to be done here manually.  This requires that you directly modify peripheral registers, e.g. `adc_hw` for ADC and `dma_hw->ch[0]` for Channel 5 of the DMA.
+Understanding DMA can quite confusing, especially given how large the API functions can get, so we'll explain what needs to be done here manually.  This requires that you directly modify peripheral registers, e.g. `adc_hw` for ADC and `dma_hw->ch[0]` for Channel 0 of the DMA.
 
 In the function `init_adc_dma`, do the following:
 
 1. First call `init_dma`.  We'll fill in this function later.
 2. Call `init_adc_freerun` to configure the ADC for free-running mode, and GP26 as the ADC input.
-3. Enable the ADC FIFO. 
+3. Enable the ADC FIFO to store the generated samples.
 4. Configure the ADC to send out a DREQ signal whenever a new sample is ready in the FIFO.  The DREQ signal will tell the DMA that the data is ready to be copied.
 
 Next, in the function `init_dma`, do the following:
 
-1. Configure DMA Channel 5 to read from the ADC FIFO and write to the variable `adc_fifo_out`.  You'll need to pass the addresses of both these variables to the `read_addr` and `write_addr` fields of the DMA channel 5 configuration.
+1. Configure DMA Channel 0 to read from the ADC FIFO and write to the variable `adc_fifo_out`.  You'll need to pass the addresses of both these variables to the `read_addr` and `write_addr` fields of the DMA channel 0 configuration.
 
-2. Set the transfer count, or TRANS_COUNT, to the arithmetic OR of two values:
-    - The mode value that tells the DMA to re-trigger itself infinitely, which is 1.  You'll need to left-shift it to the correct position for the MODE field of the TRANS_COUNT field of the DMA channel 5 configuration.
-    - The number of data packets you want to transfer, which is 1.  We'll tell the channel later how big **one** data packet is in terms of bits.
+2. Set the transfer count, or `TRANS_COUNT`, to the arithmetic OR of two values:
+    - The mode value that tells the DMA to re-trigger itself infinitely, which is 1.  You'll need to left-shift it to the correct position for the `MODE` field of the `TRANS_COUNT` field of the DMA channel 0 configuration.
+    - The number of data packets you want to transfer, which is 1, which you should write to the `COUNT` field of `TRANS_COUNT`.  We'll tell the channel later how big **one** data packet is in terms of bits.
 
-3. Initialize the control trigger register of the DMA to zero.  This is a concept called the **null trigger**, and is required to ensure we don't accidentally start the DMA transfer before we're ready.  Next, create a `uint32_t` variable called `temp`, and to it, OR in the following:
+3. Initialize the control trigger register of the DMA to zero.  This is a concept called the **null trigger**, and is required to ensure we don't accidentally start the DMA transfer before we're ready.  **Create a `uint32_t` variable** called `temp`, and to it, OR in the following:
     - Specify the data size of the packet as a **half-word**.  The ADC only outputs 12-bit samples, so you'll need to set the `DATA_SIZE` field of the `temp` variable to 1.
-        - This means you left-shift the value 1 by the correct number of bits that would correspond to the `DATA_SIZE` field of the DMA channel 5 configuration, but you assign it to `temp` first.
-    - Specify the ADC DREQ signal as the TREQ trigger.  You can find the DREQ numbers under Section 12.6.4, or use `DREQ_ADC`.  Don't forget to left-shift it by the correct number of bits for the `TREQ_SEL` field of the DMA channel 5 configuration.
-    - Finally, set the EN bit.  (Once more - do not do this directly in the DMA channel 5 configuration register - do it in the `temp` variable first!)
+        - This means you left-shift the value 1 by the correct number of bits that would correspond to the `DATA_SIZE` field of the DMA channel 0 configuration, but you assign it to `temp` first.
+    - Specify the ADC DREQ signal as the TREQ trigger.  You can find the DREQ numbers under Section 12.6.4, or use `DREQ_ADC`.  Don't forget to left-shift it by the correct number of bits for the `TREQ_SEL` field of the DMA channel 0 configuration.
+    - Finally, set the EN bit.  (Once more - do not do this directly in the DMA channel 0 configuration register - do it in the `temp` variable first!)
 
 4. Write the `temp` variable to the `dma_hw->ch[0].ctrl_trig` register.  This action causes the DMA channel to start transferring samples to the `adc_fifo_out` variable.
 
@@ -199,10 +207,10 @@ Answer the following questions with regards to your code:
 
 2. What register bits did you have to write to to configure the ADC to send out a DREQ signal whenever a new sample is ready in the FIFO?  Why is it important to use the DREQ signal to trigger the DMA transfer?
 
-3. What specific register bits did you have to write to to configure DMA Channel 5 to read from the ADC FIFO and write to the variable `adc_fifo_out`?
+3. What specific register bits did you have to write to to configure DMA Channel 0 to read from the ADC FIFO and write to the variable `adc_fifo_out`?
 
 > [!IMPORTANT]
-> Show your TA that turning the potentiometer varies the value displayed on the seven segment display within the range 0.000000 to 3.300000.  Show them the code you wrote, and that it passes the `dma_adc` test case.
+> Show your TA that turning the potentiometer varies the value displayed on the seven segment display within the range 0.000000 to 3.300000.  It may be lower than 3.3 and higher than 0.0, which is fine.  Show them the code you wrote, and that it passes the `adc_dma` test case.
 > 
 > Also show your TA the answers to the questions asked above.  You must have **correct** answers to earn points for this step.
 > 
