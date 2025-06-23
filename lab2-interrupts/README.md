@@ -144,11 +144,11 @@ You'll notice that there's not any information about **configuring** or **enabli
 
 [Chapter 6.5.3: DORMANT State](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A489%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C223.738%2Cnull%5D)
 
-9. The best use case for interrupts is to wake the CPU from a low power state when an event occurs, to minimize power consumption.  As explained in that section, the DORMANT power state of the RP2350 turns off nearly everything on the microcontroller (by turning off one critical component) until an external interrupt occurs.  What register should you write to in order to enter the DORMANT state, and what value should we write?  
+10. (2 points) The best use case for interrupts is to wake the CPU from a low power state when an event occurs, to minimize power consumption.  As explained in that section, the DORMANT power state of the RP2350 turns off nearly everything on the microcontroller (by turning off one critical component) until an external interrupt occurs.  What register should you write to in order to enter the DORMANT state, and what value should we write?  
     - Hint: We are using the crystal oscillator for the clock source.
     - Hint: The function `_go_dormant` described in [6.5.6.2. DORMANT](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A491%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C438.442%2Cnull%5D) of the datasheet calls a function that writes to this register.  Find that function (you may have to go to the code example linked) that does this and see what register it writes to, what value is written, and note the loop it runs before it returns.  
         - That loop ensures the crystal and PLL (and therefore your clock frequency) are stable before re-entering your code.
-10. To enable waking from the DORMANT state by a **specific** GPIO pin interrupt, what register do you need to write to?  
+11. (1 point) To enable waking from the DORMANT state by a **specific** GPIO pin interrupt, what register do you need to write to?  
 
 > [!NOTE]
 > *How is the "Dormant" state different from the regular "Sleep" state?*
@@ -181,17 +181,23 @@ Copy in the `init_inputs` and `init_outputs` functions you implemented in lab 1 
 Next, implement `init_gpio_irq` as instructed below, along with a few other functions.  You can use either the SDK functions or directly write to registers.
 
 1. First, turn on GP22-GP25 (the user LEDs) so that they are all on when the program starts.  This is done in `init_outputs()`, which is already called in `main`.  This is how we'll know if the microcontroller is in the DORMANT state or not.
-2. Configure GP21 such that when a **rising edge** occurs on it, the function `gp21_isr` is called.  Use the function `gpio_set_irq_enabled_with_callback`.
-    - `gp21_isr`, when called, should **acknowledge the interrupt**, turn off all user LEDs GP22-GP25, and enter the DORMANT state.
-    - Once this is implemented and you press GP21, your RP2350 will not respond to any other stimulus (other than GP26) until it wakes up.  **This includes being able to upload code, because your crystal oscillator is now turned off!**  If you need to get out of this state and GP26 isn't working, press the Reset button, which will restart the oscillator, and subsequently the microcontroller.
-3. Configure GP26 to wake the microcontroller from the DORMANT state, and to execute `gp26_isr` on the rising edge (yes, you can do two events on the same edge!).  You should not have to set the callback ISR when entering DORMANT mode.
-    - We've found that using the SDK function `gpio_set_irq_enabled_with_callback` does not work when you're also trying to wake from DORMANT sleep.  Use `gpio_add_raw_irq_handler` and `gpio_set_irq_enabled` instead - make sure you call them in the right order.
-    - `gp26_isr` should **acknowledge two interrupts** - the DORMANT wake event, and the regular rising edge interrupt - and turn on GP22-GP25.
+2. Configure GP21 and GP26 such that when a **rising edge** occurs on either pin, the function `gpio_isr` is called.  Use the function `gpio_add_raw_irq_handler_masked` to add the handler for both pins at once, and don't forget to enable the GPIO IRQ for both pins, as well the BANK0 IRQ interrupt.
+3. Configure GP26 to wake the microcontroller from the DORMANT state in addition to triggering the interrupt handled by `gpio_isr`. You can configure a pin for multiple functions simultaneously.
+    - We've found that using the SDK function `gpio_set_irq_enabled_with_callback` does not work well when you're also trying to wake from DORMANT sleep. Stick with the `gpio_add_raw_irq_handler` and `gpio_set_irq_enabled` approach - make sure you call them in the right order.
+    - Your `gpio_isr` function should properly check which pin triggered the interrupt before performing the appropriate actions.
+
+In `gpio_isr`:
+- You should **identify which pin triggered the interrupt** using the event parameter passed to the handler.
+- If GP21 triggered the interrupt, acknowledge it, turn off all user LEDs GP22-GP25, and enter the DORMANT state.
+- If GP26 triggered the interrupt, acknowledge both the DORMANT wake event and the regular rising edge interrupt, then turn on GP22-GP25.
+- Once the GP21 functionality is implemented and you press GP21, your RP2350 will not respond to any other stimulus (other than GP26) until it wakes up. **This includes being able to upload code, because your crystal oscillator is now turned off!** If you need to get out of this state and GP26 isn't working, press the Reset button, which will restart the oscillator, and subsequently the microcontroller.
 
 In summary, you should implement the following functions:
 1. `init_gpio_irq` - configure GP21 and GP26 as described above and turn GP22-GP25 on.
-2. `gp21_isr` - acknowledge the interrupt, turn off all user LEDs GP22-GP25, and enter the DORMANT state.
-3. `gp26_isr` - acknowledge the DORMANT wake event and the rising edge interrupt, and turn on GP22-GP25.
+2. `gpio_isr` - This single ISR will handle interrupts from both GP21 and GP26. It should:
+    - Identify which pin triggered the interrupt (check the event parameter)
+    - If GP21: acknowledge the interrupt, turn off all user LEDs GP22-GP25, and enter DORMANT state
+    - If GP26: acknowledge both the DORMANT wake event and the rising edge interrupt, then turn on GP22-GP25
 
 > [!TIP]
 > If you're unsure what functions to use, use the [C/C++ SDK functions](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf).  Search for GPIO and/or IRQ functions.
@@ -259,7 +265,7 @@ To implement the ISR, we need to keep in mind that `keypad_isr` could get called
 In summary, you should implement the following functions:
 1. `init_keypad_irq` - configure the GPIO pins 2 through 5 to trigger an interrupt on a rising edge, and call `keypad_isr` when that happens. 
 2. `drive_column` - drive the column pin indicated by the global variable `col` high and all other column pins low.  Sleep for 25 milliseconds.  Increment `col` mod 4 after driving the pin.
-3. `keypad_isr` - acknowledge the interrupt, call `drive_column` to drive the next column pin, check the row pins for a high signal, and print out the key that was pressed.
+3. `keypad_isr` - acknowledge the interrupt, check if a rising edge has occurred on any of the row pins, and for each row pin that was high, print out the corresponding key that was pressed.
 
 Upload and monitor in PlatformIO.  Hopefully, pressing a button on your keypad should print out that key on your Serial Monitor.
 
