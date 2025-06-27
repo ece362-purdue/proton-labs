@@ -183,7 +183,6 @@ Next, implement `init_gpio_irq` as instructed below, along with a few other func
 1. First, turn on GP22-GP25 (the user LEDs) so that they are all on when the program starts.  This is done in `init_outputs()`, which is already called in `main`.  This is how we'll know if the microcontroller is in the DORMANT state or not.
 2. Configure GP21 and GP26 such that when a **rising edge** occurs on either pin, the function `gpio_isr` is called.  Use the function `gpio_add_raw_irq_handler_masked` to add the handler for both pins at once, and don't forget to enable the GPIO IRQ for both pins, as well the BANK0 IRQ interrupt.
 3. Configure GP26 to wake the microcontroller from the DORMANT state in addition to triggering the interrupt handled by `gpio_isr`. You can configure a pin for multiple functions simultaneously.
-    - We've found that using the SDK function `gpio_set_irq_enabled_with_callback` does not work well when you're also trying to wake from DORMANT sleep. Stick with the `gpio_add_raw_irq_handler` and `gpio_set_irq_enabled` approach - make sure you call them in the right order.
     - Your `gpio_isr` function should properly check which pin triggered the interrupt before performing the appropriate actions.
 
 In `gpio_isr`:

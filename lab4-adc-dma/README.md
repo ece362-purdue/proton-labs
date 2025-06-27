@@ -12,7 +12,7 @@
 | 2 | Perform a single-shot sample conversion | 20 |
 | 3 | Perform free-running sample conversions | 20 |
 | 4 | Configure the DMA to automate ADC sample conversions | 35 |
-| 5 | In-Lab Checkoff Step | * |
+| 5 | Confirm your checkoffs before leaving | * |
 | &nbsp; | Total: | 100 |
 <br>
 
@@ -216,11 +216,11 @@ Answer the following questions with regards to your code:
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-### Step 5: In-Lab Checkoff Step
+### Step 5: Confirm your checkoffs before leaving
 
 > [!CAUTION]
 > Make sure you got checked off here: https://engineering.purdue.edu/ece362/checkoff/
 > 
 > Make sure to upload your confirmation code and verify that it is accepted by Gradescope.  You will know it is accepted if you get the points from Gradescope.
 > 
-> Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs, that your confirmation code was accepted on Gradescope before logging out and leaving for the day.
+> Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs and that your confirmation code was accepted on Gradescope before logging out and leaving for the day.
