@@ -191,7 +191,7 @@ Next, in the function `init_dma`, do the following:
     - Specify the ADC DREQ signal as the TREQ trigger.  You can find the DREQ numbers under Section 12.6.4, or use `DREQ_ADC`.  Don't forget to left-shift it by the correct number of bits for the `TREQ_SEL` field of the DMA channel 0 configuration.
     - Finally, set the EN bit.  (Once more - do not do this directly in the DMA channel 0 configuration register - do it in the `temp` variable first!)
 
-4. Write the `temp` variable to the `dma_hw->ch[0].ctrl_trig` register.  This action causes the DMA channel to start transferring samples to the `adc_fifo_out` variable.
+4. Write the `temp` variable to the `dma_hw->ch[0].ctrl_trig` register.  This action causes the DMA channel to start transferring samples to the `adc_fifo_out` variable.  The purpose of `_trig` is to indicate that the DMA channel is now ready to be **triggered** by the DREQ signal from the ADC.
 
 *Why don't we just directly read `adc_hw->fifo` in the DMA channel?*  The very act of *reading* the `fifo` register tells the ADC that a sample has been read, and it will then start filling the FIFO with the next sample.  This is why we need to use the DREQ signal to tell the DMA that the ADC has a new sample ready to be read, rather than us needing to add a loop in our `main` function to wait until a new sample is ready.  It's all about small optimizations!
 
