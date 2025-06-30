@@ -11,8 +11,8 @@
 | 1   | Read the datasheet | 20 |
 | 2   | Bit-banging SPI with 7-segment displays | 20 |
 | 3   | Use SPI to communicate with 7-segment display | 20 |
-| 4   | Use SPI to communicate with LCD/OLED display | 20 |
-| 5   | Automate LCD/OLED display with SPI and DMA | 20 |
+| 4   | Automate 7-segment display handling with SPI and DMA | 20 |
+| 5   | Use SPI to communicate with LCD/OLED display | 20 |
 | 6   | Confirm your checkoffs before leaving | * |
 | 99  | Automate SPI transmits with PIO | ** |
 | &nbsp; | Total: | 100 |
@@ -285,3 +285,35 @@ Carefully check your code, and then head back to `main.c` and uncomment `STEP5`,
 > Make sure to upload your confirmation code and verify that it is accepted by Gradescope.  You will know it is accepted if you get the points from Gradescope.
 > 
 > Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs and that your confirmation code was accepted on Gradescope before logging out and leaving for the day.
+
+### Step 99: (Optional) Automate SPI transmits with PIO 
+
+PIO, or Programmable Input/Output, is a special peripheral unique to the Raspberry Pi microcontrollers, including the RP2350.  It goes one step up from bit-banging in that you can write **instructions** to implement whatever protocol you want, which takes away the need to worry about exact timing constraints, which can be difficult when manipulating pins.  
+
+When you tackle projects, PIO can be incredibly useful as you can use it to implement data transmission protocols that are not natively supported by the RP2350, such as the ones needed to communicate with WS2812 LED strips, Adafruit LED matrices, etc. or even custom protocols that you may need for your project.
+
+![pio structure](images/pio.png)
+
+A PIO is similar to a CPU in that:
+- It has a program memory from which it fetches, decodes and executes instructions.
+- It has a "scratch memory" that can be used to temporarily store data.
+- It can configure and drive GPIO pins and can trigger or handle DMA requests.
+
+A PIO is *very different* from a CPU in that:
+- It has a very limited instruction set, which is designed to be simple and efficient for manipulating GPIO pins.
+- It cannot communicate with the rest of the system except through FIFO buffers, which also can only be used to set pin values and scratch register values, or read them.
+
+Read over [PIO Programs](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#_pio_programs) and Control Flow (immediately after that) in the RP2350 datasheet to see some examples of PIO programs, and descriptions of how they operate.  In a nutshell, we write a PIO program, for example the **squarewave** example that was shown:
+
+```pio
+.program squarewave
+  set pindirs, 1 ; Set pin to output
+again:
+  set pins, 1 [1] ; Drive pin high and then delay for one cycle
+  set pins, 0 ; Drive pin low
+  jmp again ; Set PC to label `again`
+```
+
+That PIO program gets compiled to a **binary format** with a program called `pioasm`, or PIO Assembler, into a binary format.  To make including it in your project easier, we've added code to detect if you have `.pio` files in your `src` directory, and uses `pioasm` to compile them into `.pio.h` header files that will get automatically included in your project.
+
+Then, in your `main.c`, you use the definitions created in that header file to load the compiled PIO program into the PIO instruction memory, and start the PIO state machine which fetches, decodes and executes the instructions in the PIO program.  You can configure additional things like a different PIO clock speed to make it slower, the pins to be configured by the PIO, 
