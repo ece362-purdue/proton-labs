@@ -171,12 +171,12 @@ The two alarms will do the following:
 
 Two things to explain from that:
 - You have a 16-element array of `bool` elements called `state`.  This corresponds to the `keymap` character array that translates the row and column pins to characters.  In `state`, if an element is `true`, it means that the corresponding key is currently pressed, and vice-versa if it is `false`.  You will update this `state` array in `keypad_isr`.
+    - Find the definition in `keypad.c` itself.
 
 - To track button presses AND releases as they happen, we provide you with a global FIFO queue called `kev` (Key EVents) with push and pop functions `key_push` and `key_pop` respectively.  We define these as "events".  When an event occurs, we push a 9-bit value with `key_push` that contains the pressed state of the key and the value of the key pressed.  Therefore:
     - When the button 8 is pressed, the value 9'b100111000 is pushed into the queue.  The 9th bit is 1, indicating "button pressed", and bits 8 through 0 8'b00111000 indicate the [ASCII number](https://www.ascii-code.com/) for "8", which is 56.
     - When the button 4 is released, the value 9'b000110100 is pushed into the queue.  The 9th bit is 0, indicating "button released", and bits 8 through 0 8'b00110100 indicate the [ASCII number](https://www.ascii-code.com/) for "4", which is 52.
-
-You can see the definitions for these variables and functions in `keypad.h`, which is provided to you.
+    - You can see the definitions for these variables and functions in `queue.h`, which is provided to you.
 
 Now that we have a basic understanding of how to do this, in `keypad.c`, implement the following functions:
 
@@ -234,7 +234,7 @@ With this method of keypad polling, we should be able to press multiple buttons,
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-When you need to use the keypad in future labs, you will be expected to copy in `keypad.c` and `keypad.h` into that lab's repository, and call the initialization functions as we demonstrated for you in `main.c`, using `key_pop` to wait on key events from the keypad.
+When you need to use the keypad in future labs, you will be expected to copy in `keypad.c` and `queue.h` into that lab's repository (if it doesn't already exist, or if you need to fill in the functions), and call the initialization functions as we demonstrated for you in `main.c`, using `key_pop` to wait on key events from the keypad.
 
 ### Step 3: Use the multiplexed display
 
