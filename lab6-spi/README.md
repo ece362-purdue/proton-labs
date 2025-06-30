@@ -84,7 +84,7 @@ We can also **chain** multiple shift registers by connecting the data output of 
 
 So if we happen to have two 8-bit shift registers, we could use 11 of those bits to act as the "pins" that we're now replacing.  
 
-Now, let's go ahead and wire up the two 74HC595 shift registers in your kit.  Disconnect the wires between your Proton board and the 7-segment displays, and the USB-C cable to your debugger (as you need to route wires underneath it) and follow this schematic to wire up your shift registers:
+Now, let's go ahead and wire up the two 74HC595 shift registers in your kit.  Disconnect the wires between your Proton board and the 7-segment displays, and the USB-C cable to your debugger (as you need to route wires underneath it).  **Place the shift registers so that the side of pins 1-8 face the seven-segment display (the pin 1 dot is on the right side of the chip facing you), which is *opposite* to what you used to do with other 74-series chips.**  This is to make the wiring easier.  Then, follow this schematic to wire up your shift registers:
 
 ![alt text](images/7seg-schem.png)
 
@@ -145,17 +145,23 @@ In `display.c`, do the following:
 
 Implement `display_init_bitbang` to initialize the 3 pins for communicating with the 7-segment display as GPIO outputs.  Set the CSn pin high and the SCK and TX pins low so that we don't accidentally send any data to the shift registers.
 
-Implement `display_bitbang_spi` to perform the actual SPI communication bit-banging.  The message to be sent are the 8 11-bit elements of `msg`.  For each of the 8 elements, you will push out 3 bits that correspond to the 3 decoder address pins, and then 8 bits that correspond to the segments of the selected display.  
+Implement `display_bitbang_spi` to perform the actual SPI communication bit-banging.  The message to be sent are the 8 11-bit elements of `msg`.  For each of the 8 elements, you will push out 3 bits that correspond to the 3 decoder address pins, and then 8 bits that correspond to the segments of the selected display.  **However, you must still send 16 bits at a time to make sure the bits reach the correct positions, so make sure to left-pad the 3 bits with 5 zeroes.**
 
 How SPI works in a nutshell is as follows:
-- CSn (chip select) is pulled low to select the device.
-- TX (data) is set to the data to be sent, whether that's a logic 1 or 0.
-- SCK (clock) is toggled high to shift the data out to the device.
-- The process is repeated for each bit of data to be sent.
-- After all bits of one element are sent, sleep for 1 millisecond to allow the current propagation to settle.
-- After all 8 elements are sent, CSn is pulled high to deselect the device.
+- When transmiting a new element from the eight in the `msg` buffer, CSn (chip select) is pulled low to select the device.  Sleep for 10 microseconds to allow the device to settle.
+- TX (data) is set to the data to be sent, whether that's a logic 1 or 0.  Sleep for 1 microsecond to allow the data to propagate and satisfy any setup time requirements (remember those?).
+- SCK (clock) is toggled high to shift the data out to the device.  Sleep for 5 microseconds, then toggle it low to complete the clock cycle, and sleep another 5 microseconds.
+- The process of setting data, and toggling the clock, is repeated for each bit of data to be sent until the element is fully sent.
+- After each elements is sent, CSn is pulled high to deselect the device.  Sleep for 10 microseconds to allow the device to settle.
 
 In `main.c`, make sure `STEP2` is defined.  This will call both functions for you in `main()`.  Upload your code and you should see the 7-segment displays light up with the numbers 0-7, each on a different display.  
+
+When it doesn't work:
+1. Check your wiring, carefully.  Use a multimeter to perform continuity checks from the SPI lines to the shift registers and from the shift registers to the 7-segment displays.
+2. Check your pins in `main.c` to ensure you are using the correct pins for SPI SCK, CSn and TX.  Ensure that you are making them GPIO outputs, **not** SPI outputs.  SPI comes in the next step.
+3. Use an oscilloscope's Serial function (literally just press the Serial button), or the Logic Analyzer on an AD2/3, to watch the SPI signals as the `display_bitbang_spi` function runs.  You are implementing bit-banging for 16-bit SPI, and you can consider a clock speed of 100 KHz.  Compare them to the signals below and ensure they look similar.
+
+![spi-waveforms](images/7seg-waves.png)
 
 > [!IMPORTANT]
 > Show your TA your working 7-segment displays and that you are bit-banging SPI.  Show them the code you wrote, and that it passes the `bitbang` test case.
@@ -173,10 +179,21 @@ In `display.c`, implement `display_init_spi` to initialize the three GPIO pins t
   - We're only sending 11 bits at a time, but we need to send 16 at a time so that 1) the SPI peripheral can send the data in one go, and 2) the two 8-bit shift registers will receive the data correctly.
 - The CPOL and CPHA should be set to 0, meaning that the clock is idle low, and data is sampled on the rising edge of the clock.
 - The endianness (bit order) should be set to MSB first, meaning that the most significant bit is sent first, which is the A2 pin of the decoder on your 7-segment display.
+  - While we were writing this lab, we discovered that the SPI isn't even capable of LSB-first transmission!  If you ever find yourself needing to use that, just flip the bits that you're transmitting.
+- Finally, the SPI peripheral should be enabled.  (You may see something about DREQ signals being always enabled - that doesn't have to be done until the DMA step.)
 
-In the same file, implement `display_print` to send each element of `msg` to the SPI peripheral.    (Now that we're using SPI, things get a lot simpler!)  Since we're using a lower clock speed, there's no need to sleep between sending each element, as the SPI peripheral will handle the timing for us.  Of course, we can still improve on that in the next step...
+In the same file, implement `display_print` to write each element of `msg` to the SPI peripheral data buffer, which triggers a "transaction".  The SPI peripheral, having received a new "datum" (our `msg` element), will automatically toggle the select/clock/data lines for us and transmit the datum we just gave it.  (Now that we're using SPI, things get a lot simpler!)  Notice that now there's no need to sleep between sending each element, as the SPI peripheral will handle the timing for us.  This can 
+
+However, we are still in a situation where we're using Of course, we can still improve on that in the next step...
 
 Uncomment STEP3, which calls both functions for you in `main`.  Upload and monitor, and you should see the same result as before, but now the 7-segment displays are being driven by the SPI peripheral instead of bit-banging.
+
+When it doesn't work:
+1. Check your pins in `main.c` to ensure you are using the correct pins for SPI SCK, CSn and TX.  Ensure that you are making them SPI outputs, **not** GPIO outputs.  GPIO was for manually bit-banging SPI.
+2. Use an oscilloscope's Serial function (literally just press the Serial button), or the Logic Analyzer on an AD2/3, to watch the SPI signals as the `display_bitbang_spi` function runs.  You are implementing bit-banging for 16-bit SPI, and you are using a clock speed of 125 KHz.  Compare them to the signals below (should be the same as when you bit-banged SPI) and ensure they look similar.
+3. Make sure you specified that you were using an LCD or OLED display 
+
+![spi-waveforms](images/7seg-waves.png)
 
 > [!IMPORTANT]
 > Show your TA your working 7-segment displays and that you are using the SPI peripheral.  Show them the code you wrote, and that it passes the `spi` test case.
@@ -187,7 +204,44 @@ Uncomment STEP3, which calls both functions for you in `main`.  Upload and monit
 
 In the past two steps, we used a loop to continually push out the bits to the 7-segment displays.  However, we like to ensure that whatever can be offloaded, should be offloaded to the hardware separate from the CPU.  
 
-Thus we come revisit the DMA peripheral.  You may remember from lab 4 where you used DMA to move sample data from the ADC to a variable in memory.  We'll now flip that around and use DMA to send data from memory to the SPI peripheral, which will then send it out to the 7-segment displays.
+Thus we revisit the DMA peripheral from lab 4.  You may remember back in lab 4 that you used DMA to move sample data from the ADC to a variable in memory.  We'll now flip that around and use DMA to send data from the `msg` array to the SPI peripheral, which will then send it out to the 7-segment displays.  This frees up the CPU to do other things while the DMA handles 
+
+In the function `display_init_dma`, configure a free DMA channel by setting four things, which is generally the case for setting up any DMA transfer:
+1. The source address, which is the address of the `msg` array.
+2. The destination address, which is the SPI data register for the SPI peripheral associated with the 7-segment display.
+3. The transfer count, which should set the DMA channel for ENDLESS mode, and will perform 8 transfers.
+
+In a new temporary 32-bit variable, set the following parameters:
+
+4. The data size of each transfer will be the size of one element of `msg`, or 16 bits.
+5. The read address should increment after every transfer.
+6. The read address should wrap every X bits.  (Figure out what X is.)
+  - When you are in ENDLESS mode, the DMA will keep incrementing the source address by 16 bits (2 bytes) after each transfer in order to reach the next element of `msg`.  However, DMA doesn't understand that `msg` is only 8 elements long, so we need to tell it to wrap around to the first element's address after it has transferred the first element.  
+  - Therefore, the value of X is the number of bits that the DMA should wrap around after transferring all eight elements of `msg`.
+7. Select SPI1 TX as the Data Request (DREQ) source.
+  - When SPI finishes transmitting data, or has only just been configured, the data register will be empty, i.e. have a value of zero.  This is used to tell other peripherals, including DMA and IRQ, that the SPI transmit (TX) FIFO is empty, and ready to receive new data.  For DMA, that triggers a data request.
+8. Finally, enable the DMA channel.
+
+If you didn't already enable DREQ signals from the SPI in the previous steps, do that before you configure DMA.
+
+At the top of `main.c` in the username block, specify what DMA channel number you used.  We'll use this for `autotest`.s
+
+Then, assign the temporary register to the DMA channel's `ctrl_trig` register, which will configure and enable the DMA channel with the parameters you just set.
+
+> [!NOTE]
+> *There is a `ctrl` register and a `ctrl_trig` register.  What's the difference?*
+> The `ctrl` register is used to configure the DMA channel, while the `ctrl_trig` register is used to trigger the DMA channel and start the transfer.  This is very helpful if you want to restart the DMA transfer yourself by changing a few bits every time.  You could theoretically even use DMA to start a new DMA transfer, which could also be used to restart the first one!  That process is called "chaining" and can be extremely useful if you want to perform multiple different DMA transfers in a row without having to manually trigger each one.
+> 
+> Read [12.6.3.1 Aliases and Triggers](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_dma_starting_channels) for different options on triggering a DMA channel to start - you can even write the `ctrl` register first and write to an *alias* register for the transfer count, read address or write address registers to do the DMA triggering instead.
+> 
+> The purpose of the temporary register is so that we set all our parameters first before writing to the `ctrl_trig` register, which would start the DMA transfer immediately.
+
+Upload and monitor, and you should see the same result as before, but now the 7-segment displays are being driven by the SPI peripheral with DMA, while the CPU remains in a loop and can now be used for something else.
+
+When it doesn't work:
+
+1. Ensure that you set the correct DMA channel number in `main.c` at the top of the file in the variable `SEG7_DMA_CHANNEL`, and that you are using the same DMA channel in `display_init_dma`.
+2. Debug your code, and go through the DMA Channel X registers in the RP2350 datasheet to ensure you are setting the correct parameters.  Make sure you are using the correct DMA channel throughout the code.  Check to see that the bits you want to set are being set properly in the `ctrl_trig`, `trans_count`, read and write address registers.
 
 > [!IMPORTANT]
 > Show your TA your working 7-segment displays and that you are using the SPI peripheral.  Show them the code you wrote, and that it passes the `dma` test case.
@@ -203,7 +257,7 @@ The display functions with an **internal controller** that interprets the comman
 We'll do our initialization in `chardisp.c` ("chardisp" is short for "character display").  The initialization is different for the two types of displays, so make sure to follow the instructions for your specific display type.
 
 > [!NOTE]
-> *How do you know what to do for this display?*
+> *How do we know how to communicate with this display and that it supports SPI?*  
 > There is a datasheet for your display here: https://ece362-purdue.github.io/proton-labs/datasheets/
 > 
 > If you read it carefully, it describes what bits you need to send to the display to initialize it, set the cursor position, and write text to it.  
@@ -218,6 +272,7 @@ Initialize the pins that you have connected to your LCD/OLED display in `init_ch
   - **10 bits for the OLED**.
 - CPOL and CPHA should be set to 0, as usual.
 - The endianness (bit order) should be set to MSB first, as usual.
+  - While we were writing this lab, we discovered that the SPI isn't even capable of LSB-first transmission!  If you ever find yourself needing to use that, just flip the bits that you're transmitting.
 
 #### 5.2: `send_spi_cmd`
 
@@ -225,15 +280,15 @@ In this function, wait until the SPI peripheral (whose associated object passed 
 
 #### 5.3: (LCD only) `send_spi_data`
 
-This function just calls `send_spi_cmd` but it ORs in **0x100** to the value.  The presence of this bit indicates that it is a data byte, not a command byte, to the display's controller.
+This function just calls `send_spi_cmd` but it ORs in **0x100** to the value.  The presence of this bit indicates that it is a data byte, not a command byte, to the display's controller.  Make sure to transmit the value with the SPI peripheral passed in as an argument - don't hardcode it!
 
 #### 5.3: (OLED only) `send_spi_data`
 
-This function just calls `send_spi_cmd` but it ORs in **0x200** to the value.  The presence of this bit indicates that it is a data byte, not a command byte, to the display's controller.
+This function just calls `send_spi_cmd` but it ORs in **0x200** to the value.  The presence of this bit indicates that it is a data byte, not a command byte, to the display's controller.  Make sure to transmit the value with the SPI peripheral passed in as an argument - don't hardcode it!
 
 #### 5.4: (LCD only) `cd_init`
 
-We're now ready to initialize the LCD display.  We'll give you the list of command to send to the display to properly initialize it, but you need to go through the LCD datasheet to understand how to do this.  **Be prepared to explain to your TA what each command does and how you found it.**
+In this step, we're going to initialize the LCD display by transmitting commands via the SPI peripheral connected to it.  We'll give you the list of command to send to the display to properly initialize it, but you need to go through the LCD datasheet to understand how to do this.  **Be prepared to explain to your TA what each command does and how you found it.**
 
 1. Sleep 1 millisecond to let power to the display stabilize, in case we have only just plugged in the Proton.
 2. Perform a Function Set command with the following parameters:
@@ -250,7 +305,7 @@ We're now ready to initialize the LCD display.  We'll give you the list of comma
 
 #### 5.4: (OLED only) `cd_init`
 
-We're now ready to initialize the OLED display.  We'll give you the list of command to send to the display to properly initialize it, but you need to go through the OLED datasheet to understand how to do this.  **Be prepared to explain to your TA what each command does and how you found it.**
+In this step, we're going to initialize the OLED display by transmitting commands via the SPI peripheral connected to it.  We'll give you the list of command to send to the display to properly initialize it, but you need to go through the OLED datasheet to understand how to do this.  **Be prepared to explain to your TA what each command does and how you found it.**
 
 1. Sleep 1 millisecond to let power to the display stabilize, in case we have only just plugged in the Proton.
 2. Perform a Function Set command with the following parameters:
@@ -271,6 +326,12 @@ This function will send the first 16 characters of the string argument `str` to 
 Same as `cd_display1`, but you send the 16 characters to the second line of your display.
 
 Carefully check your code, and then head back to `main.c` and uncomment `STEP5`, which will call all the functions you just implemented.  Upload your code and you should see your display show a reaffirming message!
+
+When it doesn't work:
+1. Check your wiring, carefully.  Use a multimeter to perform continuity checks from the SPI lines to the display and from the display to the Proton board.
+2. Check your pins in `main.c` to ensure you are using the correct pins for SPI SCK, CSn and TX, and that they are SPI outputs.
+3. Ensure you are using the correct SPI peripheral associated with the pins you specified in `main.c`, and that you are consistently using that peripheral throughout your `chardisp.c` functions.
+4. Use an oscilloscope's Serial function, or the Logic Analyzer on an AD2/3, to watch the SPI signals as the `cd_init` function runs.  You should see a series of commands being sent to the display, and then the text being displayed on it.  Configure the data size based on the display type you are using, and the clock speed to 10 KHz.  
 
 > [!IMPORTANT]
 > Show your TA your working display and that you are using the SPI peripheral.  Show them the code you wrote, and that it passes the `chardisp` test case.
@@ -316,4 +377,4 @@ again:
 
 That PIO program gets compiled to a **binary format** with a program called `pioasm`, or PIO Assembler, into a binary format.  To make including it in your project easier, we've added code to detect if you have `.pio` files in your `src` directory, and uses `pioasm` to compile them into `.pio.h` header files that will get automatically included in your project.
 
-Then, in your `main.c`, you use the definitions created in that header file to load the compiled PIO program into the PIO instruction memory, and start the PIO state machine which fetches, decodes and executes the instructions in the PIO program.  You can configure additional things like a different PIO clock speed to make it slower, the pins to be configured by the PIO, 
+Then, in your `main.c`, you use the definitions created in that header file to load the compiled PIO program into the PIO instruction memory, and start the PIO state machine which fetches, decodes and executes the instructions in the PIO program.  You can configure additional things like a different PIO clock speed to make it slower, the pins to be configured by the PIO, etc. before the PIO state machine starts running.
