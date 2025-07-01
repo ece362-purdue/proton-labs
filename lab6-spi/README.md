@@ -137,6 +137,11 @@ Go over [Section 12.3: SPI](https://datasheets.raspberrypi.com/rp2350/rp2350-dat
 5. (3 points) What SDK function is used to set the parameters for SPI configuration, specifically the data format, CPOL/CPHA, endianness (bit order)?
 6. (2 points) What SDK function is used to send 16-bit data through a certain SPI peripheral?
 
+> [!IMPORTANT]
+> Show your answers for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
+> 
+> Avoid the urge to ask others (AI/LLMs are included in "others") for answers.  
+
 ### Step 2: Bit-banging SPI with 7-segment displays
 
 "Bit-banging" is a technique where you manually control the GPIO pins yourself to implement SPI, rather than relying on the SPI peripheral.  We teach you this technique because you can use bit-banging for *any* digital protocol, e.g. PWM.  However, it is a last-resort measure when you have run out of peripherals but still have free GPIO pins to use.  We also teach you this technique because it is a great way to understand how SPI works at a low level.
@@ -378,3 +383,5 @@ again:
 That PIO program gets compiled to a **binary format** with a program called `pioasm`, or PIO Assembler, into a binary format.  To make including it in your project easier, we've added code to detect if you have `.pio` files in your `src` directory, and uses `pioasm` to compile them into `.pio.h` header files that will get automatically included in your project.
 
 Then, in your `main.c`, you use the definitions created in that header file to load the compiled PIO program into the PIO instruction memory, and start the PIO state machine which fetches, decodes and executes the instructions in the PIO program.  You can configure additional things like a different PIO clock speed to make it slower, the pins to be configured by the PIO, etc. before the PIO state machine starts running.
+
+Using PIO to automate SPI is different from having DMA do it in that PIO can still make small adjustments to the data being sent, such as adding a delay between bits, or changing the data being sent based on some condition.  
