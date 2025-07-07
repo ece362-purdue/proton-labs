@@ -182,7 +182,7 @@ Now that we have a basic understanding of how to do this, in `keypad.c`, impleme
 
 #### 2.1. `keypad_init_pins`  
 
-This function initializes the GPIO pins for the keypad.  It should set GP6-GP9 as outputs (for driving the columns) and GP2-GP5 as inputs (for reading the rows).  The function should also set the pull-up resistors on the input pins to ensure that they read high when no button is pressed.  This should do the same thing as `init_keypad` from labs 1 and 2.
+This function initializes the GPIO pins for the keypad.  It should set GP6-GP9 as outputs (for driving the columns) and GP2-GP5 as inputs (for reading the rows).  It should initialize the column pins to 0.  This should do the same thing as `init_keypad` from labs 1 and 2.
 
 #### 2.2. `keypad_init_timer`  
 
