@@ -190,6 +190,11 @@ In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `key
 - One hard requirement that we have for how you set the handler is that you set it as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.
 - Look for the Programmer's Model section and/or the C/C++ SDK if you need help figuring out how to do this.
 
+> [!NOTE]
+> *Why 1.10 seconds?*
+> 
+> Notice that we're no longer using a sleep function when we do it this way.  Instead of one loop that drives the column, sleeps, and reads rows, we're having the timer trigger two alarms 0.1 seconds apart - one alarm responsible for driving the column, and the other for reading the rows.  This creates a "space" of 0.1 ms where the CPU can work on something else instead of sleeping (as one ought to make it do when working with embedded systems...)!
+
 #### 2.3. `keypad_read_rows`  
 
 This is a one-liner.  Return a single 4-bit value of the current state of GP2-GP5, which are the row pins.  For example, if GP3,GP4 is high but GP2,GP5 are low, then the return value of this function must be 6 (or 4'b0110).
