@@ -68,6 +68,8 @@ Now that we've understood how this works, connect SEL2, SEL1, SEL0 to GP20, GP19
 
 Connect D8-D1 to GP17-GP10, respectively.  These are the eight data pins of the TLC59211PWR sink driver.  Finally, connect VCC and GND to power and ground.
 
+![7seg-card](7seg-explanation.png)
+
 > [!IMPORTANT]
 > Run `check_wiring` in the autotest console to check your wiring.  If you have any issues, carefully check your wiring and identify missing power/ground connections, or miswired connections.
 
@@ -261,7 +263,9 @@ In this step, we'll implement an alarm on TIMER1 that will fire every 3 millisec
 With these variables, go ahead and implement the following functions in `display.c`:
 
 #### 3.1: `display_init_pins`  
-Initialize pins GP10-GP20 as outputs.  GP20-GP18 are connected to the select lines for the 74HC138 decoder which chooses one of the eight displays, and GP17-GP10 will be the data lines for the TLC59211PWR sink driver, connected to the shared seven-segment pins between all eight displays.  This should do the same thing as `init_7seg` from labs 1 and 2.
+Initialize pins GP10-GP20 as outputs.  GP20-GP18 are connected to the select lines for the 74HC138 decoder which chooses one of the eight displays, and GP17-GP10 will be the data lines for the TLC59211PWR sink driver, connected to the seven-segment pins shared between all eight displays.  Here is a full explanation of how your 7-segment display card works.
+
+![7seg-card](7seg-explanation.png)
 
 #### 3.2: `display_init_timer`  
 Initialize TIMER1 to fire ALARM0 after 3 milliseconds, at which point the interrupt will call `display_isr` when triggered.  Make sure to enable the interrupt for ALARM0 on TIMER1.  Again, set `display_isr` as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.
