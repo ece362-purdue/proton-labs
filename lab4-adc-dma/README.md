@@ -173,7 +173,7 @@ Understanding DMA can quite confusing, especially given how large the API functi
 In the function `init_adc_dma`, do the following:
 
 1. First call `init_dma`.  We'll fill in this function later.
-2. Call `init_adc_freerun` to configure the ADC for free-running mode, and GP26 as the ADC input.
+2. Call `init_adc_freerun` to configure the ADC for free-running mode, as well as the GPIO pin we used previously as the ADC input.
 3. Enable the ADC FIFO to store the generated samples.
 4. Configure the ADC to send out a DREQ signal whenever a new sample is ready in the FIFO.  The DREQ signal will tell the DMA that the data is ready to be copied.
 
