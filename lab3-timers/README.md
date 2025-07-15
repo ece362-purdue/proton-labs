@@ -205,6 +205,7 @@ This is a one-liner.  Return a single 4-bit value of the current state of GP2-GP
 
 We're going to change this a little bit from what we had in lab 2.
 - First, make sure to acknowledge the interrupt for ALARM0 on TIMER0.
+    - Look very carefully at how this is done by the appropriate functions.  Hint: `hw_clear_bits` may not work the way you think it would...
 - Increment the value of `col` first.  
     - We initialized `col` to -1 to account for this so that we scan COL3 (GP6) first.
     - Ensure that `col` wraps around to 0 after 3 - your columns pins are from GP6 to GP9.
@@ -216,6 +217,7 @@ We're going to change this a little bit from what we had in lab 2.
 
 We're going to change this a lot.  In the last lab, we used interrupts on each row pin.  However, that may not be very effective when we want to press buttons across multiple columns.  With this two-alarm approach, we can get pretty close.  
 - First, acknowledge the interrupt for ALARM1 on TIMER0.  
+    - Look very carefully at how this is done by the appropriate functions.  Hint: `hw_clear_bits` may not work the way you think it would...
 - Get the current row pin values by calling `keypad_read_rows`.  
 - For each of the row pins that are high, indicating that a button is pressed, check if the corresponding bit in `state` is low (indicating that the button was not pressed before).  If it is low, then we have a new key press.  
     - If so, set the corresponding bit in `state` to high.  
