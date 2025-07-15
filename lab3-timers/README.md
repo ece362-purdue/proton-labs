@@ -195,7 +195,7 @@ In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `key
 > [!NOTE]
 > *Why 1.10 seconds?*
 > 
-> Notice that we're no longer using a sleep function when we do it this way.  Instead of one loop that drives the column, sleeps, and reads rows, we're having the timer trigger two alarms 0.1 seconds apart - one alarm responsible for driving the column, and the other for reading the rows.  This creates a "space" of 0.1 ms where the CPU can work on something else instead of sleeping (as one ought to make it do when working with embedded systems...)!
+> Notice that we're no longer using a sleep function when we do it this way.  Instead of one loop that drives the column, sleeps, and reads rows, we're having the timer trigger two alarms 0.1 seconds apart - one alarm responsible for driving the column, and the other for reading the rows.  This creates a "space" of 100 ms where the CPU can work on something else instead of sleeping (as one ought to make it do when working with embedded systems...)!
 
 #### 2.3. `keypad_read_rows`  
 
