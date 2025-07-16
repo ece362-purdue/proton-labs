@@ -211,6 +211,11 @@ Answer the following questions with regards to your code:
 
 3. What specific register bits did you have to write to to configure DMA Channel 0 to read from the ADC FIFO and write to the variable `adc_fifo_out`?
 
+If it doesn't work:
+
+1. Make sure you copied in the required functions into `display.c` file from lab 3.
+2. Debug and check the appropriate registers to see if they are set correctly.
+
 > [!IMPORTANT]
 > Show your TA that turning the potentiometer varies the value displayed on the seven segment display within the range 0.000000 to 3.300000.  It may be lower than 3.3 and higher than 0.0, which is fine.  Show them the code you wrote, and that it passes the `adc_dma` test case.
 > 
