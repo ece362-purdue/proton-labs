@@ -98,17 +98,17 @@ For both displays: place your display to the left of your audio jack from lab 5.
 
 #### 0.2.2: (LCD only) Wire up your SMH1602 LCD display
 
-Follow this schematic to wire up your LCD display:
+Follow this schematic to wire up your **LCD display**:
 
 ![smh1602 wiring](images/smh1602.png)
 
-#### 0.2.3: (OLED only) Wire up your SEH1602 OLED display
+#### 0.2.2: (OLED only) Wire up your SEH1602 OLED display
 
-Follow this schematic to wire up your OLED display:
+Follow this schematic to wire up your **OLED display**:
 
 ![smh1602 wiring](images/seh1602.png)
 
-#### 0.2.4: Specify your SPI pins in `main.c`
+#### 0.2.3: Specify your SPI pins in `main.c`
 
 Finally, in your `main.c` file, set the following constants to the pin numbers you used for SPI SCK, CSn and TX for both the 7-segment display and the LCD/OLED display.  You'll find them underneath where you normally put your username:
 
