@@ -34,7 +34,9 @@ By the end of the lab, you will have learned how to create your own command shel
 
 No other wiring is needed other than ensuring your Debug Probe is still connected to your Proton board, via the debug and UART pins (which should have remained in place throughout the semester).
 
-### Step 1: Read the background + datasheet
+The structure of `main.c` is also quite different from previous labs.  Instead of having a single `main()` function, we have several steps that you will uncomment the top-level `#define` for as you complete them.  When you start a new step, make sure to comment out the previous step's `#define` so that you don't run into issues with **multiple definitions of the same function**.
+
+### Step 1: Read the background and datasheet
 
 Asynchronous serial communication using a Universal Asynchronous Receiver/Transmitter (UART) has been a staple of inter-computer communication since its introduction in the 1960s. Although asynchronous serial has been largely supplanted by more specialized communication protocols that are faster or more specially structured, it remains the only interface on your microcontroller that can be readily used for ad hoc interactive bidirectional communication. In this lab, you will use a UART to implement communication with an interactive program. You will examine the asynchronous serial protocol using an oscilloscope to identify the communication payload.
 
@@ -106,9 +108,11 @@ In the first step, we directly used UART functions to read and write characters.
 
 The function `stdio_init_all` does quite a bit of heavy lifting for us to allow the C standard I/O (stdio) functions like `putchar()`, `getchar()`, `scanf()`, `printf()`, etc. to work with the UART peripheral.  It sets up the UART peripheral to be used for standard input and output, allowing you to use these functions to read from and write to the UART.  
 
-If you dive into that function, and go through `stdio_uart_init -> stdio_uart_init_full`, you'll find `stdio_set_driver_enabled`.  At this point, we arrive in the `stdio.c` from the Pico C/C++ SDK.  
+If you dive into that function, and go through `stdio_uart_init -> stdio_uart_init_full`, you'll find `stdio_set_driver_enabled`.  At this point, we arrive in the `stdio.c` from the Pico C/C++ SDK.  This file teaches us a lot about how Raspberry Pi's SDK connects the UART peripheral to the C standard library functions, which is by creating a "**driver**" that handles the reading and writing of characters via the UART peripheral when an associated C standard library function, like `printf` or `fgets` or `scanf`, is used.
 
-In this step, you will implement that functionality yourself, so that you can understand how it works under the hood, and be able to apply it to *any* microcontroller, especially if they don't come with this sort of helper code, or if you wanted to use another UART entirely, or if you wanted to customize it further.  This is also intended to highlight how these functions can work across multiple platforms, from microcontrollers to desktop computers.
+These "drivers" are simplistic versions of the "device drivers" you may have heard of while using your computer on a regular basis, e.g. installing a *driver* for your printer or GPU.  They are pieces of software that allow the operating system to interact with those hardware devices in a standardized way.  In our case, the "operating system" is the C standard library, and the "hardware device" is the UART peripheral.
+
+In this step, you will implement this "driver" yourself, so that you can understand how it works under the hood, and be able to apply it to *any* microcontroller, especially if they don't come with this sort of helper code, or if you wanted to use another UART entirely, or if you wanted to customize it further.  This is also intended to highlight how these functions can work across multiple platforms, from microcontrollers to desktop computers.
 
 #### 3.1 Configure UART to handle one character at a time
 
@@ -124,8 +128,11 @@ You can also see the file, `newlib_interface.c`, that defines these syscalls on 
 // DO NOT JUST COPY IN THIS CODE - THIS IS ALREADY ADDED.  
 // READ THE COMMENTS TO UNDERSTAND WHAT IT DOES.
 
+// The handle for standard input
 #define STDIO_HANDLE_STDIN  0
+// The handle for standard output
 #define STDIO_HANDLE_STDOUT 1
+// The handle for standard error output (unused in this lab)
 #define STDIO_HANDLE_STDERR 2
 
 ........
@@ -176,9 +183,9 @@ int _read(int handle, char *buffer, int length) {
     // handle is irrelevant since these functions will only ever be called 
     // by the correct functions.  No need for an if statement.
 
-    // Given the buffer and a specific length to read, read 1 
+    // Instructions: Given the buffer and a specific length to read, read 1 
     // character at a time from the UART until the buffer is 
-    // filled or the length is reached.
+    // filled or the length is reached. 
 }
 
 int _write(int handle, char *buffer, int length) {
@@ -192,8 +199,8 @@ int _write(int handle, char *buffer, int length) {
     // handle is irrelevant since these functions will only ever be called 
     // by the correct functions.  No need for an if statement.
 
-    // Given the buffer and a specific length to write, write 1
-    // character at a time to the UART until the length is reached.
+    // Instructions: Given the buffer and a specific length to write, write 1
+    // character at a time to the UART until the length is reached. 
 }
 ```
 
@@ -250,7 +257,9 @@ Since human beings who write left-to-right languages (like English) often start 
 
 However, it seems that we don't have to do anything.  If you type some characters, and then press "Enter", you see that the cursor does get moved to the beginning of the line (CR) and then moved down to the new line (LF).  This is because the Serial Monitor is already handling this for us, and it does not send the CR and LF characters to the UART.  It only sends the LF character.
 
-If you set breakpoints in `_read()` where the character has been received, and then debug, and press Enter into a serial monitor, you'll see the first character is 0x0D (CR).  Continue execution, and you'll then see the LF arrive.  **To clarify - this is not behavior implemented by the RP2350, but rather by the Serial Monitor program in PlatformIO.**  If you try using a *proper* serial terminal, it'll send only an LF (on Linux - it still sends an CRLF on Windows).  
+If you set breakpoints in `_read()` where the character has been received, and then debug, and press Enter into a serial monitor, you'll see the first character is 0x0D (CR).  Continue execution, and you'll then see the LF arrive.  **To clarify - this is not behavior implemented by the RP2350, but rather by the Serial Monitor program in PlatformIO.**  
+
+If you try using a *proper* serial terminal, it'll send only an LF (on Linux - it still sends an CRLF on Windows).  For those cases, you might see the cursor move down but not left, in which case you need to implement the CR behavior yourself by printing a CR along with the LF (before or after doesn't matter).
 
 **There's nothing much to do for this step** other than to demonstrate to your TA that pressing Enter results in both a CR and LF being sent to the UART in the debugger.
 
@@ -277,13 +286,225 @@ Try entering your name, a space, and then your age as a number.  `scanf` will te
 
 However, we'd like to be able to handle the Backspace key in this case as well, so that we can edit our input before pressing Enter (as you would expect when you write a regular C program that uses `scanf`).  There's not a really good way to do this with what we have so far, because we're having our `_read()` function read one character at a time, and then return it to `scanf()`, which expects to read a whole string at once.  **This is why we need buffering.**
 
-What we'll do in the next step is then implement a simple buffer that will allow us to read in a whole string, and use the regular delimiting characters like space or newline to be able to parse the string into individual words or numbers, in order to satisfy the `scanf` function's expectations.
+What we'll do in the next step is then implement a simple buffer that will allow us to read in a whole string.
 
-A second consideration is that we don't want the CPU to be responsible for watching the UART for incoming characters.  If you look at how the `_read()` functions works currently, the CPU is blocked while waiting for a character to arrive.  We'll use DMA in the next step to automatically watch the UART for incoming characters, and push them into the buffer, using an interrupt handler to properly shift characters and account for things like newlines.
+A second consideration is that we don't want the CPU to be responsible for watching the UART for incoming characters.  If you look at how the `_read()` functions works currently, the CPU is **blocked** while waiting for a character to arrive, so we'll replace that with a sleep in our own implementation.  
+
+We'll use interrupts in the next step to have the UART automatically store incoming characters into the buffer, using an interrupt handler to properly shift characters and account for things like newlines.
 
 ### Step 4: Automate your new UART device driver
 
-### Step 5: Confirm your checkoffs before leaving
+> [!NOTE]
+> Comment out the STEP3 definition at the top of the file, and uncomment STEP4.
+
+In this step, we'll do a few things:
+
+#### 4.1 Implement a simple buffer
+
+We'll add a 32-byte buffer to store incoming characters from the UART, with minimal processing for newlines and backspaces.  This is done for you under STEP4, called `serbuf` (serial buffer).  
+
+#### 4.2 Configure UART to fire interrupts on receive
+
+In the function `init_uart_irq`, configure the same UART you configured in Step 2 (assuming we will call `init_uart` for you first) to do the following:
+- Disable the internal FIFO, since we will now be handling the character buffering ourselves.
+- Enable the necessary bits to mask the receive interrupt (not a typo - the datasheet says that "masking" is the correct term to enable the interrupt).
+- Set up `uart_rx_handler` to be the exclusive handler for the overall UART interrupt, and enable the UART interrupt.
+
+#### 4.3 Implement the UART receive interrupt handler
+
+Take a look at some of the variables defined just underneath `#define STEP4`.  You have the `serbuf` buffer, and an associated index `seridx` that keeps track of where the next character should be written in the buffer.  `BUFSIZE` sets the size of the buffer to 32 bytes, which is more than enough for basic line editing.
+
+There's a variable called `newline_seen` that will indicate later on that the user has pressed Enter, and so we should process the buffer.  In this case, we're treating the newline as a **delimiter character**, which indicates the end of the line.
+
+The handler will get called as soon as a character is received on the UART.  In this handler, you must:
+
+- Acknowledge the interrupt by setting the appropriate bit in the relevant UART register.
+    - We've found that reading the data register is also sufficient, but we want you to always think "interrupt handler? acknowledge it!".  Better safe than sorry.
+- If `seridx` reaches `BUFSIZE`, return immediately so we don't lose the data we have.
+- Read the character directly from the UART data register into a new character variable `c`.  There's no need to use any SDK functions to do this since the very act of calling the handler indicates that a character is already available.
+- If the character is a newline (ASCII 0x0A), set `newline_seen` to 1.
+- If (NOT else if) the character is a backspace and some characters have already been received, write backspace-space-backspace to the UART to erase the last character, decrement `seridx`, and return.  Then, set the character at `serbuf[seridx]` to 0, so that we don't process it later.
+- Otherwise, if the character is not a backspace, print it out with the UART, and write it to `serbuf[seridx]` and increment `seridx`.
+
+By itself, the handler should now properly handle strings, and `_read` can simply wait and transfer the data back when a newline is seen.
+
+#### 4.4 Re-implement the `_read` syscall
+
+Before we proceed, make sure to copy the `_write` syscall from Step 3.  It doesn't change much.
+
+Copy the `_read` syscall function definition (not the body) from Step 3, and then implement it as follows:
+
+- Until a newline is seen, sleep 5 milliseconds.
+    - This provides valuable CPU time to the system to handle other tasks, such as the UART receive interrupt.
+- Once seen, set `newline_seen` back to 0.
+- Copy the contents of `serbuf` into `buffer`.  The number of characters to copy is `seridx`, which is the number of characters received so far.
+    - This is only true as long as `length` is greater than or equal to `seridx`.  If `length` is less than `seridx`, copy only `length` characters.  However, since our `BUFSIZE` is 32, this should not be an issue.
+- Reset `seridx` to 0.
+- Return the passed argument `length`, and **not** `seridx`.  This is because the C standard library functions expect the length of the string to be returned, not the number of characters received.
+
+#### 4.5 Test your implementation
+
+In the `main` function, add the following:
+
+```c
+init_uart();
+init_uart_irq();
+
+setbuf(stdout, NULL); // Disable buffering for stdout
+
+char name[8];
+int age = 0;
+for(;;) {
+    printf("Enter your name and age: ");
+    scanf("%s %d", name, &age);
+    // THIS IS IMPORTANT.
+    fflush(stdin);
+    printf("Hello, %s! You are %d years old.\r\n", name, age);
+    sleep_ms(100);  // in case the output loops and is too fast
+}
+```
+
+Note the addition of a new line that flushes the input buffer after reading the name and age.  We found that without it, `scanf` wouldn't work properly, and would keep returning the same input over and over again.  This isn't normal behavior, but as long as you remember to add this line when using line-buffered input functions like `scanf/fgets`, you should be fine.
+
+Try running the code, and entering your name and age.  You should be able to edit your input with Backspace, and see the output printed correctly.
+
+There's still limitations to this approach that we can work around as needed:
+
+- Input is limited to 32 characters.  If `serbuf` fills up because you typed 32 characters or more, the handler will always return and not process any more characters whatsoever.  You can fix this by either increasing `BUFSIZE` or by discarding characters when the buffer is full.
+
+- `scanf` is still technically a blocking function, and perhaps you don't want the control code to be stuck here while you're waiting on the user to type something in.  That requires a completely different approach to how you will handle incoming characters - you still store characters in a buffer continuously with the UART interrupt, but instead of using `scanf` which blocks flow, just read the buffer manually when you need it.  
+
+A common question that comes up is why we didn't use DMA to handle the UART receive.  DMA is purely a data transfer peripheral - it wouldn't be able to handle things like Backspace and newlines, which would have required CPU time anyway.  DMA is still useful if you're connecting UART to another device, where you know exactly the format of the data being received into the RP2350, and you don't have to do extra processing on the received data.
+
+> [!IMPORTANT]
+> Show your TA that you can read in a name and age using `scanf`, and that you can edit your input with Backspace.  Show them the code you wrote, and explain how it works.
+>
+> Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
+
+### Step 5: Design a Peripheral Configuration Shell
+
+> [!NOTE]
+> Comment out the STEP4 definition at the top of the file, and uncomment STEP5.
+
+Having a command shell is an incredibly powerful tool for interacting with your microcontroller, as you may have already noticed from the autotests in the previous labs.  In this last step before you go off and tackle your projects, we'll explain how to implement a simple command shell that allows you to configure peripherals on the RP2350, and then use it to configure the UART peripheral.
+
+What if we told you that you could write the following, in such a command shell:
+
+```
+gpio out 22
+gpio set 22 1
+```
+
+And it would set GPIO 22 to output and then set it high?  We can do this with a bit of string parsing and tokenization, which we'll show as follows.  (The same concepts apply when you run things like `cp`, `ls`, `mv file newfile`, etc. in a Linux terminal.)
+
+Under STEP5, implement the following functions in `main.c`:
+
+```c
+void cmd_gpio_out(int argc, char **argv) {
+    // argc and argv have the same meanings as they do when you use them in 
+    // regular C programs.
+    // Ensure that argc is at least 2, otherwise print an example use case and return.
+
+    // The first argument is the command name, which is "gpio" in this case.
+    // The second argument is the subcommand, which is "out" in this case.
+    // The third argument is the pin number, which should be within (0, 47). Otherwise print an error.
+    // Initialize the pin appropriately, and return.
+}
+void cmd_gpio_set(int argc, char **argv) {
+    // argc and argv have the same meanings as they do when you use them in 
+    // regular C programs.
+    // Ensure that argc is at least 3, otherwise print an example use case and return.
+
+    // The first argument is the command name, which is "gpio" in this case.
+    // The second argument is the subcommand, which is "set" in this case.
+    // The third argument is the pin number, which should be within (0, 47). Otherwise print an error.
+    // The fourth argument is the value to set the pin to, which should be either 0 or 1. Otherwise print an error.
+    
+    // Check that the pin was initialized first. Otherwise print an error and return.
+    
+    // Set the pin value appropriately, and return.
+}
+void cmd_gpio(int argc, char **argv) {
+    // This is the main command handler for the "gpio" command.
+    // It will call either cmd_gpio_out or cmd_gpio_set based on the arguments.
+    
+    // Ensure that argc is at least 2, otherwise print an example use case and return.
+
+    // If the second argument is "out", call cmd_gpio_out with argc-1 and argv+1.
+    // If the second argument is "set", call cmd_gpio_set with argc-1 and argv+1.
+}
+```
+
+To implement these functions, you might find the following helpful:
+- Use `atoi()` to convert a string to an integer.  This is useful for converting the pin number and value arguments.
+- Use `strcmp()` to compare strings.  This is useful for checking the command and subcommand names.
+- Use `printf()` to print messages as usual.
+
+Copy in the `init_uart_irq`, `uart_rx_handler`, `_read` and `_write` functions, and the variables they depend upon, from Step 4 into Step 5.  
+
+Next, create a `main` function (with no arguments as usual) such that:
+
+- It calls `init_uart()` and `init_uart_irq()` to set up the UART peripheral and the receive interrupt.
+- It turns off buffering for only `stdout`.
+- It prints a nice welcome message, for which we'll give you the lines:
+
+```c
+printf("%s's Peripheral Command Shell (PCS)\n", username);
+printf("Enter a command below.\n\n");
+```
+
+- It initializes the following variables:
+    - `int argc` to hold the number of arguments.
+    - `char *argv[10]` to hold the arguments for the command.
+    - `char input[100]` to hold the command string to be modified by `fgets`.
+
+- It starts an infinite loop, prints "\r\n> " with no newline after, and calls `fgets(input, sizeof(input), stdin)` to read a line of input from the user.
+- It flushes the input buffer with `fflush(stdin)`.
+- It removes the newline character by using `strcspn` to find the newline character in the input string and replace it with a null terminator ('\0').
+- It uses `strtok` to tokenize the input string into arguments, using space as the delimiter.  It does this continually until no tokens are left, or until `argc` reaches 10.  Increment `argc` for each token found, and store the token in `argv[argc]`.
+- It then calls `cmd_gpio(argc, argv)` to handle the command.  
+
+Here are some examples from our end that you'll want to check your functionality against (the last one is a valid [test](https://news.ycombinator.com/item?id=25851770) for an unknown command):
+
+```
+username's Peripheral Command Shell (PCS)
+Enter a command below.
+
+> gpio out -1
+Invalid pin number: -1. Must be between 0 and 47.
+
+> gpio out 99
+Invalid pin number: 99. Must be between 0 and 47.
+
+> gpio out 22
+Initialized pin 22 as output.
+
+> gpio set 22 1
+Set pin 22 to 1.
+
+> gpio set 23 1
+Pin 23 is not initialized as an output.
+
+> gpio out 23
+Initialized pin 23 as output.
+
+> gpio set 23 0
+Set pin 23 to 0.
+
+> gpio set 23 1
+Set pin 23 to 1.
+
+> where's the bathroom?
+Unknown command: where's
+```
+
+If it works, congratulations on making your first command shell!  You can now use this to configure *any* peripheral on the RP2350, and you can extend it to add more commands as needed.  
+
+It also doesn't have to be just peripherals - you can use these to automatically send commands to external devices like LCDs, or read sensors, or read/write to files on an SD card.  Debugging those methods can get quite time-consuming if you just use the debugger, so having a command shell to quickly test things will be very useful.
+
+**And that's a wrap on the embedded labs! Congratulations on making it through!**
+
+### Step 6: Confirm your checkoffs before leaving
 
 > [!CAUTION]
 > Make sure you got checked off here: https://engineering.purdue.edu/ece362/checkoff/
