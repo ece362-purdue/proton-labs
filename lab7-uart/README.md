@@ -464,7 +464,7 @@ printf("Enter a command below.\n\n");
 - It uses `strtok` to tokenize the input string into arguments, using space as the delimiter.  It does this continually until no tokens are left, or until `argc` reaches 10.  Increment `argc` for each token found, and store the token in `argv[argc]`.
 - It then calls `cmd_gpio(argc, argv)` to handle the command.  
 
-Here are some examples from our end that you'll want to check your functionality against (the last one is a valid [test](https://news.ycombinator.com/item?id=25851770) for an unknown command):
+Here are some examples from our end that you'll want to check your functionality against (the last one is a valid [test](https://news.ycombinator.com/item?id=25851770) for an unknown command).  Some of these commands are supposed to turn on/off LEDs on your Proton, so watch it carefully!
 
 ```
 username's Peripheral Command Shell (PCS)
@@ -480,7 +480,7 @@ Invalid pin number: 99. Must be between 0 and 47.
 Initialized pin 22 as output.
 
 > gpio set 22 1
-Set pin 22 to 1.
+Set pin 22 to 1.   (This should turn on the LED on pin 22.)
 
 > gpio set 23 1
 Pin 23 is not initialized as an output.
@@ -489,10 +489,10 @@ Pin 23 is not initialized as an output.
 Initialized pin 23 as output.
 
 > gpio set 23 0
-Set pin 23 to 0.
+Set pin 23 to 0.    (LED on pin 23 should already be off.)
 
 > gpio set 23 1
-Set pin 23 to 1.
+Set pin 23 to 1.    (LED on pin 23 should now be on.)
 
 > where's the bathroom?
 Unknown command: where's
