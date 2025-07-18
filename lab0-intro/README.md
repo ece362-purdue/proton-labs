@@ -245,7 +245,7 @@ int main() {
 
     // Initialize pins 22, 23, 24, 25 
     // (each 1 bit corresponds to a pin, hence 0xff << 22)
-    gpio_init_mask(0xf << 22);
+    gpio_set_function(0xf << 22);
     // Set them all to outputs 
     gpio_set_dir_out_masked64(0xf << 22);
 
@@ -273,7 +273,7 @@ On most microcontrollers including ours, you must ensure that you always remain 
 
 There are two critical things we need to be able to use ~~the Proton~~ any microcontroller to its fullest potential:
 
-**Debugging** - the ability to step through code and inspect variables as the program runs on the microprocessor.
+**Debugging** - the ability to step through code and inspect registers and variables as the program runs on the microprocessor.
 
 **Serial Communication** - the ability to send and receive text from the microcontroller to a computer with the help of a device called a **UART** (universal asynchronous receiver/transmitter) on each of the two devices communicating.
 
@@ -337,9 +337,11 @@ If you see the four colored LEDs on the Proton board turn on and off in sequence
 
 At the same time, we also see the "Hello, world!" message appear in the **serial monitor**.  This is the output from the `printf` statement in our code.  The serial monitor is a tool that allows us to send and receive data from the microcontroller over the UART interface.  You can use it to send commands to your microcontroller, or to receive data from it.
 
-A critical function to any microcontroller development environment is to be able to **reset** your code so that you can start it again from the beginning.  On our Proton board, this is achieved with the Reset pushbutton.  Your RP2350 can be reset by pressing this button which connects a pin called RUN on your RP2350 micro, to ground.  The active-low RUN signal will then cause the RP2350 to fully reset and start executing code from the boot address.  The same thing happens when you unplug and replug your Proton board - a **power-on reset** (POR) occurs in that case.
+A critical function to any microcontroller development environment is to be able to **reset** your code so that you can start it again from the beginning.  On our Proton board, this is achieved with the Reset pushbutton.  Your RP2350 can be reset by pressing this button which connects a pin called RUN on your RP2350 micro, to ground.  The active-low RUN signal will then cause the RP2350 to fully reset and start executing code from the boot ROM address (you can actually see this when we start debugging).  The same thing happens when you unplug and replug your Proton board - a **power-on reset** (POR) occurs in that case.
 
-Try holding the Reset button - you'll see that the micro doesn't run code until you let go of the button.  You might recall this behavior from ECE 270, where you had `rst`/reset ports in your submodules.  It's the exact same thing here!
+![reset button to run](images/run.png)
+
+Try holding the Reset button - you'll see that the micro doesn't run code until you let go of the button.  You might recall this behavior from ECE 270, where you had `rst`/reset ports in your submodules.  It's the exact same concept here!
 
 Now, we're going to learn how to debug by **stepping through** our code, line by line, similar to how you debugged C in ECE 264.  Set a breakpoint on the `gpio_init_mask` line by clicking in the left margin of the editor window - you'll see a red dot appear.  Then, in the PlatformIO menu, move your cursor down to Quick Access and click Start Debugging.  Alternatively, you can press F5 (or Fn+F5, depending on your keyboard) to start debugging.  
 
@@ -349,9 +351,10 @@ This will open the Debug view, which starts at the `ldr r0, =BOOTROM_VTABLE_OFFS
 
 There are a lot of things going on in the debug view that you should understand:
 
-- First, in the top right is a terminal with the OpenOCD process.  When you clicked Start Debugging, it sent your compiled code to be flashed on to your Proton through the Proton debugger.  Instead of "shutting down" as it did earlier, it is now "halted due to debug-request".  
-- The Debug Console shows output from `gdb`, which may be familiar to you from prior coding classes.  You have used `gdb` in the past to debug programs as you ran them on your own computer's CPU, but now you are using it to debug a program running on a completely separate computer - your microcontroller.  This is called "remote debugging".
-- On the left sidebar, you have the `Variables` tab.  When you define variables, you can see their values here.  
+- First, in the bottom right is a terminal with the OpenOCD process, printed in yellow and red.  When you clicked Start Debugging, the OpenOCD program sent your compiled code in binary format to be uploaded via the Proton debugger to the RP2350 microcontroller, which saves it into the onboard flash memory.  However, once uploaded, OpenOCD is not "shutting down" as when we uploaded a program earlier - instead, it is now "halted due to debug-request".  
+    - This "Debug Console" also shows output from `gdb`, which may be familiar to you from prior coding classes.  You have used `gdb` in the past to debug programs as you ran them on your own computer's CPU, but now you are using it to debug a program running on a completely separate computer - your microcontroller.  This is called "remote debugging".
+    - You can type in different `gdb` commands here to inspect variables, set breakpoints and control the execution of your program.  You may also find it more helpful to use VScode's interface to do this instead.
+- On the left sidebar, you have the `Variables` tab.  When you define variables, you can see their values here.  They'll be separated into Local/Global/Static variables.
 - The `Call Stack` tab shows you the current function call stack.  This is useful for understanding how you got to where you are in your code.  In a dual-core configuration, you can see the call stack for both cores.  Your code will only run on **core 0** by default until we tell it otherwise.
 - The `Breakpoints` tab shows you all the breakpoints you have set in your code.  You can enable and disable them here.
 - The `Peripherals` tab shows you the state of the peripherals on your microcontroller.  As you start configuring them in next labs, we'll have you look here to see their state and understand how they work.
@@ -366,12 +369,24 @@ In the center-top of your window, you'll see a toolbar with the following button
 - `Restart` - this will restart your program from the beginning, similar to `Reset device`.
 - `Stop` - this will stop your program and disconnect the debugger, at which your Proton will remain halted.
 
-Click the `Step over` button (or press F10) to step over each line.  Once we step over the `gpio_put` lines, you should see the LEDs turn on or off.  
+### How to use the debugger effectively
+
+Click the `Step over` button (or press F10) to step over the `stdio_init_all` line.
+
+Before you step over the `gpio_init_mask` line, expand the Peripherals view on the left sidebar, and click on the `SIO` peripheral, and expand the field labeled `gpio_oe`, which is the "GPIO Output Enable" status register, which tells us if a pin has been configured as an output.  By default, this may be at 0x00000000, indicating that no GPIO pins have been set as outputs.  Step over the line, and this value will now change to 0x03c00000.  If you turn this into its binary value, this is four 1s in a row starting at bit 22, indicating that pins 22, 23, 24 and 25 have been set as outputs.  Use the default calculator in Programming mode on your respective OS, or find an online base converter to inspect the individual bits of the value 0x03c00000 to confirm this.
+
+![calculator](images/calc.png)
+
+This highlights a golden rule you should follow when doing your embedded labs:
+
+**In embedded systems, the way to debug is not by using print statements - it is by inspecting the state of the peripheral registers and variables in your code using the debugger.**  
+
+Go ahead and step over until you reach the first `gpio_put` lines.  You can even right click on the line number you want to reach and click "Run to Line".  Once again, go back to the Peripherals menu, and this time, expand SIO -> `gpio_out`, which is the "GPIO Output Value" register that tells us what the current output value of each GPIO pin is - a 1 indicates the pin is high, and a 0 indicates the pin is low.  You'll see that the value is 0x00000003, which indicates that pins 0 and 1 are high (because `stdio_init_all` configures them to be used for serial communication, so they are high by default) and no other pins are in use.  Step over the `gpio_put` line, and you'll see that the value changes, indicating that pin 22 is now high.  Keep stepping through and you can see how the value changes as each pin is turned on or off.  
 
 As you step over the `printf` line, you should see the message "Hello, world!" appear in the serial monitor.  If it's closed, you can pull it up again while debugging by clicking the "Monitor" button in the PlatformIO menu, or using the Quick Access menu via Ctrl/Cmd-Shift-P and typing **Serial Monitor**.
 
 > [!IMPORTANT]
-> Show your TA that you can step through code and see the output on the serial monitor.  
+> Show your TA that you can step through code and see the output on the serial monitor.  Demonstrate how you can inspect the state of the GPIO pins in the Peripherals view.
 > 
 > If you are having issues, please ask a TA for help.
 > 

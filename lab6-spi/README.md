@@ -98,9 +98,15 @@ For both displays: place your display to the left of your audio jack from lab 5.
 
 #### 0.2.2: (LCD only) Wire up your SMH1602 LCD display
 
-Follow this schematic to wire up your LCD display:
+Follow this schematic to wire up your **LCD display**:
 
 ![smh1602 wiring](images/smh1602.png)
+
+#### 0.2.2: (OLED only) Wire up your SEH1602 OLED display
+
+Follow this schematic to wire up your **OLED display**:
+
+![smh1602 wiring](images/seh1602.png)
 
 #### 0.2.3: Specify your SPI pins in `main.c`
 

@@ -173,7 +173,7 @@ Understanding DMA can quite confusing, especially given how large the API functi
 In the function `init_adc_dma`, do the following:
 
 1. First call `init_dma`.  We'll fill in this function later.
-2. Call `init_adc_freerun` to configure the ADC for free-running mode, and GP26 as the ADC input.
+2. Call `init_adc_freerun` to configure the ADC for free-running mode, as well as the GPIO pin we used previously as the ADC input.
 3. Enable the ADC FIFO to store the generated samples.
 4. Configure the ADC to send out a DREQ signal whenever a new sample is ready in the FIFO.  The DREQ signal will tell the DMA that the data is ready to be copied.
 
@@ -195,7 +195,9 @@ Next, in the function `init_dma`, do the following:
 
 *Why don't we just directly read `adc_hw->fifo` in the DMA channel?*  The very act of *reading* the `fifo` register tells the ADC that a sample has been read, and it will then start filling the FIFO with the next sample.  This is why we need to use the DREQ signal to tell the DMA that the ADC has a new sample ready to be read, rather than us needing to add a loop in our `main` function to wait until a new sample is ready.  It's all about small optimizations!
 
-In `main`, just after where you called `init_7seg_timer`, make a second call to `init_adc_dma`.  Then, in an infinite loop, call the function `printfloat`, which has been provided in `support.c`, with the parameter value `(adc_fifo_out * 3.3) / 4095.0`.  This scales the 12-bit ADC value to a voltage between 0 and 3.3V.  You can also use the provided `printfloat` function to print the value of `adc_fifo_out` to the console.  We recommend adding a delay of 250 ms in between `printfloat` calls so that you can more easily read the values on the 7-segment display - remember, the conversions will still happen as fast as possible.
+In `main`, just after where you called `display_init_timer`, note the call to `init_adc_dma`.  In an infinite loop, we've calculated `(adc_fifo_out * 3.3) / 4095.0`.  This scales the 12-bit ADC value, saved by the DMA, to a voltage value between 0 and 3.3V.  
+
+We use the `snprintf` function to convert that floating-point value to a string, and then call `display_char_print` with it to have it be rendered on the seven-segment display.  A wait time of 100 ms is used to avoid overwhelming the display with updates, which would make it unreadable.
 
 Hopefully, you should now have a very simple voltmeter on your breadboard!
 
@@ -208,6 +210,11 @@ Answer the following questions with regards to your code:
 2. What register bits did you have to write to to configure the ADC to send out a DREQ signal whenever a new sample is ready in the FIFO?  Why is it important to use the DREQ signal to trigger the DMA transfer?
 
 3. What specific register bits did you have to write to to configure DMA Channel 0 to read from the ADC FIFO and write to the variable `adc_fifo_out`?
+
+If it doesn't work:
+
+1. Make sure you copied in the required functions into `display.c` file from lab 3.
+2. Debug and check the appropriate registers to see if they are set correctly.
 
 > [!IMPORTANT]
 > Show your TA that turning the potentiometer varies the value displayed on the seven segment display within the range 0.000000 to 3.300000.  It may be lower than 3.3 and higher than 0.0, which is fine.  Show them the code you wrote, and that it passes the `adc_dma` test case.

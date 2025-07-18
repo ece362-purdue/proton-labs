@@ -68,6 +68,8 @@ Now that we've understood how this works, connect SEL2, SEL1, SEL0 to GP20, GP19
 
 Connect D8-D1 to GP17-GP10, respectively.  These are the eight data pins of the TLC59211PWR sink driver.  Finally, connect VCC and GND to power and ground.
 
+![7seg-card](7seg-explanation.png)
+
 > [!IMPORTANT]
 > Run `check_wiring` in the autotest console to check your wiring.  If you have any issues, carefully check your wiring and identify missing power/ground connections, or miswired connections.
 
@@ -182,13 +184,18 @@ Now that we have a basic understanding of how to do this, in `keypad.c`, impleme
 
 #### 2.1. `keypad_init_pins`  
 
-This function initializes the GPIO pins for the keypad.  It should set GP2-GP5 as outputs (for driving the columns) and GP6-GP9 as inputs (for reading the rows).  The function should also set the pull-up resistors on the input pins to ensure that they read high when no button is pressed.  This should do the same thing as `init_keypad` from labs 1 and 2.
+This function initializes the GPIO pins for the keypad.  It should set GP6-GP9 as outputs (for driving the columns) and GP2-GP5 as inputs (for reading the rows).  It should initialize the column pins to 0.  This should do the same thing as `init_keypad` from labs 1 and 2.
 
 #### 2.2. `keypad_init_timer`  
 
 In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `keypad_drive_column`, and enable that interrupt.  Then, initialize TIMER0 to fire alarm 1 after 1.10 seconds to call `keypad_isr`, and enable that interrupt as well.  
 - One hard requirement that we have for how you set the handler is that you set it as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.
 - Look for the Programmer's Model section and/or the C/C++ SDK if you need help figuring out how to do this.
+
+> [!NOTE]
+> *Why 1.10 seconds?*
+> 
+> Notice that we're no longer using a sleep function when we do it this way.  Instead of one loop that drives the column, sleeps, and reads rows, we're having the timer trigger two alarms 0.1 seconds apart - one alarm responsible for driving the column, and the other for reading the rows.  This creates a "space" of 100 ms where the CPU can work on something else instead of sleeping (as one ought to make it do when working with embedded systems...)!
 
 #### 2.3. `keypad_read_rows`  
 
@@ -198,17 +205,19 @@ This is a one-liner.  Return a single 4-bit value of the current state of GP2-GP
 
 We're going to change this a little bit from what we had in lab 2.
 - First, make sure to acknowledge the interrupt for ALARM0 on TIMER0.
+    - Look very carefully at how this is done by the appropriate functions.  Hint: `hw_clear_bits` may not work the way you think it would...
 - Increment the value of `col` first.  
     - We initialized `col` to -1 to account for this so that we scan COL3 (GP6) first.
     - Ensure that `col` wraps around to 0 after 3 - your columns pins are from GP6 to GP9.
 - With the newly changed value of `col`, drive the selected column GPIO pin high, and drive all others low.
     - You can do this in a single statement with the SIO `gpio_togl` register, which atomically toggles GPIO pins in a single write.  Remember that if statements, for loops, etc. add a lot of unnecessary instruction execution to interrupt handlers, and you want to keep those short n' sweet!  Handlers should do their job quickly and return to the main program as soon as possible.
-- Finally, set the timer's counter to trigger ALARM0 again in 12.5 ms, implementing a repeating alarm.
+- Finally, set the timer's counter to trigger ALARM0 again in 25 microseconds, implementing a repeating alarm.
 
 #### 2.5. `keypad_isr`  
 
 We're going to change this a lot.  In the last lab, we used interrupts on each row pin.  However, that may not be very effective when we want to press buttons across multiple columns.  With this two-alarm approach, we can get pretty close.  
 - First, acknowledge the interrupt for ALARM1 on TIMER0.  
+    - Look very carefully at how this is done by the appropriate functions.  Hint: `hw_clear_bits` may not work the way you think it would...
 - Get the current row pin values by calling `keypad_read_rows`.  
 - For each of the row pins that are high, indicating that a button is pressed, check if the corresponding bit in `state` is low (indicating that the button was not pressed before).  If it is low, then we have a new key press.  
     - If so, set the corresponding bit in `state` to high.  
@@ -217,7 +226,7 @@ We're going to change this a lot.  In the last lab, we used interrupts on each r
 - For each of the row pins that are low, indicating that a button is released, check if the corresponding bit in `state` is high (indicating that the button was pressed before).  If it is high, then we have a key release.  
     - If so, set the corresponding bit in `state` to low.    
     - Push the event into `kev`.  For example, if the key released was "5", then the value pushed into the queue should be `9'b000110101`, which is 5 in ASCII (53) with the "pressed" bit set to 0.  
-- Make sure to reset ALARM1 so that the timer will fire it again in 12.5 ms, implementing a repeating alarm.
+- Make sure to reset ALARM1 so that the timer will fire it again in 25 microseconds, implementing a repeating alarm.
 
 Here's the keypad pinout again to help you visualize the connections.  You should have GP9 to GP2 connected to COL1 to ROW4 respectively.
 
@@ -256,7 +265,9 @@ In this step, we'll implement an alarm on TIMER1 that will fire every 3 millisec
 With these variables, go ahead and implement the following functions in `display.c`:
 
 #### 3.1: `display_init_pins`  
-Initialize pins GP10-GP20 as outputs.  GP20-GP18 are connected to the select lines for the 74HC138 decoder which chooses one of the eight displays, and GP17-GP10 will be the data lines for the TLC59211PWR sink driver, connected to the shared seven-segment pins between all eight displays.  This should do the same thing as `init_7seg` from labs 1 and 2.
+Initialize pins GP10-GP20 as outputs.  GP20-GP18 are connected to the select lines for the 74HC138 decoder which chooses one of the eight displays, and GP17-GP10 will be the data lines for the TLC59211PWR sink driver, connected to the seven-segment pins shared between all eight displays.  Here is a full explanation of how your 7-segment display card works.
+
+![7seg-card](7seg-explanation.png)
 
 #### 3.2: `display_init_timer`  
 Initialize TIMER1 to fire ALARM0 after 3 milliseconds, at which point the interrupt will call `display_isr` when triggered.  Make sure to enable the interrupt for ALARM0 on TIMER1.  Again, set `display_isr` as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.
