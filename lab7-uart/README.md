@@ -87,11 +87,11 @@ Go over [12.1 UART](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.p
 
 ### Step 2: Configure a UART to transmit and receive text
 
-In the function `init_uart`, using the SDK functions or by writing to the registers directly, configure the UART 0 peripheral to communicate at 115200 bps, with 8 data bits, no parity, and 1 stop bit.
+In the function `init_uart`, using the SDK functions or by writing to the registers directly, configure the UART 0 peripheral to communicate at 115200 bps (bits per second), with 8 data bits, no parity, and 1 stop bit.
 
 In `main`, we've provided code that calls `init_uart`, waits for a character to be received, and then transmits that character back.  
 
-Uncomment STEP2 at the top of the file and upload and monitor.  Try typing characters into the terminal.  Instead of seeing the character you had just pressed, you see "You typed: " followed by the character you typed, instead of seeing the character echo back.  Weird, right?
+Uncomment STEP2 at the top of the file and upload and monitor.  Try typing characters into the terminal.  Instead of seeing the character you had just pressed, you see "You typed: " followed by the character you typed, instead of seeing the character echo back as soon as you press it.  Weird, right?
 
 That's because, by default, **UART does not automatically echo characters back to the terminal**.  You have to write code to do that.  The code in `main` is a good start, but generally terminal emulators have more robust echoing capabilities, such as handling backspace and other control characters, which we'll do next.
 
@@ -102,7 +102,8 @@ That's because, by default, **UART does not automatically echo characters back t
 
 ### Step 3: Link UART to C standard I/O library
 
-Comment out the STEP2 definition and uncomment STEP3.
+> [!NOTE]
+> Comment out the STEP2 definition and uncomment STEP3.
 
 In the first step, we directly used UART functions to read and write characters.  However, it can be a bit tedious to use these functions directly, especially when we want to read in strings or formatted data in ways that we're all more familiar with from typical C programs.
 
