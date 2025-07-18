@@ -369,19 +369,76 @@ A PIO is *very different* from a CPU in that:
 - It has a very limited instruction set, which is designed to be simple and efficient for manipulating GPIO pins.
 - It cannot communicate with the rest of the system except through FIFO buffers, which also can only be used to set pin values and scratch register values, or read them.
 
-Read over [PIO Programs](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#_pio_programs) and Control Flow (immediately after that) in the RP2350 datasheet to see some examples of PIO programs, and descriptions of how they operate.  In a nutshell, we write a PIO program, for example the **squarewave** example that was shown:
+Read over [PIO Programs](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#_pio_programs) and Control Flow (immediately after that) in the RP2350 datasheet to see some examples of PIO programs, and descriptions of how they operate.  In a nutshell, we write a PIO program that implements SPI:
 
-```pio
-.program squarewave
-  set pindirs, 1 ; Set pin to output
-again:
-  set pins, 1 [1] ; Drive pin high and then delay for one cycle
-  set pins, 0 ; Drive pin low
-  jmp again ; Set PC to label `again`
+```
+.program spi_7seg
+.side_set 2
+
+; This program reads one 16-bit half-word from FIFO 
+; and implements SPI to send them out.
+; CSn - side set 0
+; SCK - side set 1
+; MOSI - output pin
+
+.wrap_target
+    set x, 15 side 1      ; side-sets CSn low, SCK high
+loop:
+    out pins, 1 side 2    ; Output one bit to MOSI
+    jmp x-- loop side 0   ; Decrement x, if not zero, jump to loop. 
+                          ; side-set CSn high, SCK low
+.wrap
 ```
 
-That PIO program gets compiled to a **binary format** with a program called `pioasm`, or PIO Assembler, into a binary format.  To make including it in your project easier, we've added code to detect if you have `.pio` files in your `src` directory, and uses `pioasm` to compile them into `.pio.h` header files that will get automatically included in your project.
+Right below this would be an initialization function that sets up the PIO state machine to run this program, and configures the GPIO pins for SCK, CSn and MOSI.  The PIO program will then be loaded into the PIO instruction memory, and the state machine will start running it.
 
-Then, in your `main.c`, you use the definitions created in that header file to load the compiled PIO program into the PIO instruction memory, and start the PIO state machine which fetches, decodes and executes the instructions in the PIO program.  You can configure additional things like a different PIO clock speed to make it slower, the pins to be configured by the PIO, etc. before the PIO state machine starts running.
+```c
+% c-sdk {
+static inline void bitbang_program_init(PIO pio, uint sm, uint offset, uint pin_sck, uint pin_csn, uint pin_mosi) {
+    // CSn (13), SCK, TX (15)
+    pio_sm_set_enabled(pio, sm, false);
+    
+    // Initialize GPIOs for SCK, CSn, and MOSI
+    pio_gpio_init(pio, pin_sck);
+    pio_gpio_init(pio, pin_csn);
+    pio_gpio_init(pio, pin_mosi);
+    
+    // Set SCK and CSn as sideset pins (outputs), MOSI as OUT pin (output)
+    pio_sm_set_consecutive_pindirs(pio, sm, pin_csn, 3, true); // SCK and CSn
+    
+    // Set pin values to CSn high and SCK/MOSI low
+    pio_sm_set_pins_with_mask(pio, sm, (1u << pin_csn), (1u << pin_sck) | (1u << pin_csn) | (1u << pin_mosi));
+
+    // Configure state machine
+    pio_sm_config c = bitbang_program_get_default_config(offset);
+    // Set the clock divider to 100 MHz / 100 = 1 MHz
+    // but effective frequency will much be lower due 
+    // to the side-set and out instructions.
+    sm_config_set_clkdiv(&c, 100.0f);
+    sm_config_set_out_pin_base(&c, pin_mosi);
+    sm_config_set_out_pin_count(&c, 1);
+    sm_config_set_out_pins(&c, pin_mosi, 1);
+    sm_config_set_sideset_pins(&c, pin_sck);
+    sm_config_set_sideset_pins(&c, pin_csn);
+    sm_config_set_sideset(&c, 2, false, false);
+    sm_config_set_out_shift(&c, false, true, 16);
+
+    // Initialize the state machine with the configuration
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
+```
+
+That PIO program gets compiled to a **binary format** with a program called `pioasm`, or PIO Assembler, into a binary format.  To make including it in your project easier, we've added code to detect if you have `.pio` files in your `src` directory, and use `pioasm` to compile them into `.pio.h` header files that will get automatically included in your project.  **Don't edit the header files directly!**
+
+Then, in your `main.c`, you use the definitions created in that header file to load the compiled PIO program into the PIO instruction memory, and start the PIO state machine which fetches, decodes and executes the instructions in the PIO program.  
+
+```c
+uint offset = pio_add_program(pio, &spi_7seg_program);
+bitbang_program_init(pio, sm, offset, PIO_7SEG_SCK, PIO_7SEG_CSn, PIO_7SEG_TX);
+```
+
+You can configure additional things like a different PIO clock speed to make it slower, the pins to be configured by the PIO, etc. before the PIO state machine starts running.
 
 Using PIO to automate SPI is different from having DMA do it in that PIO can still make small adjustments to the data being sent, such as adding a delay between bits, or changing the data being sent based on some condition.  
