@@ -123,7 +123,7 @@ const int SPI_DISP_TX = 0; // Replace with your TX pin number for the LCD/OLED d
 ```
 
 > [!WARNING]
-> When you are choosing pins, make sure that you do not use pins that are already being used for some purpose.  So far, you are using GP2-9 for the keypad, GP36-39 for PWM, GP45 for the ADC.  Use pins on both sides of the board so that you can easily connect them to the SPI pins on the Proton board side facing each of them.
+> When you are choosing pins, make sure that you do not use pins that are already being used for some purpose.  So far, you are using GP2-9 for the keypad, GP21-GP26 for the pushbuttons and onboard LEDs, GP36-39 for PWM, GP45 for the ADC.  Use pins on both sides of the board so that you can easily connect them to the SPI pins on the Proton board side facing each of them.
 
 ### Step 1: Read the datasheet
 

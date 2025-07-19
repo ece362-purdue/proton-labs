@@ -136,8 +136,8 @@ Make sure you did the reading in Step 0.2, and then read the following sections 
 
 [Chapter 3.1.5: Inter-processor FIFOs (Mailboxes)](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A45%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C682.714%2Cnull%5D)
 
-7. What kind of data structure is the mailbox FIFO on the RP2350?  You might recall this from a previous course (or look it up if you forgot).  
-8. How many `char` values could one mailbox hold?
+8. What kind of data structure is the mailbox FIFO on the RP2350?  You might recall this from a previous course (or look it up if you forgot).  
+9. How many `char` values could one mailbox hold?
     - Hint: Each `char` is 8 bits wide.
 
 You'll notice that there's not any information about **configuring** or **enabling** an interrupt before we can use it, like we did with GPIO pins in the previous lab.  We don't know this yet by just looking at the datasheet, so we'll have to wait until the corresponding step here to find out.  Datasheets can be weird like that...
