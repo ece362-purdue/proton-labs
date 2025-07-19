@@ -258,7 +258,7 @@ In this step, we'll implement an alarm on TIMER1 that will fire every 3 millisec
 
 1. `msg` - An array of 8 characters that will hold the seven-segment representation of the characters to display.  Initially, it contains the seven-segment representation of "01234567", which is what we will display first.
 
-2. `font` - An array whose indices correspond to the ASCII values of characters, and whose values are the seven-segment representation of those characters.  For example, `font['0']` is the seven-segment representation of "0", which is `8'b01101111`.  You can use this array to convert ASCII values to their seven-segment representation.  The actual values are in `font.S`, which is provided to you.
+2. `font` - An array whose indices correspond to the ASCII values of characters, and whose values are the seven-segment representation of those characters.  For example, `font['0']` is the seven-segment representation of "0", which is `8'b00111111`.  You can use this array to convert ASCII values to their seven-segment representation.  The actual values are in `font.S`, which is provided to you.
 
 3. `index` - A global integer that keeps track of which 7-segment display to show a value on.  When we configure our timer interrupt to fire every 3 milliseconds to display some value on a specific digit, this variable will be incremented until 7, at which point it will wrap around to 0.  This way, we can cycle through all eight displays. 
 
@@ -298,7 +298,7 @@ You can use the global `font` array to convert ASCII values to the seven-segment
 #### 3.4: `display_isr`  
 This is where the magic happens!  In this function, do the following:
 - Acknowledge the interrupt for ALARM0 on TIMER1.
-- Set the value of GP20-GP10 to a new 10-bit value where the provided global variable `index` is used to select the seven-segment display to turn on, and the value of `msg[index]` is used to determine which segments to light up.  `msg` is an array of 8 characters that initially contains the seven-segment representation of "01234567" - you can see this at the top of the file.
+- Set the value of GP20-GP10 to a new 11-bit value where the provided global variable `index` is used to select the seven-segment display to turn on, and the 8-bit value of `msg[index]` is used to determine which segments to light up.  `msg` is an array of 8 characters that initially contains the seven-segment representation of "01234567" - you can see this at the top of the file.
 - Increment `index` by 1, and wrap around to 0 after 7.  (Can you do this without an if statement or modulus?  Hint: think in binary.)
 - Make TIMER1 ALARM0 fire the interrupt again in 3 milliseconds.
 
