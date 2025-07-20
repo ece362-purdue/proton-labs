@@ -23,10 +23,10 @@
 
 ### Instructional Objectives
 
-- To understand what pulse-width modulation (PWM) is and how it is used.
-- To understand how to configure and use the PWM peripheral on the RP2350.
-- To implement static and varying duty cycle PWM signals.
-- To convert a PWM signal to an audio signal using the LM324 op-amp and a capacitor.
+- To understand what a Serial Peripheral Interface (SPI) is, and how it works.
+- To understand how to configure and use the SPI peripheral on the RP2350.
+- To implement SPI by bit-banging it with GPIO pins.
+- To utilize SPI to communicate with 7-segment displays and LCD/OLED displays.
 
 ### Step 0.1: Set up your environment
 
