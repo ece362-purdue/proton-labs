@@ -182,7 +182,7 @@ Next, in the function `init_dma`, do the following:
 1. Configure DMA Channel 0 to read from the ADC FIFO and write to the variable `adc_fifo_out`.  You'll need to pass the addresses of both these variables to the `read_addr` and `write_addr` fields of the DMA channel 0 configuration.
 
 2. Set the transfer count, or `TRANS_COUNT`, to the arithmetic OR of two values:
-    - The mode value that tells the DMA to re-trigger itself infinitely, which is 1.  You'll need to left-shift it to the correct position for the `MODE` field of the `TRANS_COUNT` field of the DMA channel 0 configuration.
+    - The mode value that tells the DMA to re-trigger itself infinitely after the transfer count reaches 0, which is 1.  You'll need to left-shift it to the correct position for the `MODE` field of the `TRANS_COUNT` field of the DMA channel 0 configuration.
     - The number of data packets you want to transfer, which is 1, which you should write to the `COUNT` field of `TRANS_COUNT`.  We'll tell the channel later how big **one** data packet is in terms of bits.
 
 3. Initialize the control trigger register of the DMA to zero.  This is a concept called the **null trigger**, and is required to ensure we don't accidentally start the DMA transfer before we're ready.  **Create a `uint32_t` variable** called `temp`, and to it, OR in the following:
