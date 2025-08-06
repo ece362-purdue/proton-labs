@@ -113,11 +113,11 @@ If you dive into that function, and go through `stdio_uart_init -> stdio_uart_in
 
 These "drivers" are simplistic versions of the "device drivers" you may have heard of while using your computer on a regular basis, e.g. installing a *driver* for your printer or GPU.  They are pieces of software that allow the operating system to interact with those hardware devices in a standardized way.  In our case, the "operating system" is the C standard library, and the "hardware device" is the UART peripheral.
 
-In this step, you will implement this "driver" yourself, so that you can understand how it works under the hood, and be able to apply it to *any* microcontroller, especially if they don't come with this sort of helper code, or if you wanted to use another UART entirely, or if you wanted to customize it further.  This is also intended to highlight how these functions can work across multiple platforms, from microcontrollers to desktop computers.
+In this step, you will implement this driver yourself, so that you can understand how it works under the hood, and be able to apply it to *any* microcontroller, especially if they don't come with this sort of helper code, or if you wanted to use another UART entirely, or if you wanted to customize it further.  This is also intended to highlight how these functions can work across multiple platforms, from microcontrollers to desktop computers.
 
 #### 3.1 Configure UART to handle one character at a time
 
-The C standard library is implemented on the RP2350 with the help of a library called 'newlib', or rather, Raspberry Pi's version of it that they provide in the SDK.  If you dive into `PLATFORMIO_LOCATION/packages/framework-picosdk/src/rp2_common/pico_clib_interface/picolibc_interface.c` (PLATFORMIO_LOCATION will be different by OS), you'll find that it defines some interesting functions like `_write` and `_read`, and "handles" (or pipes) for `stdin, stdout, stderr` that are prepended with "STDIO_HANDLE".
+The C standard library is implemented on the RP2350 with the help of a library called 'newlib', or rather, Raspberry Pi's version of it that they provide in the SDK.  If you dive into `PLATFORMIO_LOCATION/packages/framework-picosdk/src/rp2_common/pico_clib_interface/newlib_interface.c` (PLATFORMIO_LOCATION will be different by OS), you'll find that it defines some interesting functions like `_write` and `_read`, and "handles" (or pipes) for `stdin, stdout, stderr` that are prepended with "STDIO_HANDLE".
 
 These functions are called "system calls", or syscalls for short.  System calls are different from regular functions in that they are typically used by an operating system to request services from the hardware, or in this case, interacting with the UART peripheral when a request to **read or write** data is made by the C standard library functions.  
 
@@ -204,6 +204,8 @@ int _write(int handle, char *buffer, int length) {
     // character at a time to the UART until the length is reached. 
 }
 ```
+
+Implementing these two system calls is how we implement a driver that links the C standard library functions to the UART peripheral.  
 
 Once you've implemented these two, make sure STEP3 is uncommented at the top of the file.  Then, look at the `main` function to see that, in an infinite loop, we call `getchar()`, and its result is immediately put into `putchar()`.  Simply put - print out every character we receive from the UART.
 
