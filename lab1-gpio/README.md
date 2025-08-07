@@ -30,7 +30,7 @@
 > 
 > Keep in mind the food-and-liquids policy of the lab, which is to bring absolutely no food or liquid with you to your lab sessions.  If you must bring it, keep it under the window in the back of BHEE 160.  **Failure to follow this rule will result in a penalty.** 
 > 
-> Similar to 270, 362 labs should be started at home, and checked off in lab.  **Do not wait to start your lab in your lab section, or you will not finish.**  You must be checked off for all steps in lab to receive full credit.
+> ECE 362 labs should be started at home, and checked off in lab.  **Do not wait to start your lab in your lab section, or you will not finish.**  You must be checked off for all steps in lab to receive full credit.
 
 > [!NOTE]
 If at any point you need to get checked off, or need to get help, you can add yourself to the [lab queue](https://engineering.purdue.edu/~menon18/queup/?room=36200).  **Bookmark this link in your lab machine browser.**
@@ -82,27 +82,25 @@ When you flash your microcontroller with a program, the instructions executed by
 Make sure to clone the code repository from GitHub Classroom.  Keep in mind to add, commit and push any changes you make so that your work is accessible from a lab machine. 
 
 > [!CAUTION]
-> **If you have not set up VScode with PlatformIO as described in Lab 0 on BOTH your physical machine and your lab machine, you should do that now.**  
+> **If you have not set up VScode with PlatformIO as described in Lab 0 on BOTH your physical machine and your lab machine, please do that now.**  
 > 
-> Having two working environments provides you the necessary redundancy to ensure you can still work in case one environment randomly stops working, using `git` to keep your work in the cloud and seamlessly transition to the other machine.  
+> Having two working environments provides you the necessary redundancy to ensure you can still work in case one environment randomly stops working.  Use `git` to keep your work synced to GitHub whenever you finish a step, and seamlessly transition to the other machine when you have to do so.  
 > 
-> **Please do not assume this will not happen to you, because it absolutely can.**
+> **Please do not assume a data catastrophe will not happen to you, because it absolutely can.  Commit and push often.**
 
-In addition, a precompiled autotest object has been incorporated into the template folder.  You can utilize it to test the subroutines (another word for functions).  To run the autotest, uncomment the `autotest()` call in the `main` function and click "Upload and Monitor".  Make sure that your debugger is connected via USB, that the shunt jumpers connecting the debugger to your Proton board are in place, and the the Proton board is also connected via USB.
+In addition, a precompiled autotest object has been included in your template folder.  You can utilize it to test the subroutines (another word for functions).  To run the autotest, uncomment the `autotest()` call in the `main` function and click "Upload and Monitor".  Make sure that your debugger is connected via USB, that the shunt jumpers connecting the debugger to your Proton board are in place, and the the Proton board is also connected via USB.
 
 We recommend leaving `autotest()` commented out until you actually need it - it adds about 20 KB of code to your program, which can take a long time to upload.  Uncomment it when you need to test a step, or need to generate a confirmation code to get checked off.
 
-If you are on Windows, take care to select the correct COM port in the Serial Monitor window.  
+If you get a message asking you to **select** a serial port because there are multiple, you need to select the one that corresponds to your Debug Probe.  First, unplug the Debug Probe, try "Upload and Monitor" and note the ports that appear in the dropdown.  Then plug in the Debug Probe, and try "Upload and Monitor" again.  The new port that appears is your Debug Probe.  Select that port.
 
-If you are on Linux, the port will be `/dev/ttyACM0` or `/dev/ttyUSB0`.  
+- If you are on Linux, the port will be `/dev/ttyACM0`.  
+- If you are on Windows, the port will be `COMX`, where `X` is a number.  The Debug Probe will usually be the last port in the list.
+- If you are on Mac, the port will be `/dev/cu.usbmodemXXXX` where `XXXX` is a number.  
 
-If you are on Mac, the port will be `/dev/cu.usbmodemXXXX` where `XXXX` is a number.  
+If you don't see anything after the serial port connection is established, press the Reset pushbutton to see the introductory text from `autotest` - the text won't appear because VScode/PlatformIO wasn't ready when the text was printed from your Proton board.  Try typing something, and you should see the characters appear.  That should confirm the connection is working as intended.
 
-On Mac or Linux, you can find the port by comparing the outputs of running `ls /dev/tty*` in a terminal window before and after plugging in your board.  The new device that appears is your board.
-
-If you don't see anything after the serial port connection is established, press the Reset pushbutton to see the introductory text from `autotest`.  Try typing something, and you should see the characters appear.  That should confirm the connection is working as intended.
-
-You should see a prompt similar to the following:
+Once you press the Reset button after the monitor appears, you should see a prompt similar to the following:
 
 ```text
 GPIO Lab Test Suite
@@ -124,7 +122,7 @@ You can then type `help` to learn what commands you can use to test a certain su
 
 In ECE 36200, unlike prior courses, you will build on the **same** circuit in each lab.  This allows you to build up a full development board that will help you more easily prototype designs with a variety of external components.  **Therefore, it is very important that you follow the layout we provide in the lab manual.**  This will make it easier for you to debug your circuit, and for your TAs to help you debug your circuit.  It will also ensure you have space for all your components as long as you follow the layout.  **TAs will not help with complex wiring if it does not follow the required layout.**
 
-At this point, you should have only the Proton development board on your breadboard.  In this lab, we'll add the keypad in the row above the Proton board, making space for wiring.  See the diagram below.
+At this point, you should have only the Proton development board on your breadboard.  In this lab, we'll add the keypad in the row above the Proton board, making space for wiring.  See the diagram below.  
 
 ![lab1-schem.png](images/lab1_schem.png)
 
@@ -138,9 +136,11 @@ Use the pin numbers on your Proton board to determine which pins to connect the 
 
 ## Step 1: Read the Datasheet
 
-The first step to understanding any microcontroller is to read the datasheet.  This is a universal *first step* that we want you to remember for not just microcontrollers, but various parts that you will interface to in the future.  Every single lab will have this first step.
+The first step to understanding any microcontroller is to **read the datasheet**.  This is a universal *first step* that we want you to remember for not just microcontrollers, but various parts that you will interface to in the future.  Every single lab will have this first step.
 
-The Proton board is, strictly speaking, not actually the microcontroller itself - it is a **development board** on which you have an RP2350B microcontroller, which is the black square chip in the center of your Proton board.  This chip is what holds your microprocessor cores and peripherals.  The 8-pin W25Q128JVS flash memory chip above the RP2350 is what receives and stores your program when you click "Upload" in VScode.  When you press the reset button, or provide power to your board, the RP2350 chip reads the program from this flash memory and executes it.  That code can then be made to interact with the peripherals on the RP2350 chip, and for this lab in particular, configure and control the GPIO pins on the RP2350.
+The Proton board is, strictly speaking, not actually the microcontroller itself - it is a **development board** on which you have an RP2350B microcontroller, which is the black square chip in the center of your Proton board.  This chip is what holds your microcontroller's CPU cores and peripherals.  The 8-pin Winbond W25Q128JVS flash memory chip above the RP2350 is what receives and stores your program when you click "Upload" in VScode.  The 4-pin NCP1117 chip is a voltage regulator that takes the 5V input from your USB port, and converts it to 3.3V to use with the RP2350.  
+
+When you press the button labeled Reset, or provide power to your board, the voltage regulator will power the RP2350 chip, which then reads the program from the Winbond flash memory and executes it.  That code can then be made to interact with the peripherals on the RP2350 chip, and for this lab in particular, configure and control the GPIO pins on the RP2350.
 
 ![flash and power](images/flash-power.png)
 
@@ -160,9 +160,11 @@ https://github.com/user-attachments/assets/081f1251-55cd-4d20-8b06-419479307833
 
 See the animation above, and use that technique to dive into the three constituent functions of `gpio_init` to determine what registers are being modified, and note them down.  A register takes the form `peripheral->registername`, for example `sio_hw->gpio_in`.  Here, the peripheral that controls the GPIO pins is `sio_hw`, and `gpio_in` is the register that returns the high/low state of the GPIO pins, with each bit of the register indicating a different pin.
 
-1. (15 points) What four `sio_hw` registers are used to set the direction of a GPIO pin?  When is one pair of registers used over the other?  Show your TA where you found this information after diving through the `gpio_init` function.  Give an example of a value for `mask` that would configure GP21 as an input, and GP22 as an output.  Note that `PICO_USE_GPIO_COPROCESSOR` is not defined and that the total number of GPIOs on the RP2350B is 48.
+Now that you've understood function diving, answer the questions below.  **You should find the answers only in the datasheet and the SDK, and not on any other website.**  We will ask you to show where you found your answers and how you arrived at them, so take notes on how to find your answers so that you can show your TA once you arrive in lab.
 
-2. (5 points) What third register would you check to confirm if a GPIO pin was configured as an input or output?  Show your TA how you arrived at your answer.  (Hint: the registers above are write-only, so you can't read them back to check if pins were configured correctly.)
+1. (15 points) What are the four `sio_hw` registers involved in setting the direction of a GPIO pin?  When should one pair of registers be used over the other?  Show your TA where you found this information after diving through the `gpio_init` function.  Give an example of a value for `mask` that would configure GP21 and GP26 as inputs, and which of the four registers it should be written to.  Note that `PICO_USE_GPIO_COPROCESSOR` is not defined and that the total number of GPIOs on the RP2350B is 48.
+
+2. (5 points) What third register would you check to confirm if a GPIO pin was already configured as an input or output?  Show your TA how you arrived at your answer.  (Hint: the registers above are write-only, so you can't read them back to check if pins were configured correctly.)
 
 3. (5 points) What pair of registers are used to set the value of a GPIO pin (i.e. high/low, logic 1/0)?  Show your TA how you arrived at your answer.
 
