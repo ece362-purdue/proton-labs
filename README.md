@@ -1,7 +1,7 @@
 # ECE 36200 Lab Experiments (Purdue Proton)
 
-> [!CAUTION]
-> **Work in progress.  Contents of these lab experiments may change closer to the start of the semester.**
+<!-- > [!CAUTION]
+> **Work in progress.  Contents of these lab experiments may change closer to the start of the semester.** -->
 
 Each link below takes you to the README.md file for each lab, so you don't have to click through the folders to find the page.
 
@@ -22,7 +22,7 @@ Embedded:
 [Lab 4 - ADC and DMA](lab4-adc-dma/README.md)  
 [Lab 5 - PWM](lab5-pwm/README.md)  
 [Lab 6 - SPI](lab6-spi/README.md)  
-[Lab 7 - USART](lab7-usart/README.md)   
+[Lab 7 - UART](lab7-uart/README.md)   
 
 *Not for credit*  
 [Lab - I2C](lab-i2c/README.md)  
