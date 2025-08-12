@@ -1,5 +1,9 @@
 # ECE 36200 Lab Kit Components
 
+## Lab Kit List
+
+- [Components in "Lab Kit 6"](assets/kit-components/362parts.xlsx)
+
 ## Simpler components in your kit
 
 - [LM324 Quad Op-Amp](assets/kit-components/LM324.pdf)
