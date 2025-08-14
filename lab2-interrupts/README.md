@@ -69,7 +69,7 @@ In this lab, it's helpful to have an understanding of the layout of the processo
 
 ![RP2350 Core Layout](images/core-diagram.png)
 
-You don't have to worry too much about the nitty-gritty terminology right now, but you can still make out **four CPU cores** in the middle block that say ARM/RISC-V/ARM/RISC-V.  Note how they go through muxes/multiplexers (which **selects** one of the two cores in each pair) which connects the **instruction and data memories** (two key parts of your uploaded program) to only two of the cores.  
+You don't have to worry too much about the nitty-gritty terminology right now, but you can still make out **four CPU cores** in the middle block that say ARM/RISC-V/ARM/RISC-V.  Note how they go through muxes/multiplexers (which **selects** one of the two cores in each pair) which connects the **instruction and data memories** (populated with data from your uploaded program) to only two of the cores.  
 
 The "chosen" cores are connected to the "Split" muxes below the block, which either fetches program data from memory, or performs an operation on the GPIO pins via the single-cycle IO (SIO) peripheral, depending on what instruction is being executed by that CPU core.  
 
@@ -94,12 +94,14 @@ void gpio_isr_example() {
 }
 ```
 
-The top block in the diagram is the **debugging interface**, that allows a debug host (e.g. the debugger you connected to the SWCLK and SWD pins of your Proton board) to control the CPU core's behavior while it's executing a program.  Chapter 3 tells us that the debugger allows you to:
+The top block in the diagram is the **debugging interface**, that allows a "debug host" (the Debug Probe you connected to the SWCLK and SWD pins of your Proton board) to control the CPU core's behavior while it's executing a program.  Chapter 3 tells us that the debugger allows you to:
 
 - Run, halt and reset the cores
 - Inspect internal core state such as registers
 - Access memory from the core’s point of view
 - Load code onto the device and run it
+
+In fact, when we click the Pause/Step Over buttons while debugging in VScode, that action is sent to the Debug Probe, which then sends an **interrupt** to the CPU core to stop what it's doing, allowing the Debug Probe to read the frozen state of the CPU cores, including registers and memory.  **This is how embedded debugging works!**
 
 As for interrupts, we see a bus called "System Interrupts" that connects to all the cores through the IRQ (Interrupt ReQuests).  This is how interrupts reach the CPU cores, causing main program execution to halt and the ISR to run.  
 
@@ -115,18 +117,18 @@ So, what interrupts are available?  Scroll down to [Section 3.2](https://datashe
 
 ### Step 1: Read the datasheet
 
-Make sure you did the reading in Step 0.2, and then read the following sections of the RP2350 datasheet and answer the questions underneath.  **Be prepared to show your TA where you found the answer, and do not use anything other than the SDK functions or the datasheet to answer these questions.** (3 points each)
+Make sure you did the reading in Step 0.2, and then read the following sections of the RP2350 datasheet and answer the questions underneath.  **Be prepared to show your TA where you found the answer, and do not use anything other than the SDK functions or the datasheet to answer these questions.** (3 points each, unless otherwise specified)
 
 > [!TIP]
 > If you are on Chrome, these links might not take you directly to the chapter number, so use Ctrl-F to search for the chapter number in the datasheet.  These links were generated from Firefox, so it should still work there.
 
-[Chapter 3.2: Interrupts](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A85%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C361.924%2Cnull%5D)
+[Chapter 3.2: Interrupts](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#interrupts)
 
 1. To enable interrupts from a specific source, we need to know the IRQ number.  What is the IRQ number for the non-secure GPIO interrupts from Bank 0?
 2. What is/are the IRQ number(s) for the non-secure cross-core FIFO interrupt(s)?  Are there different IRQ numbers for both active cores?
 3. Is it possible for one interrupt handler to **interrupt** another interrupt handler?  How do the cores know which interrupt handler is allowed to interrupt another one, i.e. which registers specify this order on the ARM and RISC-V cores?
 
-[Chapter 9.5: GPIO Interrupts](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A594%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C564.608%2Cnull%5D)
+[Chapter 9.5: GPIO Interrupts](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_gpio_interrupts)
 
 4. What are the four types of interrupts that can be generated from a GPIO pin?
 5. If you want to run a function every time a GPIO pin level crosses from low to high, but **not** when it is already high, which of the four types of interrupts should you implement a callback for?

@@ -16,7 +16,7 @@
 | &nbsp; | Total: | 100 |
 <br>
 
-\* - If either your checkoffs or your Gradescope submission are made after the lab section, a 20% penalty is levied on the final score.
+\* - You must get your whole lab checked off before the end of your lab section to avoid a late penalty of 20%.
 
 ## Instructional Objectives
 - To learn how to find relevant information in a microcontroller datasheet.
@@ -28,16 +28,26 @@
 > 
 > Your breadboard should have been signed with a silver sharpie with your username and the signature of the TA.  If you have not yet done this, please notify a TA and get it signed as soon as possible.  **Failure to do so by lab 2 will result in a zero for the lab currently running in that week.**
 > 
-> Keep in mind the food-and-liquids policy of the lab, which is to bring absolutely no food or liquid with you to your lab sessions.  If you must bring it, keep it under the window in the back of BHEE 160.  **Failure to follow this rule will result in a penalty.** 
+> Keep in mind the food-and-liquids policy of the lab, which is to bring absolutely no food or liquid with you to your lab sessions.  If you must bring it, keep it under the window in the back of BHEE 160.  **Failure to follow this rule will result in a lab penalty.** 
 > 
 > ECE 362 labs should be started at home, and checked off in lab.  **Do not wait to start your lab in your lab section, or you will not finish.**  You must be checked off for all steps in lab to receive full credit.
 
 > [!NOTE]
 If at any point you need to get checked off, or need to get help, you can add yourself to the [lab queue](https://engineering.purdue.edu/~menon18/queup/?room=36200).  **Bookmark this link in your lab machine browser.**
 
+## How does your RP2350 microcontroller on the Proton board work?
+
+The Proton board is, strictly speaking, not actually the microcontroller itself - it is a **development board** on which you have an RP2350B microcontroller, which is the black square chip in the center of your Proton board.  This chip is what holds your microcontroller's CPU cores and peripherals.  The 8-pin Winbond W25Q128JVS flash memory chip above the RP2350 is what receives and stores your program when you click "Upload" in VScode.  The 4-pin NCP1117 chip is a voltage regulator that takes the 5V input from your USB port, and converts it to 3.3V to use with the RP2350.  
+
+When you press the button labeled Reset, or provide power to your board, the voltage regulator will power the RP2350 chip, which then reads the program from the Winbond flash memory and executes it.  That code can then be made to interact with the peripherals on the RP2350 chip, and for this lab in particular, configure and control the GPIO pins on the RP2350.
+
+![flash and power](images/flash-power.png)
+
+Therefore, when we want to understand the internals of the microcontroller we wish to work with, we want to look up datasheets for "RP2350", not "Proton", which is the *development board* that carries the RP2350.  A similar parallel would be the "Adafruit HUZZAH32" which carries an "ESP32" microcontroller.  
+
 ## General Purpose Input/Output (GPIO)
 
-Your microcontroller can be considered a fully functioning computer, much unlike the machine you happen to be reading this on.  A key difference is how your microcontroller interacts with the outside world.  Your laptop has a keyboard, mouse, and screen that allow you to interact with it.  Your microcontroller, however, has **GPIO pins** that allow it to interact with the outside world.  
+Your microcontroller ~~can be~~ is considered a fully functioning computer, much unlike the machine you happen to be reading this on.  A key difference is how your microcontroller interacts with the outside world.  Your laptop has a keyboard, mouse, and screen that allow you to interact with it.  Your microcontroller, however, has **GPIO pins** that allow it to interact with the outside world.  
 
 In this experiment, you will learn how to connect and configure simple input devices (push buttons and keypad) and output devices (LEDs) to your Proton development board's GPIO pins. 
 
@@ -71,11 +81,15 @@ where each bit of the register corresponds to a different GPIO pin.  The GPIO pi
 > 
 > The RP2350 CPU cores are **32-bit**, which means the largest register they can operate on in a single "cycle" is 32 bits.  You may see functions that imply they can change 64 bits of data at a time, but if you dive into it, it's just writing to two 32-bit registers, e.g. `gpio_put_all64`.
 
-Therefore, to configure a pin to act as an output to drive current to some external component, you will need to write code that modifies specific registers in memory to do so.  Raspberry Pi offers an API with functions that would do all this for you, but in this course, you will dive into the functions to see what registers they are changing.  We do this so that you understand how your microcontroller works at the lowest level, and how to debug your code when it doesn't work as expected.  Therefore, **do not use online examples unless otherwise directed.**
-
-Nearly all of you are coming from ECE 270, where you wrote Verilog to implement hardware.  This course is a continuation of that, in that your microcontroller is the overall **top module** that instantiates the various peripherals as **submodules**.  
+Nearly all of you are coming from ECE 270, where you wrote Verilog to implement hardware.  This course is a continuation of that, in that your microcontroller is the overall **top module** that instantiates the various peripherals as **submodules**.  Changing register values is just changing the values connected to the submodules' **ports** or **internal `logic` registers**.
 
 When you flash your microcontroller with a program, the instructions executed by the CPU/top module in that program can be used to change the values of the registers in those peripherals/submodules.  This is how we will implement an **embedded system**.
+
+Modifying all these registers directly can get tedious, so Raspberry Pi (in this case) provides a **Software Development Kit** (SDK) that provides functions that can be used to modify these registers.  
+
+However, any good embedded systems engineer should understand how the SDK functions work at the register level, because the registers are the only effective way to debug our code when it doesn't work as expected - we saw this in lab 0 when looking at the `gpio_out` register, for example.  Therefore, for each lab, you can **look through** the SDK functions for the new peripheral you're learning about, but you must **dive** into the functions to see what registers they are modifying, and explain that to your TAs.
+
+Back to GPIO - to configure a pin to act as an output to drive current to some external component like an LED, you will need to dive into those SDK functions, and write code that modifies specific registers in memory to do so.  
 
 ## Step 0.1: Set up your environment
 
@@ -138,15 +152,11 @@ Use the pin numbers on your Proton board to determine which pins to connect the 
 
 The first step to understanding any microcontroller is to **read the datasheet**.  This is a universal *first step* that we want you to remember for not just microcontrollers, but various parts that you will interface to in the future.  Every single lab will have this first step.
 
-The Proton board is, strictly speaking, not actually the microcontroller itself - it is a **development board** on which you have an RP2350B microcontroller, which is the black square chip in the center of your Proton board.  This chip is what holds your microcontroller's CPU cores and peripherals.  The 8-pin Winbond W25Q128JVS flash memory chip above the RP2350 is what receives and stores your program when you click "Upload" in VScode.  The 4-pin NCP1117 chip is a voltage regulator that takes the 5V input from your USB port, and converts it to 3.3V to use with the RP2350.  
+### 1.1 Do your research
 
-When you press the button labeled Reset, or provide power to your board, the voltage regulator will power the RP2350 chip, which then reads the program from the Winbond flash memory and executes it.  That code can then be made to interact with the peripherals on the RP2350 chip, and for this lab in particular, configure and control the GPIO pins on the RP2350.
+Bookmark the [Proton datasheets page](https://ece362-purdue.github.io/proton-labs/datasheets/) to be your starting point, where we link the various Raspberry Pi pages that you will find helpful in understanding and utilizing the RP2350 microcontroller.
 
-![flash and power](images/flash-power.png)
-
-Therefore, when we want to understand the internals of the microcontroller we wish to work with, we want to look up datasheets for "RP2350", not "Proton".  Bookmark the [Proton datasheets page](https://ece362-purdue.github.io/proton-labs/datasheets/) to be your starting point, where we link the various Raspberry Pi pages that you will find helpful in understanding and utilizing the RP2350 microcontroller.
-
-You can gain a basic introduction to your RP2350 chip by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).  You may have to scroll down to the next page.
+You can gain a basic introduction to your RP2350 chip by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).  If there are terms that you don't understand, look them up, or ask a TA.  You may have to scroll down to the next page.
 
 Next, read [Chapter 9: GPIO](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A587%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D) as well as [Chapter 3.1.3: GPIO Control](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A41%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C707.498%2Cnull%5D) under SIO.
 
@@ -160,22 +170,24 @@ https://github.com/user-attachments/assets/081f1251-55cd-4d20-8b06-419479307833
 
 See the animation above, and use that technique to dive into the three constituent functions of `gpio_init` to determine what registers are being modified, and note them down.  A register takes the form `peripheral->registername`, for example `sio_hw->gpio_in`.  Here, the peripheral that controls the GPIO pins is `sio_hw`, and `gpio_in` is the register that returns the high/low state of the GPIO pins, with each bit of the register indicating a different pin.
 
+### 1.3 Answer these questions
+
 Now that you've understood function diving, answer the questions below.  **You should find the answers only in the datasheet and the SDK, and not on any other website.**  We will ask you to show where you found your answers and how you arrived at them, so take notes on how to find your answers so that you can show your TA once you arrive in lab.
 
-1. (15 points) What are the four `sio_hw` registers involved in setting the direction of a GPIO pin?  When should one pair of registers be used over the other?  Show your TA where you found this information after diving through the `gpio_init` function.  Give an example of a value for `mask` that would configure GP21 and GP26 as inputs, and which of the four registers it should be written to.  Note that `PICO_USE_GPIO_COPROCESSOR` is not defined and that the total number of GPIOs on the RP2350B is 48.
+1. (12 points) What are the four `sio_hw` registers involved in setting the direction of a GPIO pin?  List two reasons for when one pair of registers should be used over the other.  Show your TA where you found this information after diving through the `gpio_init` function.  
 
-2. (5 points) What third register would you check to confirm if a GPIO pin was already configured as an input or output?  Show your TA how you arrived at your answer.  (Hint: the registers above are write-only, so you can't read them back to check if pins were configured correctly.)
+2. (3 points) Give an example of a value for `mask` that would configure GP21 and GP26 as inputs, and which of the four registers it should be written to.  Note that `PICO_USE_GPIO_COPROCESSOR` is not defined and that the total number of GPIOs on the RP2350B is 48.
 
-3. (5 points) What pair of registers are used to set the value of a GPIO pin (i.e. high/low, logic 1/0)?  Show your TA how you arrived at your answer.
+3. (5 points) What registers would you check to confirm if a GPIO pin numbered between 0 and 47 was already configured as an input or output?  Show your TA how you arrived at your answer.  (Hint: the registers above are write-only, so you can't read them back to check if pins were configured correctly.)
 
-4. (5 points) What register can be used to read the value of a GPIO pin, regardless of whether it is configured as an input or output?  Show your TA how you arrived at your answer.
+4. (5 points) What two pairs of registers are used to change the value of a GPIO pin numbered between 0 and 47 (i.e. high/low, logic 1/0)?  Show your TA how you arrived at your answer.
 
-5. (10 points) Within the SDK function that configures the GPIO pins for the SIO functions, explain to your TA which lines of code do the following:
-    - Set input enable on, output disable off for a GPIO pin
-    - Set the function for a GPIO pin to SIO
-    - Clear the isolation latch for a GPIO pin, so that the SIO peripheral can control the pin
+5. (5 points) What two pairs of registers can be used to read the value of a GPIO pin numbered between 0 and 47, regardless of whether it is configured as an input or output?  Show your TA how you arrived at your answer.
 
-6. (5 points) What is the function number for SIO?  Show your TA how you arrived at your answers.  (Hint: you can find the SIO function number by diving into the `gpio_function_t` enum in the relevant function.)
+6. (15 points) Determine the SDK function that configures the GPIO pins to be associated with `GPIO_FUNC_SIO` which lets the GPIO pins be controlled using the registers above.  Within that function, explain to your TA which lines of code do the following:
+    - Set input enable on, output disable off for a GPIO pin.
+    - Set the function for a GPIO pin to SIO.  (What is the function number for SIO?)
+    - Turn off the **isolation latch** for a GPIO pin, so that the SIO peripheral can control the pin.
 
 7. (5 points) In the function that sets the function for a GPIO pin, there is code specifically for the RP2350 (`#if !PICO_RP2040`) that has the comment "// Remove pad isolation now that the correct peripheral is in control of the pad".  Read Section 9.7 to understand what a "pad" is, and why you need to remove the isolation latch.  Show the relevant paragraph to your TA and discuss it so you understand it.  
 
@@ -192,7 +204,7 @@ Now that you've understood function diving, answer the questions below.  **You s
 ## Step 2: Configure output pins for LEDs
 
 > [!CAUTION]
-> We're now entering your first coding assignment, so it is worth mentioning at this stage - **do not use AI/LLM tools to auto-generate this code**.  **If a TA observes you using Copilot/ChatGPT or similar tools in lab, you will be subject to academic dishonesty penalties and disciplinary action**.  
+> We're now entering your first coding assignment, so we will mention this once again - **do not use AI/LLM tools to auto-generate this code**.  **If a TA observes you using Copilot/ChatGPT or similar tools in lab, you will be subject to academic dishonesty penalties and disciplinary action**.  
 > 
 > Aside from the fact that it is academically dishonest to lift code from another source, the purpose of the labs is to teach you how to use your microcontroller and understand it at its lowest level.  Copying code from someone else (a person or an LLM) is going to handicap your ability to parse, analyze and apply information from multiple sources - critical to implementing new designs and debugging them.
 >
