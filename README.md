@@ -13,7 +13,9 @@ Resources for the Purdue Proton, and other parts used in the kit, can be found [
 
 ## Code Template
 
-If you need a fresh template to start writing your code in, use [this](template.zip).
+If you need a fresh template to start writing your code in for your project, use [this](template.zip).
+
+**For lab experiments below**, you will receive a GitHub Classroom link - do not use the template.
 
 ## Lab Experiments
 
