@@ -11,6 +11,10 @@ If you are not currently enrolled in ECE 36200 but wish to access the code templ
 
 Resources for the Purdue Proton, and other parts used in the kit, can be found [here](https://bit.ly/purdue-proton).
 
+## Code Template
+
+If you need a fresh template to start writing your code in, use [this](template.zip).
+
 ## Lab Experiments
 
 Embedded:
