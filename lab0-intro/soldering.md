@@ -23,7 +23,7 @@ If you are left-handed, a left-handed soldering station should also be available
 
 [This video](https://www.youtube.com/watch?v=InZK5s4RVMw) shows a full walkthrough of the Proton board soldering process.
 
-**Do not skip any parts of this video - it is critical that you understand and try to remember the process before you start soldering.**  
+**Do not skip any parts of this video - it is critical that you understand and familiarize yourself with the process before you start soldering.**  
 
 ## Introduction
 
