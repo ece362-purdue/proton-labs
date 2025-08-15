@@ -14,6 +14,16 @@
 > - Ensure the soldering iron is turned OFF. 
 > - Ensure the fume hood is turned ON so that it pulls fumes away from your face, and placed over your breadboard.
 > - Ensure the soldering iron is in its holder.
+> - If you have long hair, tie it back.
+> - If you have long sleeves, roll them up.
+
+If you are left-handed, a left-handed soldering station should also be available for you to use.  Ensure that the soldering iron is on **your left (dominant) side**, and the solder wire is on **your right (non-dominant) side**.  
+
+## Watch the video below
+
+[This video](https://www.youtube.com/watch?v=InZK5s4RVMw) shows a full walkthrough of the Proton board soldering process.
+
+**Do not skip any parts of this video - it is critical that you understand and try to remember the process before you start soldering.**  
 
 ## Introduction
 
