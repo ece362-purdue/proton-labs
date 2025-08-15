@@ -137,14 +137,14 @@ Read [Section 12.8 - System Timers](https://datasheets.raspberrypi.com/rp2350/rp
 
 5. (2 points) Assuming default settings, what is one "tick" in real time?  After one tick, the counter in the timer increments by 1.
 
-6. (3 points) What is the default **tick source** for timers TIMER0 and TIMER1?
+6. (3 points) What is the reference clock associated with the default **tick source** (which provides a fixed frequency) for timers TIMER0 and TIMER1?
 
 7. (5 points) What is the furthest point in time, in minutes, that the alarms can be set to generate an interrupt?
 
 8. (5 points) What are the three steps to enable an alarm on a particular timer?  What line of code would you write to clear/set a bit for the first step?
 
 9. (5 points) What needs to be done to clear a latched interrupt (i.e. acknowledge a timer interrupt) so that it does not fire again?
-    - *Why is this important?*  Recall that if you don't do this, the interrupt will keep firing, executing the handler over and over again, and you will not be able to return to the main program.
+    - *Why is this important?*  Recall from lab 2 that if you don't do this, the interrupt will keep firing, executing the handler over and over again, and you will not be able to return to the rest of your program from the handler.
 
 > [!IMPORTANT]
 > Show your answers for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
