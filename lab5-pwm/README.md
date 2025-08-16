@@ -83,15 +83,15 @@ PWM, or pulse-width modulation, is a way to create an approximate analog signal 
 
 On some microcontrollers, there is a specific peripheral called the DAC (digital-to-analog converter) that can be used for the same purpose.  However, since RP2350 doesn't have a DAC, we'll have to make do with the PWM, an LM324 amplifier, and a capacitor to "smooth out" the PWM signal to an analog signal.
 
-To understand how this wave is created, read **Overview**, **Programmer's Model** including **12.5.2.1. Pulse Width Modulation** in [Section 12.5. PWM](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_pwm) and answer the following questions.
+To understand how this wave is created, read **Overview**, **Programmer's Model** including **12.5.2.1. Pulse Width Modulation** in [Section 12.5. PWM](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_pwm) and answer the following questions.  
 
-1. (5 points) How many **distinct** PWM outputs are there, i.e. what is the maximum number of PWM signals that can be generated simultaneously, regardless of GPIO pins?  Why can't you generate a PWM signal per GPIO pin?  (Reminder: you are using an RP2350B on your Proton board, which has GPIO0 through GPIO47.)
+1. (5 points) How many **distinct** PWM outputs are there, i.e. what is the maximum number of PWM signals that can be generated simultaneously, regardless of GPIO pins?  Why can't you generate a PWM signal per GPIO pin?  (Reminder: you are using an RP2350B on your Proton board, which has GPIO0 through GPIO47.)  
+  
+2. (5 points) What is the name of the register that contains the highest counting period for each specific PWM "slice"?   
+  
+3. (5 points) What is the name of the PWM's free-running counter that holds the "current value", or the value that is incremented by the PWM slice, which wraps around to 0 when it reaches the value of the register in question 2?  (Hint: use the SDK function `pwm_get_counter` to figure this out, as the register name is not clear from the datasheet.)  See the graphs in 12.5.2.1 in the datasheet to help visualize this.  
 
-2. (5 points) What is the name of the register that contains the highest counting period for each specific PWM "slice"?  
-
-3. (5 points) What is the name of the PWM's free-running counter that holds the "current value", or the value that is incremented by the PWM slice, which wraps around to 0 when it reaches the value of the register in question 2?  (Hint: use the SDK function `pwm_get_counter` to figure this out, as the register name is not clear from the datasheet.)  See the graphs in 12.5.2.1 in the datasheet to help visualize this.
-
-4. (5 points) What is the name of the register that holds the "input value", the value compared against the free-running counter register above?  When the "current value" reaches the "input value", the PWM output is toggled.  See the graphs in 12.5.2.1 in the datasheet to help visualize this.
+4. (5 points) What is the name of the register that holds the "input value", the value compared against the free-running counter register above?  When the "current value" reaches the "input value", the PWM output is toggled.  See the graphs in 12.5.2.1 in the datasheet to help visualize this.
 
 5. (5 points) What would the values of the two registers in questions 2 and 3 have to be to generate a 50% duty cycle PWM signal?  What about 0% and 100%?
 
