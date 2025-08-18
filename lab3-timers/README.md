@@ -93,10 +93,11 @@ The source clocks that the RP2350 can use and derive different frequencies from 
     - Your CPU cores will use this clock frequency while executing the instructions from your code.
     - Why not leave it at 1.5 GHz?  [This StackOverflow post](https://electronics.stackexchange.com/questions/351512/why-do-micro-controllers-run-100s-mhz-whilst-cpus-run-ghz) explains it best.  Most of the time, it's about bringing down power consumption.
 - Crystal Oscillator (XOSC): This is a 12 MHz crystal oscillator that is used as a reference clock for the PLLs, and can also be used directly as a reference clock for the onboard peripherals.
+    - We turned this off when we entered the DORMANT state in lab 2, but turned it back on when we exited it.
 - Low Power Oscillator (LPOSC): This is a 32 kHz oscillator that is used for low-power or low-frequency applications.  Typically, you want to make this as accurate as possible, so a 32.768 kHz crystal would be more ideal.
     - We don't have this on our board, but it's possible to add one later on if you want to use the RP2350 in a low-power application with a need for more accurate timing, e.g. alarm clocks.
 
-The very helpful RP2350 also adds a feature called "resus", short for *resuscitation*, that restarts the clocks if you are debugging your code and the clocks accidentally stop.
+The very helpful RP2350 also adds a feature called "resus", short for *resuscitation*, that restarts the clocks if you are debugging your code and the clocks accidentally stop.  For it to be useful, read the datasheet and SDK functions on how to enable and use it (when doing your projects, for example).
 
 From these various **clock sources**, we derive the following clocks for use by peripherals:
 - `clk_gpout0-3`: These are the clocks that are output on the GPCLK0-3 pins.  You can use these to drive external peripherals, or to test your code on a custom board.
@@ -133,7 +134,7 @@ Now for questions.  Review how the 7-segment display works above, and answer the
 3. (5 points) If the bus was assigned the value 11'b00100000111, which display would be lit up, and what digit would be shown on the selected display?
 4. (5 points) If the bus was assigned the value 11'b10101100110, which display would be lit up, and what digit would be shown on the selected display?
 
-Read [Section 12.8 - System Timers](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A1182%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C415.326%2Cnull%5D) and answer the following questions:
+Read [Section 12.8 - System Timers](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_timer) and answer the following questions:
 
 5. (2 points) Assuming default settings, what is one "tick" in real time?  After one tick, the counter in the timer increments by 1.
 
