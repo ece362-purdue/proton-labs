@@ -86,7 +86,7 @@ Always consider that updating less pixels overall can make your display feel muc
 
 For games where you have a few moving objects, such as "sprites", the `LCD_DrawPicture` function can be used to draw a picture at a specific location on the display.  If the sprite is small enough, the refresh rate will be fast enough to make it feel responsive.  If you have a lot of sprites, you may want to consider using a technique called "double buffering", where you draw the next frame in memory, and then copy it to the display all at once, instead of drawing each sprite one by one.
 
-Here are two past projects that have implemented graphically demanding games on the TFT LCD display (and the bugs they encountered):
+Here are two past projects that have implemented graphically demanding games on the TFT LCD display (and the bugs they encountered).  These were implemented on the STM32 which had a lower clock speed than the RP2350, so you should be able to improve the frame rate and responsiveness of your games:
 
 <!-- video 1 -->
 
