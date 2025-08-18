@@ -51,7 +51,7 @@ Once you set pin definitions in both files, fill out the `init_spi_lcd` function
 
 Upload and monitor, and you should see the TFT LCD initialize and display a simulation of the [three-body problem](https://en.wikipedia.org/wiki/Three-body_problem)!  If it doesn't, check your wiring and pin definitions.
 
-<!-- Insert MP4 here -->
+https://github.com/user-attachments/assets/797cb4c4-0b1c-419d-ace3-683e4e8fa5f2
 
 #### Displaying a series of images like a GIF
 
@@ -88,8 +88,8 @@ For games where you have a few moving objects, such as "sprites", the `LCD_DrawP
 
 Here are two past projects that have implemented graphically demanding games on the TFT LCD display (and the bugs they encountered):
 
-<!-- video 1 -->
+https://github.com/user-attachments/assets/1c4d4f3d-abbb-4efb-a75c-61940df41fba
 
-<!-- video 2 -->
+https://github.com/user-attachments/assets/49f374b1-18e7-4351-a4ce-57cae8506bc2
 
 Good luck with your project, and we hope you enjoy using the TFT LCD display!  If you have any questions, feel free to ask a TA or your lab coordinator.
