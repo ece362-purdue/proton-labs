@@ -61,21 +61,21 @@ Normally, we find the function associated with GPIO functions in the **GPIO Func
 
 The ADC, or analog-to-digital converter, is a peripheral with a very simple mandate.  It takes the voltage on an associated GPIO pin, ideally within the range between 0 (zero) and VCC (typically 3.3V), and converts it into a digital value that can be processed by code flashed on the microcontroller.  An ADC has a number of bits used to represent that digital value, and on the Pico 2, it has 12 bits, meaning that it can represent a voltage in 2^12 = 4096 discrete steps.  The higher the number of bits, the higher the precision of the voltage reading.
 
-To understand how the Pico 2's specific ADC works, start by reading [Section 12.4. ADC and Temperature Sensor](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A1066%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C270.17%2Cnull%5D).  You'll see that the ADC is a single peripheral capable of selecting and reading from multiple channels, which in turn are connected to specific GPIO pins or an internal temperature sensor on the board.  You can sample one channel entirely, or do a **round-robin method** where you cycle through each one, reading their samples, in free-running sampling mode.  
+To understand how the Pico 2's specific ADC works, start by reading [Section 12.4. ADC and Temperature Sensor](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_adc).  You'll see that the ADC is a single peripheral capable of selecting and reading from multiple analog channels (connected to GPIO pins and the internal temperature sensor), which in turn are connected to specific GPIO pins or an internal temperature sensor on the board.  You can sample one channel entirely, or do a **round-robin method** where you cycle through each one, reading their samples, in free-running sampling mode.  
 
 Reading a lot of samples very quickly allows you to capture a waveform, for example, or at slower speeds, to measure the voltage of a battery over time.
 
 Read about the ADC in the datasheet, find helpful SDK functions related to the ADC, and answer the following questions:
 
-1. How many samples can the ADC read per second?  What is the frequency of the ADC clock that supports this sampling rate?
+1. (3 points) How many samples can the ADC read per second?  What is the frequency of the ADC clock that supports this sampling rate?
 
-2. How many ADC channels are available on your RP2350?  Our Proton board uses the RP2350B specifically, which is the QFN-80 package.
+2. (3 points) How many ADC channels are available on your RP2350?  Our Proton board uses the RP2350B specifically, which is the QFN-80 package.
 
-3. What ADC register's bits do you have to write to in order to select a particular channel for sampling?  What bits should you write to to start a conversion?  Where should you read the result from?
+3. (3 points) What ADC register's bits do you have to write to in order to select a particular channel for sampling?  What bits should you write to to start a **one-shot** conversion (i.e. reads only one sample)?  Where should you read the result from?
 
-4. What ADC register's bits do you have to read from to determine if a conversion has completed?  Why is it important to know this?
+4. (3 points) What ADC register's bits do you have to read from to determine if a conversion has completed?  Why is it important to know this?
 
-5. How many bits does the ADC use to represent one sample?  What is the maximum value that can be represented by this many bits?
+5. (3 points) How many bits does the ADC use to represent one sample?  What is the maximum value that can be represented by this many bits?
 
 The possibility of multiple samples coming out from the ADC presents a unique problem - if we have samples coming out of the ADC at a high rate, we can't keep interrupting the CPU to manually move the samples to a memory location.  Enter Direct Memory Access, or DMA.
 
@@ -88,13 +88,13 @@ DMA is a very unique peripheral in that **it doesn't interface to anything exter
 - **From peripheral to memory**
     - And finally, this is what we'll use - when the ADC starts generating samples, we can use DMA to move those samples into memory, where we can process them in batches later, if we wish.
 
-Read [Section 12.6: DMA](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A1092%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C308.622%2Cnull%5D) and answer the following questions:
+Read [Section 12.6: DMA](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_dma) and answer the following questions:
 
-1. What registers need to be written to to **configure** a DMA channel for transfer?  Could you use the same DMA channel to repeatedly transfer data, or would you need to reconfigure it each time?  If a repeated transfer is possible, what register bits need to be modified?
+6. (3 points) What registers need to be written to to **configure** a DMA channel for transfer?  Could you use the same DMA channel to repeatedly transfer data, or would you need to reconfigure it each time?  If a repeated transfer is possible, what register bits need to be modified?
 
-2. How do you **trigger**, or start, a DMA transfer given a configured DMA channel?
+7. (2 points) How do you **trigger**, or start, a DMA transfer given a configured DMA channel?
 
-3. We can configure a DMA channel to **request** data from the ADC when it is ready to perform the transfer.  What is the associated Data Request (DREQ) number for the ADC?  
+8. (1 point) We can configure a DMA channel to **request** data from the ADC when it is ready to perform the transfer.  What is the associated Data Request (DREQ) number for the ADC?  
 - The concept of a DREQ number is similar to that of an interrupt number (IRQ) - they both specify the **sources** of events that can trigger a DMA transfer, or an interrupt.
 
 > [!IMPORTANT]

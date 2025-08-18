@@ -137,11 +137,11 @@ SPI stands for Serial Peripheral Interface, and it is by far one of the simplest
 Go over [Section 12.3: SPI](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_spi) of the RP2350 datasheet to understand what the pins do, as well as the SDK functions associated with SPI in the C/C++ SDK datasheet, and answer the following questions:
 
 1. (5 points) What are the four signals used in SPI communication?  Which one are we not using?  Why would not use that pin for display communication?
-2. (5 points) How many devices and their types can be connected to a single SPI bus?  (Hint: think about how you can use the CSn pin.)
+2. (2 points) How many devices and their types can be connected to a single SPI bus?  (Hint: think about how you can use the CSn pin.)
 3. (5 points) What is the maximum clock frequency for SPI on the RP2350?  
-4. (5 points) Which SDK function initializes the SPI peripheral?  What are the parameters that you need to pass to it?
+4. (3 points) Which SDK function initializes the SPI peripheral?  What are the parameters that you need to pass to it?
 5. (3 points) What SDK function is used to set the parameters for SPI configuration, specifically the data format, CPOL/CPHA, endianness (bit order)?
-6. (2 points) What SDK function is used to send 16-bit data through a certain SPI peripheral?
+6. (2 points) What SDK function is used to send 16-bit data through the SPI0 or SPI1 instance?
 
 > [!IMPORTANT]
 > Show your answers for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
