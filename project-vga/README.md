@@ -10,7 +10,9 @@ The folks over at Cornell implemented a VGA driver originally for the Raspberry 
 
 In order to try out this project yourself:
 
-- Obtain a VGA monitor and a breakout board so you can connect it to your Proton board.  The one we're using in this picture is [here](https://www.amazon.com/Portable-1024%C3%97600-Speakers-Multi-Function-Raspberry/dp/B0D53RRHMD) and we're using a VGA breakout adapter to split it into its constituent pins.  Ensure that the LO_GRN, HI_GRN, BLUE_PIN, RED_PIN are consecutively placed with LO_GRN having the lowest GPIO number, as the pins will be used with the PIO which requires a consectutive bit mask to address each of the pins.
+- Obtain a VGA monitor and a breakout board so you can connect it to your Proton board.  The one we're using in this picture is [here](https://www.amazon.com/Portable-1024%C3%97600-Speakers-Multi-Function-Raspberry/dp/B0D53RRHMD) and we're using a VGA breakout adapter to split it into its constituent pins.  
+
+- Ensure that the HSYNC, VSYNC, Green Return/Ground, Green Data, Blue Data, and Red Data pins are all connected consecutively.  The example code starts from pin 16.  This requirement has to do with how the PIO peripheral manages the connected GPIO pins.
 
 - Find the code here: https://github.com/vha3/Hunter-Adams-RP2040-Demos/tree/master/VGA_Graphics
 
@@ -20,12 +22,10 @@ In order to try out this project yourself:
 
 ```c
 enum vga_pins {
-    HSYNC=16, 
-    VSYNC=17, 
-    // these 4 must be consecutive pins
-    // and LO_GRN must be the lowest pin.
-    LO_GRN=29, HI_GRN=30, BLUE_PIN=31, RED_PIN=32 
+    HSYNC=16, VSYNC, LO_GRN, HI_GRN, BLUE_PIN, RED_PIN 
 };
 ```
+
+So as long as the pins are all consecutive to each other with the HSYNC pin being the lowest GPIO pin, it *should* work.
 
 - In the `main` function in one of the files (name is unique to the project you choose), remove the line that changes the clock speed to 150 MHz - this is already done on the RP2350, and only needed to be done the previous-generation RP2040.  
