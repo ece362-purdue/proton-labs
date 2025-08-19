@@ -121,9 +121,11 @@ The C standard library is implemented on the RP2350 with the help of a library c
 
 These functions are called "system calls", or syscalls for short.  System calls are different from regular functions in that they are typically used by an operating system to request services from the hardware, or in this case, interacting with the UART peripheral when a request to **read or write** data is made by the C standard library functions.  
 
-At the embedded level, syscalls aren't really that much different from regular functions in terms of who is allowed to call them, but at the OS level, syscalls are part of a piece of software called the **kernel**, which is responsible for managing hardware resources and providing services to user programs.  You can think of `newlib` as a lightweight kernel that provides a set of syscalls for the C standard library to use.
+On a more sophisticated computer with an OS like Windows/macOS/Linux, the syscalls are implemented in the kernel, and when programs need access to hardware resources like a hard drive, network, or display, they invoke the kernel's syscalls, which handles the interaction with the hardware on behalf of the requesting program.  This is how the C standard library functions like `printf`, `scanf`, and `fgets` are able to work on any computer, regardless of the underlying hardware.  
 
-You can also see the file, `newlib_interface.c`, that defines these syscalls on the Pico SDK GitHub [here](https://github.com/raspberrypi/pico-sdk/blob/ee68c78d0afae2b69c03ae1a72bf5cc267a2d94c/src/rp2_common/pico_clib_interface/newlib_interface.c).
+At the embedded level, however, there is no OS, so the layers of abstraction are much thinner.  When we use C standard library functons like `getchar()` or `putchar()`, they will call the `_read` and `_write` syscalls provided by `newlib`, respectively.  What we'll do now is rewrite those syscalls to directly interact with the UART peripheral, so that we can directly use the C standard library functions to read and write data to the UART.
+
+Here's the portion of `newlib_interface.c` that defines these syscalls on the [Pico SDK GitHub](https://github.com/raspberrypi/pico-sdk/blob/ee68c78d0afae2b69c03ae1a72bf5cc267a2d94c/src/rp2_common/pico_clib_interface/newlib_interface.c):
 
 ```c
 // DO NOT JUST COPY IN THIS CODE - THIS IS ALREADY ADDED.  
