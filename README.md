@@ -32,7 +32,9 @@ Embedded:
 
 *Not for credit*  
 [Lab - I2C](lab-i2c/README.md)  
+[Project Guides - MSP2202 TFT LCD Display](project-lcd/README.md)  
 [Project Guides - USB and Networking](project-usb/README.md)  
 [Project Guides - Adafruit NeoTrellis](project-neotrellis/README.md)
+[Project Guides - Video Graphics Array (VGA)](project-vga/README.md)  
 
 ECE 36200 Lab Experiments (Purdue Proton) © 2025 by Purdue University, Niraj Menon is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
