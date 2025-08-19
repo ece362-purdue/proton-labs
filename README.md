@@ -30,7 +30,8 @@ Embedded:
 [Lab 6 - SPI](lab6-spi/README.md)  
 [Lab 7 - UART](lab7-uart/README.md)   
 
-RISC-V:
+RISC-V:  
+
 [Lab 8 - Intro to RISC-V Assembly](lab8-riscv-intro/README.md)  
 [Lab 9 - Control Flow](lab9-control-flow/README.md)  
 [Lab 10 - Functions](lab10-functions/README.md)  
