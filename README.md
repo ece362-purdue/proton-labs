@@ -30,6 +30,12 @@ Embedded:
 [Lab 6 - SPI](lab6-spi/README.md)  
 [Lab 7 - UART](lab7-uart/README.md)   
 
+RISC-V:
+[Lab 8 - Intro to RISC-V Assembly](lab8-riscv-intro/README.md)
+[Lab 9 - Control Flow](lab9-control-flow/README.md)
+[Lab 10 - Functions](lab10-functions/README.md)
+[Lab 11 - Computer Organization](lab11-comp-org/README.md)
+
 *Not for credit*  
 [Lab - I2C](lab-i2c/README.md)  
 [Project Guides - MSP2202 TFT LCD Display](project-lcd/README.md)  
