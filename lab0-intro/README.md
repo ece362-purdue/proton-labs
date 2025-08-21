@@ -245,7 +245,7 @@ int main() {
 
     // Initialize pins 22, 23, 24, 25 
     // (each 1 bit corresponds to a pin, hence 0xff << 22)
-    gpio_set_function(0xf << 22);
+    gpio_init_mask(0xf << 22);
     // Set them all to outputs 
     gpio_set_dir_out_masked64(0xf << 22);
 
