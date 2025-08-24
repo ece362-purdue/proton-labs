@@ -299,7 +299,7 @@ Note the `sleep_ms` line - this is needed to ensure that when we drive a logic 1
 
 Students often get confused at this step - if you'd like a visualization of what's supposed to happen when reading the keypad, here's a flowchart.  Each key on the diagonal should turn on one LED, and their associated positions are shown on the diagram:
 
-![keypad_diagram](images/Keypad_abridged.png?)
+![keypad_diagram](images/Keypad_abridged.png?cache=no)
 
 So, holding 1 should turn on the LED at GP22 (red), holding 5 should turn on the LED at GP23 (yellow), holding 9 should turn on the LED at GP24 (green), and holding D should turn on the LED at GP25 (blue).  Holding multiple keys should turn on multiple corresponding LEDs.  If you press a key and the LED does not turn on, check your wiring and make sure that `init_outputs` is still being called in your `main` function.
 
