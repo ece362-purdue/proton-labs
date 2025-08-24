@@ -117,6 +117,11 @@ So, what interrupts are available?  Scroll down to [Section 3.2](https://datashe
 
 ### Step 1: Read the datasheet
 
+> [!NOTE]
+> Your RP2350 has 4 CPU cores, of which only 2 cores can be active at any given time.  Two of these cores are ARM Cortex-M33s, which implement the **ARMv8-M Thumb 2 instruction set**, and the other two implement the **RISC-V instruction set**.  The instruction set merely dictates what types of assembly instructions are available, but as we progress through the embedded labs using C programming, the choice of instruction set will not matter much.
+> 
+> For the embedded labs, we'll stick with the ARM cores.
+
 Make sure you did the reading in Step 0.2, and then read the following sections of the RP2350 datasheet and answer the questions underneath.  **Be prepared to show your TA where you found the answer, and do not use anything other than the SDK functions or the datasheet to answer these questions.** (3 points each, unless otherwise specified)
 
 > [!TIP]
