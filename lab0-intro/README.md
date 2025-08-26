@@ -161,7 +161,7 @@ Plug in a USB-C cable from the **debugger** - not the Proton - to your computer.
 
 Once you've flashed the debugger (if applicable) and/or your debugger's red LED turns on, plug in a second USB-C cable into the Proton board.  You should always see the 5V red indicator and 3.3V green indicator LEDs on the Proton board turn on.  If they do not, immediately pull out the USB-C cable - **there could be a short with how you connected it to your breadboard, or in your solder joints**.  More likely than not, though, the LEDs are probably just damaged, but ask a TA to confirm.  
 
-If you see "RP2350" appear as a flash drive on your computer when it is connected, your board is fine, and it's just in bootloader mode.  You *could* drop in a UF2 file to flash it, but we don't have a compiled program just yet, so there's no need.  
+By default, your Proton should start flashing the LEDs in a Johnson Counter pattern.  If they do not turn on, but you see "RP2350" appear as a flash drive on your computer when it is connected, your board is still fine - it's just in bootloader mode.  You *could* drop in a UF2 file to flash it, but we don't have a compiled program just yet, so there's no need.  
 
 You may also see a green LED in the middle of the board start flashing, in which case your board was already tested and confirmed as working, and you can ignore it.
 
