@@ -220,7 +220,10 @@ In your `main` function, call `init_outputs`, and then start an infinite loop th
 
 2. Turn OFF each LED from GP22-GP25 in sequence, with a 500 ms delay between each LED. 
 
-Does this sound too easy?  Here's the catch - **you need to do this without using any of the SDK functions except `sleep_ms`**.  It is actually easier to do so, and doesn't involve any loops.  Don't worry, we'll go back to the SDK functions in the next lab, but you may find that you prefer this method of directly modifying registers as an optimal technique.  
+> [!WARNING]
+> Does this sound too easy?  Here's the catch - **you need to do this without using any of the SDK functions except `sleep_ms`**.  It is actually easier to do so, and doesn't involve any loops.  Don't worry, we'll go back to the SDK functions in the next lab, but you may find that you prefer this method of directly modifying registers as an optimal technique.  
+> 
+> If you do not follow this rule, you will not receive credit for this step.
 
 > [!TIP]
 > Instead of using `gpio_put` for every one of the four LEDs, you can just write `0xF` by a certain offset to a certain register to turn on all four LEDs in one go, with no loops.
@@ -256,6 +259,11 @@ Call `init_inputs` in your `main` function, and do the following to test your pu
 As you did before, **you need to do this without using any of the SDK functions** except `sleep_ms`.  It is actually easier to do so, and doesn't involve any loops.
 
 Upload your code and test it.  Pressing GP21 should turn on all the LEDs, and pressing GP26 should turn them all off.  If you press both buttons at the same time, the "21" button should take priority.
+
+> [!WARNING]
+> Similar to the step above, **you need to do this without using any of the SDK functions**.
+> 
+> If you do not follow this rule, you will not receive credit for this step when you get checked off.
 
 > [!IMPORTANT]
 > Demonstrate the behavior described above to your TA, and show that you are passing the `init_inputs` test in autotest.  Answer their questions and show them your code.  
@@ -302,6 +310,11 @@ Students often get confused at this step - if you'd like a visualization of what
 ![keypad_diagram](images/Keypad_abridged.png)
 
 So, holding 1 should turn on the LED at GP22 (red), holding 5 should turn on the LED at GP23 (yellow), holding 9 should turn on the LED at GP24 (green), and holding D should turn on the LED at GP25 (blue).  Holding multiple keys should turn on multiple corresponding LEDs.  If you press a key and the LED does not turn on, check your wiring and make sure that `init_outputs` is still being called in your `main` function.
+
+> [!WARNING]
+> Similar to the step above, **you need to do this without using any of the SDK functions**.
+> 
+> If you do not follow this rule, you will not receive credit for this step when you get checked off.
 
 > [!IMPORTANT]
 > Demonstrate to your TA that your code passes the `init_keypad` test in `autotest`, and that pressing 1/5/9/D turns on the corresponding LEDs on your board.  Answer their questions and show them your code.  
