@@ -189,7 +189,7 @@ Now that you've understood function diving, answer the questions below.  **You s
     - Set the function for a GPIO pin to SIO.  (What is the function number for SIO?)
     - Turn off the **isolation latch** for a GPIO pin, so that the SIO peripheral can control the pin.
 
-7. (5 points) In the function that sets the function for a GPIO pin, there is code specifically for the RP2350 (`#if !PICO_RP2040`) that has the comment "// Remove pad isolation now that the correct peripheral is in control of the pad".  Read Section 9.7 to understand what a "pad" is, and why you need to remove the isolation latch.  Show the relevant paragraph to your TA and discuss it so you understand it.  
+7. (5 points) In the function that sets the function for a GPIO pin, there is code specifically for the RP2350 (`#if HAS_PADS_BANK0_ISOLATION`) that has the comment "// Remove pad isolation now that the correct peripheral is in control of the pad".  Read Section 9.7 to understand what a "pad" is, and why you need to remove the isolation latch.  Show the relevant paragraph to your TA and discuss it so you understand it.  
 
 > [!TIP]  
 > The registers you find should start with `sio_hw` or `io_bank0_hw`, which are the SDK-provided structs that define hardware registers that, in turn, control the GPIO pins.  (You can even *dive* into `sio_hw`/`io_bank0_hw` to see the memory addresses they are defined at, and compare that to your datasheet!)  
@@ -307,7 +307,7 @@ Note the `sleep_ms` line - this is needed to ensure that when we drive a logic 1
 
 Students often get confused at this step - if you'd like a visualization of what's supposed to happen when reading the keypad, here's a flowchart.  Each key on the diagonal should turn on one LED, and their associated positions are shown on the diagram:
 
-![keypad_diagram](images/Keypad_abridged.png)
+![keypad_diagram](images/Keypad_abridged.png?cache=no)
 
 So, holding 1 should turn on the LED at GP22 (red), holding 5 should turn on the LED at GP23 (yellow), holding 9 should turn on the LED at GP24 (green), and holding D should turn on the LED at GP25 (blue).  Holding multiple keys should turn on multiple corresponding LEDs.  If you press a key and the LED does not turn on, check your wiring and make sure that `init_outputs` is still being called in your `main` function.
 
