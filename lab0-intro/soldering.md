@@ -177,6 +177,10 @@ Spray the board with isopropyl alcohol, focusing on the soldered pins, and light
     <img src="images/brush-clean.gif" style="margin: 1em 0; width: 20vw">
 </div>
 
+## Wash your hands!
+
+**After you're done soldering, wash your hands thoroughly with soap and water.**  The solder you used may contain lead, which is toxic, and you don't want to accidentally ingest any of it.  Even if you used lead-free solder, it's still a good idea to wash your hands after handling flux and solder.  
+
 ## Adding the shunt jumpers
 
 Go ahead and put on the **shunt jumpers** on your board's debugger pins.  The purpose of this 2x3 pin header is to allow you access to the **debugging interface** on your microcontroller, a very common feature in embedded systems development.  When your product goes out into the real world, the debugger is not normally attached, but since our primary focus is **learning** embedded systems, the debugger is critical to understanding what your code is, which is why it's part of your Proton devboard.  Your shunt jumpers should go on between the devboard and debugger, like this:

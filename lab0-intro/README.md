@@ -10,10 +10,12 @@
 | 1 | Solder pin headers to your development board | ** |
 | 2 | Place the Development Board on a Breadboard | ** |
 | 3 | Install VScode and PlatformIO | ** |
-| 4 | Configure PlatformIO for your board | ** |
-| 5 | Writing microcontroller code in C | ** |
-| 6 | Debugging and Printing | ** |
-| 7 | Run a command shell | ** |
+| 4 | Create a PlatformIO project | ** |
+| 5 | Debugging microcontroller code in C | ** |
+| 6 | Run a command shell | ** |
+|   | Sign Your Breadboard | ** |
+|   | Submit your work to Gradescope | ** |
+|   | Clean up your lab station | ** |
 | &nbsp; | Total: | 100* |
 <br>
 
@@ -392,7 +394,7 @@ As you step over the `printf` line, you should see the message "Hello, world!" a
 > 
 > If you had any changes, commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.  Show your TA that you have been pushing commits for each step.
 
-## Step 7: Run a command shell
+## Step 6: Run a command shell
 
 In your upcoming labs, you will include a code object that gets built along with your C code, typically called "autotest.o".  This provides (in other labs) an autotester that you can use to test individual functions and generate a confirmation code that you will submit with your code.  In this lab, it's simply a shell that executes some functions - just to get you familiar with how it works so you know how to use it for the following labs.  
 
@@ -431,7 +433,7 @@ If you haven't done so already, your TA will hand you a silver sharpie that so t
 
 Submit your work to the Lab 0 assignment on Gradescope **before the beginning of your lab section next week**.  Ensure that your PlatformIO code has been added and pushed in your GitHub repository.  
 
-## Lab Station Clean-up
+## Clean up your lab station and leave
 
 At this point, you are free to leave. Please make sure to close all windows, log out of the machine (click on your name on the top bar, and click Log Out, or similar), take all your belongings with you, and exit the lab. You must perform this clean-up procedure in every lab, or you will lose all points on the lab. 
 
