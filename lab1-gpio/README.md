@@ -134,6 +134,11 @@ You can then type `help` to learn what commands you can use to test a certain su
 
 ## Step 0.2: Wire and organize your breadboard
 
+> [!CAUTION]
+> There is a very specific place you should place your Proton board on your breadboard.  Ensure that you have a four-panel breadboard and that the Proton board is placed on it in this position.  You will have significant breadboard space issues later on if you do not follow this layout.
+
+![breadboard](images/bb-layout.jpg)
+
 In ECE 36200, unlike prior courses, you will build on the **same** circuit in each lab.  This allows you to build up a full development board that will help you more easily prototype designs with a variety of external components.  **Therefore, it is very important that you follow the layout we provide in the lab manual.**  This will make it easier for you to debug your circuit, and for your TAs to help you debug your circuit.  It will also ensure you have space for all your components as long as you follow the layout.  **TAs will not help with complex wiring if it does not follow the required layout.**
 
 At this point, you should have only the Proton development board on your breadboard.  In this lab, we'll add the keypad in the row above the Proton board, making space for wiring.  See the diagram below.  
@@ -182,7 +187,7 @@ Now that you've understood function diving, answer the questions below.  **You s
 
 4. (5 points) What two pairs of registers are used to change the value of a GPIO pin numbered between 0 and 47 (i.e. high/low, logic 1/0)?  Show your TA how you arrived at your answer.
 
-5. (5 points) What two pairs of registers can be used to read the value of a GPIO pin numbered between 0 and 47, regardless of whether it is configured as an input or output?  Show your TA how you arrived at your answer.
+5. (5 points) What pair of registers can be used to read the value of a GPIO pin numbered between 0 and 47, regardless of whether it is configured as an input or output?  Show your TA how you arrived at your answer.
 
 6. (15 points) Determine the SDK function that configures the GPIO pins to be associated with `GPIO_FUNC_SIO` which lets the GPIO pins be controlled using the registers above.  Within that function, explain to your TA which lines of code do the following:
     - Set input enable on, output disable off for a GPIO pin.
