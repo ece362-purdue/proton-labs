@@ -226,7 +226,7 @@ In your `main` function, call `init_outputs`, and then start an infinite loop th
 > If you do not follow this rule, you will not receive credit for this step.
 
 > [!TIP]
-> Instead of using `gpio_put` for every one of the four LEDs, you can just write `0xF` by a certain offset to a certain register to turn on all four LEDs in one go, with no loops.
+> Instead of using the SIO registers to change every one of the four LEDs, you can just write a certain value, by a certain offset, to a certain register, in order to implement the Johnson counter in one line.  Think back to ECE 270 and how you would implement a Johnson counter with current/next states - in this case, the next state can be a single line of code.  The simplest solution is a loop, a line that updates all LEDs at once, and a call to `sleep_ms`.
 > 
 > You can use the `sleep_ms` function to implement sleep.  What `sleep_ms` does is set a timer in the microcontroller that counts down from the specified number of milliseconds, and when it reaches 0, it **interrupts** the CPU (which enters a sleep state) and wakes it up.  You can dive into the function yourself to see how it works.
 
