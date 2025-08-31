@@ -156,9 +156,9 @@ The first step to understanding any microcontroller is to **read the datasheet**
 
 Bookmark the [Proton datasheets page](https://ece362-purdue.github.io/proton-labs/datasheets/) to be your starting point, where we link the various Raspberry Pi pages that you will find helpful in understanding and utilizing the RP2350 microcontroller.
 
-You can gain a basic introduction to your RP2350 chip by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D).  If there are terms that you don't understand, look them up, or ask a TA.  You may have to scroll down to the next page.
+You can gain a basic introduction to your RP2350 microcontroller by reading [Chapter 1: Introduction](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#_introduction).  If there are terms that you don't understand, look them up, or ask a TA.  
 
-Next, read [Chapter 9: GPIO](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A587%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D) as well as [Chapter 3.1.3: GPIO Control](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#%5B%7B%22num%22%3A41%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C707.498%2Cnull%5D) under SIO.
+Next, read [Chapter 9: GPIO](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_gpio) as well as [Chapter 3.1.3: GPIO Control](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#proc_gpio) under SIO.
 
 Under the Programmer's Model sections, identify functions that the Pico SDK provides, e.g. `gpio_init`.  Type `gpio_init(21);` into VScode inside the `init_inputs` function, and note how the editor highlights the function.  Now, if we were hobbyists, we would copy in the functions from the datasheet and call it a day.  But as learners in a 300-level computer engineering course, we do things a little differently.  If you want to be **effective** as an embedded systems engineer, you need to understand the register level at which your microcontroller operates.  In a nutshell - every function changes some hardware register in the microcontroller, causing a change in the behavior of either the CPU or the peripherals.  Understanding how those functions work is key to being able to debug your code at the register level when it doesn't work as expected.
 
@@ -254,7 +254,7 @@ Call `init_inputs` in your `main` function, and do the following to test your pu
 
 1. If the pushbutton on GP21 is pressed, turn on all the LEDs (GP22-GP25).
 2. **Otherwise**, if the pushbutton on GP26 is pressed, turn off all the LEDs (GP22-GP25).
-3. Add a 10 ms sleep between each iteration of the loop.
+3. Sleep 10 milliseconds.
 
 As you did before, **you need to do this without using any of the SDK functions** except `sleep_ms`.  It is actually easier to do so, and doesn't involve any loops.
 
