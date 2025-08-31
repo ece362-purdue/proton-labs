@@ -210,7 +210,7 @@ Now that you've understood function diving, answer the questions below.  **You s
 >
 > In the short term, you should take this rule seriously because you will have a lab practical that asks you to write code for your board **without access to the Internet**.  If you use an LLM throughout the labs or collaborate with others, you will really struggle on the practical when you won't have access to it.
 
-Implement the function `init_outputs` to configure GPIO pins 22, 23, 24, 25 (also called GP22, GP23, GP24, GP25) as outputs.  You do not need to change any other properties (slew rate, drive strength, etc).  Use the three functions you found in `gpio_init` to do this for each of the pins, or use your answers from above and write the code directly in terms of the registers you found.  (The latter method is more efficient than the other, but you can choose whichever you prefer.)
+Implement the function `init_outputs` to configure GPIO pins 22, 23, 24, 25 (also called GP22, GP23, GP24, GP25) as outputs.  You do not need to change any other properties (slew rate, drive strength, etc).  Use the three functions you found in `gpio_init` to figure out what code you need to write to do this, using the registers you found.  (The latter method is more efficient than the other, but you can choose whichever you prefer.)
 
 GP22-GP25 are the four user LEDs just beneath the "21" and "26" buttons on your Proton board, closer to the debugger.
 
