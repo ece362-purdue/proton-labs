@@ -178,7 +178,7 @@ Now that you've understood function diving, answer the questions below.  **You s
 
 2. (3 points) Give an example of a value for `mask` that would configure GP21 and GP26 as inputs, and which of the four registers it should be written to.  Note that `PICO_USE_GPIO_COPROCESSOR` is not defined and that the total number of GPIOs on the RP2350B is 48.
 
-3. (5 points) What registers would you check to confirm if a GPIO pin numbered between 0 and 47 was already configured as an input or output?  Show your TA how you arrived at your answer.  (Hint: the registers above are write-only, so you can't read them back to check if pins were configured correctly.)
+3. (5 points) What registers would you check to confirm if a GPIO pin numbered between 0 and 47 was already configured as an input or output?  Show your TA how you arrived at your answer.  (Hint: the registers you found in questions 1 and 2 are write-only, so you can't read their values again to check if pins were configured correctly.)
 
 4. (5 points) What two pairs of registers are used to change the value of a GPIO pin numbered between 0 and 47 (i.e. high/low, logic 1/0)?  Show your TA how you arrived at your answer.
 
