@@ -349,6 +349,18 @@ Congratulations on writing and running your first dual-core interruptible embedd
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
+### Step 4: Solder pin headers on to your 7-segment display card
+
+> [!NOTE]
+> This step is just to prepare for lab 3.  You don't have to do anything with the 7-segment display card for lab 2.
+> If you already soldered the pin headers on, you can skip this step.
+
+If you haven't already, solder pin headers onto your 7-segment display card.  You can use the same technique as you did for the Proton board in lab 0.  Make sure to use the single-sided pin headers, with the long end going into your breadboard.
+
+![soldering-7seg](images/soldering.png)
+
+Make sure to use a breadboard to ensure proper alignment!  Similar to how you soldered your Proton development board, use a breadboard to first hold the pin headers in place, put the 7-segment display card on top, and then solder the pins to the display.  You'll have to place the display card at the top left of your breadboard, so soldering it in place there would be ideal.
+
 ### Step 5: Confirm your checkoffs before leaving
 
 > [!CAUTION]
