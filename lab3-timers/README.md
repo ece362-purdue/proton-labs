@@ -42,21 +42,33 @@ You can then type `help` to learn what commands you can use to test a certain su
 
 If the text doesn't appear when you click "Upload and Monitor", ensure that `autotest()` is uncommented in `main.c`.
 
-### Step 0.2: Wire and organize your breadboard
+
+### Step 0.2.1: Solder pin headers on to your 7-segment display card
+
+> [!CAUTION]
+> Please be careful when soldering - we suggest making use of the ECE Shop or office hours so that a TA can assist you if you make mistakes, and that you do not accidentally burn yourself or damage the components.
+
+If you haven't already, solder pin headers onto your 7-segment display card.  You can use the same technique as you did for the Proton board in lab 0.  Make sure to use the single-sided pin headers, with the long end going into your breadboard.
+
+![soldering-7seg](images/soldering.png)
+
+Make sure to use a breadboard to ensure proper alignment!  Similar to how you soldered your Proton development board, use a breadboard to first hold the pin headers in place, put the 7-segment display card on top, and then solder the pins to the display.  You'll have to place the display card at the top left of your breadboard, so soldering it in place there would be ideal.
+
+### Step 0.2.2: Wire and organize your breadboard
 
 In this lab, we're going to add the 7-segment parallel driver card PCB that is in your kit.  This "card" was designed for you by your instructor to help alleviate wiring issues in the past from when students wired this up themselves on the breadboard, and to create space for new components in the future.  The schematic for this card is shown below, but **do not wire this up!**  We have a lot of background to get through first as to how this works:
 
-![7seg](7seg.png)
+![7seg](images/7seg.png)
 
 The eight TDCR1050M seven-segment displays should be familiar to you from ECE 270 - you had these on the FPGA board that you used.  However, unlike 270, you will not directly drive each individual pin on the display - that would require 64 I/O pins that we do not have!  
 
-![tdcr1050m-schema](tdcr1050m-schem.png)
+![tdcr1050m-schema](images/tdcr1050m-schem.png)
 
 Instead, we introduce a 74HC138 (another chip familiar to you from 270) 3-to-8 active-low decoder, whose outputs are all high except for the one specified by the three select pins.  
 
 We also introduce a TLC59211PWR chip, which is called a sink driver.  The sink driver has eight outputs, each one connected to the cathode of the segments or decimal points on each seven-segment display.  A sink driver is a device that is capable of sinking (connecting to ground) a connection with a large current flow. 47Ω limiting resistors will be placed in between the sink driver and each cathode to prevent too much current from flowing through each segment.  Conveniently, the sink driver will sink current through an output pin when its corresponding input pin is high. In this way, it acts as an open-drain inverter, since a sink driver cannot push an output pin high. Using the sink driver, a logic high applied to the driver will cause the particular segment to illuminate, which is how you would like to think about it. 
 
-![sink-driver-app](sink-driver-app.png)
+![sink-driver-app](images/sink-driver-app.png)
 
 The MMBT2907A BJTs in the middle of the decoder and sink driver chips provide power to the **common anode** of each of the displays, but only if the corresponding Base pin is turned off to allow current to flow from the Emitter through to the Collector pin (similar to Gate/Source/Drain in a MOSFET).  Note that all Base pins are connected to the outputs of the 74HC138 decoder - this is how we can control which display is active at any given time.
 
@@ -68,7 +80,7 @@ Now that we've understood how this works, connect SEL2, SEL1, SEL0 to GP20, GP19
 
 Connect D8-D1 to GP17-GP10, respectively.  These are the eight data pins of the TLC59211PWR sink driver.  Finally, connect VCC and GND to power and ground.
 
-![7seg-card](7seg-explanation.png)
+![7seg-card](images/7seg-explanation.png)
 
 > [!IMPORTANT]
 > Run `check_wiring` in the autotest console to check your wiring.  If you have any issues, carefully check your wiring and identify missing power/ground connections, or miswired connections.
@@ -83,7 +95,7 @@ Yes, but you have no way of running *anything*, much less timers, without clocks
 
 We discuss clocks *now* because it is important to understand how a timer *ticks* - literally.  Your RP2350 takes in a 12 MHz clock from a crystal oscillator, and then increases that to 150 MHz using a phase-locked loop (PLL).  This is the clock that the CPU cores use to execute instructions.  However, different peripherals, even different timers, may require different clock frequencies, and so the RP2350's' clock tree job is to produce those varied clocks.
 
-![clock-tree](clock-tree.png)
+![clock-tree](images/clock-tree.png)
 
 The source clocks that the RP2350 can use and derive different frequencies from can be identified on the left side of the diagram above:
 - GPCLK0-1: These are GPIO pins that you can use as clock inputs or outputs on your RP2350.
@@ -231,7 +243,7 @@ We're going to change this a lot.  In the last lab, we used interrupts on each r
 
 Here's the keypad pinout again to help you visualize the connections.  You should have GP9 to GP2 connected to COL1 to ROW4 respectively.
 
-![keypad](keypad.png)
+![keypad](images/keypad.png)
 
 Uncomment the STEP2 stanza in `main.c`, and run your code with `autotest` commented out.  The code in `main` will call your initialization functions for the keypad GPIO pins, and the two alarms on TIMER0.  Press a button on the keypad, and you should see "Pressed: %c", where "%c" is the character corresponding to the key pressed, printed on the Serial Monitor.  If you release the button, you should see "Released: %c" printed instead.
 
@@ -268,7 +280,7 @@ With these variables, go ahead and implement the following functions in `display
 #### 3.1: `display_init_pins`  
 Initialize pins GP10-GP20 as outputs.  GP20-GP18 are connected to the select lines for the 74HC138 decoder which chooses one of the eight displays, and GP17-GP10 will be the data lines for the TLC59211PWR sink driver, connected to the seven-segment pins shared between all eight displays.  Here is a full explanation of how your 7-segment display card works.
 
-![7seg-card](7seg-explanation.png)
+![7seg-card](images/7seg-explanation.png)
 
 #### 3.2: `display_init_timer`  
 Initialize TIMER1 to fire ALARM0 after 3 milliseconds, at which point the interrupt will call `display_isr` when triggered.  Make sure to enable the interrupt for ALARM0 on TIMER1.  Again, set `display_isr` as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.
