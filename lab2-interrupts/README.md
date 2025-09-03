@@ -192,7 +192,7 @@ Next, implement `init_gpio_irq` as instructed below, along with a few other func
     - Your `gpio_isr` function should properly check which pin triggered the interrupt before performing the appropriate actions.
 
 In `gpio_isr`:
-- You should **identify which pin triggered the interrupt** using the event parameter passed to the handler.
+- You should **identify which pin triggered the interrupt** using the pending events register (via the SDK function `gpio_get_irq_event_mask`).
 - If GP21 triggered the interrupt, acknowledge it, turn off all user LEDs GP22-GP25, and enter the DORMANT state.
 - If GP26 triggered the interrupt, acknowledge both the DORMANT wake event and the regular rising edge interrupt, then turn on GP22-GP25.
 - Once the GP21 functionality is implemented and you press GP21, your RP2350 will not respond to any other stimulus (other than GP26) until it wakes up. **This includes being able to upload code, because your crystal oscillator is now turned off!** If you need to get out of this state and GP26 isn't working, press the Reset button, which will restart the oscillator, and subsequently the microcontroller.
@@ -200,7 +200,7 @@ In `gpio_isr`:
 In summary, you should implement the following functions:
 1. `init_gpio_irq` - configure GP21 and GP26 as described above and turn GP22-GP25 on.
 2. `gpio_isr` - This single ISR will handle interrupts from both GP21 and GP26. It should:
-    - Identify which pin triggered the interrupt (check the event parameter)
+    - Identify which pin triggered the interrupt (check the pending events register)
     - If GP21: acknowledge the interrupt, turn off all user LEDs GP22-GP25, and enter DORMANT state
     - If GP26: acknowledge both the DORMANT wake event and the rising edge interrupt, then turn on GP22-GP25
 
