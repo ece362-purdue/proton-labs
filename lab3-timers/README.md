@@ -54,6 +54,10 @@ If you haven't already, solder pin headers onto your 7-segment display card.  Yo
 
 Make sure to use a breadboard to ensure proper alignment!  Similar to how you soldered your Proton development board, use a breadboard to first hold the pin headers in place, put the 7-segment display card on top, and then solder the pins to the display.  You'll have to place the display card at the top left of your breadboard, so soldering it in place there would be ideal.
 
+Here is where the components on your breadboard should be placed by now:
+
+![placement](images/lab3-layout.jpg)
+
 ### Step 0.2.2: Wire and organize your breadboard
 
 In this lab, we're going to add the 7-segment parallel driver card PCB that is in your kit.  This "card" was designed for you by your instructor to help alleviate wiring issues in the past from when students wired this up themselves on the breadboard, and to create space for new components in the future.  The schematic for this card is shown below, but **do not wire this up!**  We have a lot of background to get through first as to how this works:
