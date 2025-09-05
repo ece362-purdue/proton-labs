@@ -148,7 +148,7 @@ Comment out the STEP2 define at the top of `main.c` and uncomment the STEP3 defi
 
 Once it works, based on your code and the function implementations, answer the following questions:
 
-3.1. What register bits did you have to set/clear to configure the ADC for **free-running conversions**?  What action was performed just after configuring the ADC before control returned from the function?
+3.1. What register bits did you have to set/clear to configure the ADC for **free-running conversions**?  
 
 3.2. How many cycles does it take for the ADC to perform a conversion in free-running mode?  How many samples per second can the ADC produce in this mode, assuming a default clock frequency of 48 MHz?
 
