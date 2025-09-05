@@ -110,7 +110,7 @@ So, what interrupts are available?  Scroll down to [Section 3.2](https://datashe
 - "Cross-core FIFO interrupts: SIO_IRQ_FIFO and SIO_IRQ_FIFO_NS (Section 3.1.5)"
     - Also called "mailboxes", these are used to send ordered messages from one CPU core to the other.
     - We'll use this in Step 4.
-- "GPIO interrupts: IO_IRQ_BANK0, IRQ_IO_BANK0_NS, IO_IRQ_QSPI, IO_IRQ_QSPI_NS (Section 9.5)"
+- "GPIO interrupts: IO_IRQ_BANK0, IO_IRQ_BANK0_NS, IO_IRQ_QSPI, IO_IRQ_QSPI_NS (Section 9.5)"
     - When an **external** (GPIO pin) interrupt occurs, the GPIO pins can be configured to generate an interrupt signal that can be sent to the CPU cores, which are also configured to handle those interrupts.
     - If an ISR is called, it is very important to **acknowledge** the interrupt, otherwise it will keep firing over and over again, even if the interrupt condition is no longer true.
     - We'll use this in Step 2.
