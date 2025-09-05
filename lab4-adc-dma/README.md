@@ -90,11 +90,11 @@ DMA is a very unique peripheral in that **it doesn't interface to anything exter
 
 Read [Section 12.6: DMA](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_dma) and answer the following questions:
 
-6. (3 points) What registers need to be written to to **configure** a DMA channel for transfer?  Could you use the same DMA channel to repeatedly transfer data, or would you need to reconfigure it each time?  If a repeated transfer is possible, what register bits need to be modified?
+6. (4 points) What registers need to be written to to **configure** a DMA channel for transfer?  Could you use the same DMA channel to repeatedly transfer data, or would you need to reconfigure it each time?  If a repeated transfer is possible, what register bits need to be modified?
 
-7. (2 points) How do you **trigger**, or start, a DMA transfer given a configured DMA channel?
+7. (3 points) How do you **trigger**, or start, a DMA transfer given a configured DMA channel?
 
-8. (1 point) We can configure a DMA channel to **request** data from the ADC when it is ready to perform the transfer.  What is the associated Data Request (DREQ) number for the ADC?  
+8. (3 points) We can configure a DMA channel to **request** data from the ADC when it is ready to perform the transfer.  What is the associated Data Request (DREQ) number for the ADC?  
 - The concept of a DREQ number is similar to that of an interrupt number (IRQ) - they both specify the **sources** of events that can trigger a DMA transfer, or an interrupt.
 
 > [!IMPORTANT]
@@ -106,8 +106,10 @@ Read [Section 12.6: DMA](https://datasheets.raspberrypi.com/rp2350/rp2350-datash
 
 > [!IMPORTANT]
 > Going forward, you will need to answer questions about how you arrived at your code before you can receive a checkoff for each step, in addition to answering questions in step 1.  
+>
+> The questions in step 2 onward are there to **facilitate a discussion with your TA** - you do not necessarily have to have the right answers.  The discussion is so that your TAs can ensure you did your research properly, and to fix any misunderstandings about the code you found while diving through functions.  This is, once again, to ensure that you are learning how to read datasheets and use SDK functions, rather than just copying code blindly from unauthorized sources (other students, AI/LLM, rest of the Internet).
 > 
-> Therefore, **keep track of the sources you used to find the answers**, and keep in mind that the only acceptable sources are the RP2350 datasheets, SDK functions, or register manipulations found as a result of diving into those functions.
+> Therefore, **keep track of the sources you used to find the answers**, and keep in mind that the only acceptable sources are the RP2350 datasheets, SDK functions or documentation, or register manipulations found as a result of diving into those functions.
 
 Use the Hardware APIs documentation (detailed in the Raspberry Pi Pico extension menu) to configure the ADC to **perform a single-shot conversion** on ADC Channel 5.  You'll need to appropriately configure the pin associated with the channel, which can be done with functions in the ADC Hardware API as well, but you will be asked to explain what registers they modify, so keep track of those.
 
@@ -119,9 +121,11 @@ If not already uncommented, uncomment the STEP2 define at the top of the `main.c
 
 Once it works, based on your code and the function implementations, answer the following questions:
 
-2.1: What register(s) did you change to configure a GPIO pin to be used as an ADC input?
-2.2: What register(s) did you change to configure the ADC to use Channel 5 for sampling? 
-2.3: What bit did you set to start a single-shot conversion?  What bit did you check to see if the conversion was complete and the ADC was ready again?
+2.1: What register(s) did you change to configure a GPIO pin to be used as an ADC input?  
+  
+2.2: What register(s) did you change to configure the ADC to use Channel 5 for sampling?   
+  
+2.3: What bit did you set to start a single-shot conversion?  What bit did you check to see if the conversion was complete and the ADC was ready again?  
 
 Note that for the ADC values to print out to the console, we're only using a carriage return (`\r`) to overwrite the previous value, followed by a **flush** of the standard output stream, `stdout`.  This is done to avoid printing a new line every time, which would make the output unreadable.  We'll tackle this more in the UART lab.
 
@@ -144,9 +148,9 @@ Comment out the STEP2 define at the top of `main.c` and uncomment the STEP3 defi
 
 Once it works, based on your code and the function implementations, answer the following questions:
 
-3.2. What register bits did you have to set/clear to configure the ADC for **free-running conversions**?  What action was performed just after configuring the ADC before control returned from the function?
+3.1. What register bits did you have to set/clear to configure the ADC for **free-running conversions**?  What action was performed just after configuring the ADC before control returned from the function?
 
-3.3. How many cycles does it take for the ADC to perform a conversion in free-running mode?  How many samples per second can the ADC produce in this mode, assuming a default clock frequency of 48 MHz?
+3.2. How many cycles does it take for the ADC to perform a conversion in free-running mode?  How many samples per second can the ADC produce in this mode, assuming a default clock frequency of 48 MHz?
 
 > [!IMPORTANT]
 > Show your TA that turning the potentiometer varies the value printed to your Serial Monitor within the range 0-4095.  
