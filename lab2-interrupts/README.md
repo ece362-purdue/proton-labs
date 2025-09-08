@@ -242,6 +242,10 @@ Pressing GP26 should cause the Proton to wake up from the dormant state, execute
 
 Copy in the `init_keypad` function you implemented in lab 1 so that the GPIO pins for the keypad are configured correctly.  
 
+Here's the keypad wiring again for reference:
+
+![keypad-wiring](images/keypad.png)
+
 Uncomment the `#define STEP2` line at the top of `main.c`, and ensure that `#define STEP1` and `#define STEP3` are commented out.  
 
 You may recall from the last lab that we implemented a loop to poll the keypad for a keypress.  We did this by selecting a column pin, driving it to a logic high, and then checking the row pins to see if any of them were pulled low.
