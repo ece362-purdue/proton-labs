@@ -326,7 +326,7 @@ Until you press buttons on the keypad, you should see the display cycling throug
 Try holding down multiple buttons (not in the same row) and note how you can see the display reflect exactly the characters pressed, as well as the same release events in the same order that you perform them!
 
 > [!IMPORTANT]
-> Show your working keypad and display to your TA to earn points for this step.  You must have the display cycling through the characters in `message`, and the decimal point shifting through each digit every 0.25 seconds.  If you have any issues, ask your TA for help.
+> Show your working keypad and display to your TA to earn points for this step.  You must have the display cycling through the characters in `message`.  Pressing a key will clear the display and show the key with the decimal point lit.  Releasing the kit will add another key to the display with the decimal point turned off.  If you have any issues, ask your TA for help.
 > 
 > Uncomment `autotest` and run `display` in the autotest console to check for any errors.
 > 
