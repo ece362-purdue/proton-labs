@@ -186,16 +186,16 @@ Copy in the `init_inputs` and `init_outputs` functions you implemented in lab 1 
 
 Next, implement `init_gpio_irq` as instructed below, along with a few other functions.  You can use either the SDK functions or directly write to registers.
 
-1. First, turn on GP22-GP25 (the user LEDs) so that they are all on when the program starts.  This is done in `init_outputs()`, which is already called in `main`.  This is how we'll know if the microcontroller is in the DORMANT state or not.
+1. First, turn on GP22-GP25 (the user LEDs) so that they are all on when the program starts.  You don't have to configure the pins - you did that already in `init_outputs()`, which is called for you in `main`.  This is how we'll know if the microcontroller is in the DORMANT state or not.
 2. Configure GP21 and GP26 such that when a **rising edge** occurs on either pin, the function `gpio_isr` is called.  Use the function `gpio_add_raw_irq_handler_masked` to add the handler for both pins at once, and don't forget to enable the GPIO IRQ for both pins, as well the BANK0 IRQ interrupt.
 3. Configure GP26 to wake the microcontroller from the DORMANT state in addition to triggering the interrupt handled by `gpio_isr`. You can configure a pin for multiple functions simultaneously.
     - Your `gpio_isr` function should properly check which pin triggered the interrupt before performing the appropriate actions.
 
 In `gpio_isr`:
 - You should **identify which pin triggered the interrupt** using the pending events register (via the SDK function `gpio_get_irq_event_mask`).
-- If GP21 triggered the interrupt, acknowledge it, turn off all user LEDs GP22-GP25, and enter the DORMANT state.
-- If GP26 triggered the interrupt, acknowledge the rising edge event, then turn on GP22-GP25.
-- Once the GP21 functionality is implemented and you press GP21, your RP2350 will not respond to any other stimulus (other than GP26) until it wakes up. **This includes being able to upload code, because your crystal oscillator is now turned off!** If you need to get out of this state and GP26 isn't working, press the Reset button, which will restart the oscillator, and subsequently the microcontroller.
+    - If GP21 triggered the interrupt, acknowledge it, turn off all user LEDs GP22-GP25, and enter the DORMANT state.
+    - If GP26 triggered the interrupt, acknowledge the rising edge event, then turn on GP22-GP25.
+    - Once the GP21 functionality is implemented and you press GP21, your RP2350 will not respond to any other stimulus (other than GP26) until it wakes up. **This includes being able to upload code, because your crystal oscillator is now turned off!** If you need to get out of this state and GP26 isn't working, press the Reset button, which will restart the oscillator, and subsequently the microcontroller.
 
 In summary, you should implement the following functions:
 1. `init_gpio_irq` - configure GP21 and GP26 as described above and turn GP22-GP25 on.
@@ -227,7 +227,7 @@ Pressing GP26 should cause the Proton to wake up from the dormant state, execute
 > [!IMPORTANT]
 > Show your implementation to your TA, including the LED turning on and off when you press the pushbutton, and the debugger being able to exit the dormant state when you click Pause.  
 > 
-> Show that you pass the `gpio` test in the test suite by typing `gpio` in the Serial Monitor.
+> Show that you pass the `gpio` test in the test suite by typing `gpio` in the Serial Monitor.  **If you run the test, do not use `exit` to return to the rest of `main`** - the autotest is unable to remove the handler once it's been added. 
 > 
 > You must have a **working** implementation to earn **all** points for this step.  Answer their questions about the code you wrote.  One of those questions will be how you found the function needed to toggle the pin.
 > 
