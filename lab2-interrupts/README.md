@@ -12,7 +12,8 @@
 | 2 | Configure external interrupts from pushbuttons | 20 |
 | 3 | Configure external interrupts from the keypad | 30 |
 | 4 | Configure mailbox FIFO interrupts between processor cores | 20 |
-| 5 | Confirm your checkoffs before leaving | * |
+| 5 | Solder pin headers on to your 7-segment display card |   |
+| 6 | Confirm your checkoffs before leaving | * |
 | &nbsp; | Total: | 100 |
 <br>
 
@@ -225,7 +226,7 @@ Pressing GP21 on your breadboard should cause the Proton to enter the dormant st
 Pressing GP26 should cause the Proton to wake up from the dormant state, execute the ISR, and turn on all user LEDs, and start printing "Hello world" again.  If you press GP21 again, it should turn off all user LEDs and you can restart the process. 
 
 > [!IMPORTANT]
-> Show your implementation to your TA, including the LED turning on and off when you press the pushbutton, and the debugger being able to exit the dormant state when you click Pause.  
+> Show your implementation to your TA, including the LED turning on and off when you press the corresponding pushbuttons.  
 > 
 > Show that you pass the `gpio` test in the test suite by typing `gpio` in the Serial Monitor.  **If you run the test, do not use `exit` to return to the rest of `main`** - the autotest is unable to remove the handler once it's been added. 
 > 
@@ -353,7 +354,7 @@ Congratulations on writing and running your first dual-core interruptible embedd
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-### Step 4: Solder pin headers on to your 7-segment display card
+### Step 5: Solder pin headers on to your 7-segment display card
 
 > [!NOTE]
 > This step is just to prepare for lab 3.  You don't have to do anything with the 7-segment display card for lab 2.
@@ -365,7 +366,7 @@ If you haven't already, solder pin headers onto your 7-segment display card.  Yo
 
 Make sure to use a breadboard to ensure proper alignment!  Similar to how you soldered your Proton development board, use a breadboard to first hold the pin headers in place, put the 7-segment display card on top, and then solder the pins to the display.  You'll have to place the display card at the top left of your breadboard, so soldering it in place there would be ideal.
 
-### Step 5: Confirm your checkoffs before leaving
+### Step 6: Confirm your checkoffs before leaving
 
 > [!CAUTION]
 > Make sure you got checked off here: https://engineering.purdue.edu/ece362/checkoff/
