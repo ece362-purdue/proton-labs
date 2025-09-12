@@ -178,7 +178,7 @@ From lab 2, copy in the functions `drive_column` and `keypad_isr`.  Rename `driv
 
 When you move on to a new lab, you'll be expected to include those files from the previous lab in your project yourself, so take care to implement this properly!
 
-We're also going to significantly change how we read the keypad, moving away from the loop with sleep that we had in the last lab.  Instead, we'll implement two timer alarms that will fire every 20 milliseconds, offset from each other by 10 milliseconds.  
+We're also going to significantly change how we read the keypad, moving away from the loop with sleep that we had in the last lab.  Instead, we'll implement two timer alarms that will fire every 25 milliseconds, offset from each other by 100 milliseconds.  
 
 The offset implements the "delay" we had last lab, but now we can use that delay to do other things in the meantime, such as triggering another interrupt to update a display or read sensors.
 
@@ -228,7 +228,7 @@ We're going to change this a little bit from what we had in lab 2.
     - Ensure that `col` wraps around to 0 after 3 - your columns pins are from GP6 to GP9.
 - With the newly changed value of `col`, drive the selected column GPIO pin high, and drive all others low.
     - You can do this in a single statement with the SIO `gpio_togl` register, which atomically toggles GPIO pins in a single write.  Remember that if statements, for loops, etc. add a lot of unnecessary instruction execution to interrupt handlers, and you want to keep those short n' sweet!  Handlers should do their job quickly and return to the main program as soon as possible.
-- Finally, set the timer's counter to trigger ALARM0 again in 25 microseconds, implementing a repeating alarm.
+- Finally, set the timer's counter to trigger ALARM0 again in 25 milliseconds, implementing a repeating alarm.
 
 #### 2.5. `keypad_isr`  
 
@@ -243,7 +243,7 @@ We're going to change this a lot.  In the last lab, we used interrupts on each r
 - For each of the row pins that are low, indicating that a button is released, check if the corresponding bit in `state` is high (indicating that the button was pressed before).  If it is high, then we have a key release.  
     - If so, set the corresponding bit in `state` to low.    
     - Push the event into `kev`.  For example, if the key released was "5", then the value pushed into the queue should be `9'b000110101`, which is 5 in ASCII (53) with the "pressed" bit set to 0.  
-- Make sure to reset ALARM1 so that the timer will fire it again in 25 microseconds, implementing a repeating alarm.
+- Make sure to reset ALARM1 so that the timer will fire it again in 25 milliseconds, implementing a repeating alarm.
 
 Here's the keypad pinout again to help you visualize the connections.  You should have GP9 to GP2 connected to COL1 to ROW4 respectively.
 
