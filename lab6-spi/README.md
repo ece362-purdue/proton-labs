@@ -163,7 +163,7 @@ How SPI works in a nutshell is as follows:
 - TX (data) is set to the data to be sent, whether that's a logic 1 or 0.  Sleep for 1 microsecond to allow the data to propagate and satisfy any setup time requirements (remember those?).
 - SCK (clock) is toggled high to shift the data out to the device.  Sleep for 5 microseconds, then toggle it low to complete the clock cycle, and sleep another 5 microseconds.
 - The process of setting data, and toggling the clock, is repeated for each bit of data to be sent until the element is fully sent.
-- After each elements is sent, CSn is pulled high to deselect the device.  Sleep for 10 microseconds to allow the device to settle.
+- After each element is sent, CSn is pulled high to deselect the device.  Sleep for 10 microseconds to allow the device to settle.
 
 In `main.c`, make sure `STEP2` is defined.  This will call both functions for you in `main()`.  Upload your code and you should see the 7-segment displays light up with the numbers 0-7, each on a different display.  
 
@@ -185,7 +185,7 @@ Now, it's time for the real thing!
 
 In `display.c`, implement `display_init_spi` to initialize the three GPIO pins to be used by the SPI peripheral associated with them.  **This means you have to set the function for the pin accordingly, and it is no longer GPIO output.**  It must also initialize the associated SPI peripheral with the following parameters:
 - The clock frequency should be set to 125 KHz.
-    - Start with 125, but you can experiment and see what frequency works.  We generally recommend a lower one to let the data bits propagate through the shift registers into the 7-segment displays.
+    - Start with 125, but you can experiment and see what frequency works.  We generally recommend a lower one to let the data bits propagate through the shift registers into the 7-segment displays.  Autotest will expect 125 KHz.
 - The data format should be set to 16 bits.
     - We're only sending 11 bits at a time, but we need to send 16 at a time so that 1) the SPI peripheral can send the data in one go, and 2) the two 8-bit shift registers will receive the data correctly.
 - The CPOL and CPHA should be set to 0, meaning that the clock is idle low, and data is sampled on the rising edge of the clock.
@@ -193,9 +193,7 @@ In `display.c`, implement `display_init_spi` to initialize the three GPIO pins t
     - While we were writing this lab, we discovered that the SPI isn't even capable of LSB-first transmission!  If you ever find yourself needing to use that, just flip the bits that you're transmitting.
 - Finally, the SPI peripheral should be enabled.  (You may see something about DREQ signals being always enabled - that doesn't have to be done until the DMA step.)
 
-In the same file, implement `display_print` to write each element of `msg` to the SPI peripheral data buffer, which triggers a "transaction".  The SPI peripheral, having received a new "datum" (our `msg` element), will automatically toggle the select/clock/data lines for us and transmit the datum we just gave it.  (Now that we're using SPI, things get a lot simpler!)  Notice that now there's no need to sleep between sending each element, as the SPI peripheral will handle the timing for us.  This can 
-
-However, we are still in a situation where we're using Of course, we can still improve on that in the next step...
+In the same file, implement `display_print` to write each element of `msg` to the SPI peripheral data buffer, which triggers a "transaction".  The SPI peripheral, having received a new "datum" (our `msg` element), will automatically toggle the select/clock/data lines for us and transmit the datum we just gave it.  (Now that we're using SPI, things get a lot simpler!)  Notice that now there's no need to sleep between sending each element, as the SPI peripheral will handle the timing for us.  This can make our code more efficient as we rely on the SPI hardware to automatically handle character transmission as fast as possible with no sleeps.  Of course, we can still improve on that in the next step...
 
 Uncomment STEP3, which calls both functions for you in `main`.  Upload and monitor, and you should see the same result as before, but now the 7-segment displays are being driven by the SPI peripheral instead of bit-banging.
 
@@ -291,7 +289,7 @@ Initialize the pins that you have connected to your LCD/OLED display in `init_ch
 
 #### 5.2: `send_spi_cmd`
 
-In this function, wait until the SPI peripheral (whose associated object passed in as an argument) is not busy, and write the 16-bit value `cmd` into the SPI data register.  This will send the command to the display.
+In this function, wait until the SPI peripheral (whose associated object passed in as an argument) is not busy, and write the 16-bit value `value` into the SPI data register.  This will send the command to the display.
 
 #### 5.3: (LCD only) `send_spi_data`
 
@@ -303,7 +301,7 @@ This function just calls `send_spi_cmd` but it ORs in **0x200** to the value.  T
 
 #### 5.4: (LCD only) `cd_init`
 
-In this step, we're going to initialize the LCD display by transmitting commands via the SPI peripheral connected to it.  We'll give you the list of command to send to the display to properly initialize it, but you need to go through the LCD datasheet to understand how to do this.  **Be prepared to explain to your TA what each command does and how you found it.**
+In this step, we're going to initialize the LCD display by transmitting commands via the SPI peripheral connected to it.  We'll give you the list of commands to send to the display to properly initialize it, but you need to go through the LCD datasheet to understand how to do this.  **Be prepared to explain to your TA what each command does and how you found it.**
 
 1. Sleep 1 millisecond to let power to the display stabilize, in case we have only just plugged in the Proton.
 2. Perform a Function Set command with the following parameters:
@@ -320,7 +318,7 @@ In this step, we're going to initialize the LCD display by transmitting commands
 
 #### 5.4: (OLED only) `cd_init`
 
-In this step, we're going to initialize the OLED display by transmitting commands via the SPI peripheral connected to it.  We'll give you the list of command to send to the display to properly initialize it, but you need to go through the OLED datasheet to understand how to do this.  **Be prepared to explain to your TA what each command does and how you found it.**
+In this step, we're going to initialize the OLED display by transmitting commands via the SPI peripheral connected to it.  We'll give you the list of commands to send to the display to properly initialize it, but you need to go through the OLED datasheet to understand how to do this.  **Be prepared to explain to your TA what each command does and how you found it.**
 
 1. Sleep 1 millisecond to let power to the display stabilize, in case we have only just plugged in the Proton.
 2. Perform a Function Set command with the following parameters:
