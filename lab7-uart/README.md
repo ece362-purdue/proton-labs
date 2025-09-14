@@ -14,7 +14,6 @@
 | 4   | Automate your new UART device driver | 20  |
 | 5   | Design a Peripheral Configuration Shell | 30  |
 | 6   | Confirm your checkoffs before leaving | * |
-| 99  | Automate SPI transmits with PIO | ** |
 | &nbsp; | Total: | 100 |
 <br>
 
@@ -77,6 +76,7 @@ Go over [12.1 UART](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.p
 
 4. (4 points) Identify what the frequency of the clock to the baud rate generator is, and calculate the value of the Baud Rate Divisor register for a baud rate of 115200 bps.  
 - Hints: try out the SDK function that sets the baud rate in your `main.c` file.  The input clock to the baud rate generator is `clk_peri`.
+- Even if you find the value for the register in the datasheet, you need to show the formula and how it's used.
 
 5. (4 points) Identify the interrupt numbers associated with when the UART receives a character, and when it transmits a character.
 
@@ -328,7 +328,7 @@ The handler will get called as soon as a character is received on the UART.  In 
 - If `seridx` reaches `BUFSIZE`, return immediately so we don't lose the data we have.
 - Read the character directly from the UART data register into a new character variable `c`.  There's no need to use any SDK functions to do this since the very act of calling the handler indicates that a character is already available.
 - If the character is a newline (ASCII 0x0A), set `newline_seen` to 1.
-- If (NOT else if) the character is a backspace and some characters have already been received, write backspace-space-backspace to the UART to erase the last character, decrement `seridx`, and return.  Then, set the character at `serbuf[seridx]` to 0, so that we don't process it later.
+- If (NOT else if) the character is a backspace and some characters have already been received, write backspace-space-backspace to the UART to erase the last character, decrement `seridx` if higher than 0, set the character at `serbuf[seridx]` to '\0', so that we don't process it later, and return.
 - Otherwise, if the character is not a backspace, print it out with the UART, and write it to `serbuf[seridx]` and increment `seridx`.
 
 By itself, the handler should now properly handle strings, and `_read` can simply wait and transfer the data back when a newline is seen.
@@ -393,50 +393,42 @@ A common question that comes up is why we didn't use DMA to handle the UART rece
 
 Having a command shell is an incredibly powerful tool for interacting with your microcontroller, as you may have already noticed from the autotests in the previous labs.  In this last step before you go off and tackle your projects, we'll explain how to implement a simple command shell that allows you to configure peripherals on the RP2350, and then use it to configure the UART peripheral.
 
-What if we told you that you could write the following, in such a command shell:
+What if you could write the following:
 
 ```
 gpio out 22
 gpio set 22 1
 ```
 
-And it would set GPIO 22 to output and then set it high?  We can do this with a bit of string parsing and tokenization, which we'll show as follows.  (The same concepts apply when you run things like `cp`, `ls`, `mv file newfile`, etc. in a Linux terminal.)
+And it would set GPIO 22 to output and then set it high?  We can do this with a bit of string parsing and tokenization, which we'll show as follows.  (Those same concepts apply when you run commands like `cp`, `ls`, `mv file newfile`, etc. in a Linux terminal.)
 
-Under STEP5, implement the following functions in `main.c`:
+Under STEP5, implement `cmd_gpio` in `main.c`:
 
 ```c
-void cmd_gpio_out(int argc, char **argv) {
-    // argc and argv have the same meanings as they do when you use them in 
-    // regular C programs.
-    // Ensure that argc is at least 2, otherwise print an example use case and return.
-
-    // The first argument is the command name, which is "gpio" in this case.
-    // The second argument is the subcommand, which is "out" in this case.
-    // The third argument is the pin number, which should be within (0, 47). Otherwise print an error.
-    // Initialize the pin appropriately, and return.
-}
-void cmd_gpio_set(int argc, char **argv) {
-    // argc and argv have the same meanings as they do when you use them in 
-    // regular C programs.
-    // Ensure that argc is at least 3, otherwise print an example use case and return.
-
-    // The first argument is the command name, which is "gpio" in this case.
-    // The second argument is the subcommand, which is "set" in this case.
-    // The third argument is the pin number, which should be within (0, 47). Otherwise print an error.
-    // The fourth argument is the value to set the pin to, which should be either 0 or 1. Otherwise print an error.
-    
-    // Check that the pin was initialized first. Otherwise print an error and return.
-    
-    // Set the pin value appropriately, and return.
-}
 void cmd_gpio(int argc, char **argv) {
     // This is the main command handler for the "gpio" command.
     // It will call either cmd_gpio_out or cmd_gpio_set based on the arguments.
     
     // Ensure that argc is at least 2, otherwise print an example use case and return.
 
-    // If the second argument is "out", call cmd_gpio_out with argc-1 and argv+1.
-    // If the second argument is "set", call cmd_gpio_set with argc-1 and argv+1.
+    // If the second argument is "out":
+    //      Ensure that argc is exactly 3, otherwise print an example use case and return.
+    //      Convert the third argument to an integer pin number using atoi.
+    //      Check if the pin number is valid (0-47), otherwise print an error and return.
+    //      Set the pin to output using gpio_init and gpio_set_dir.
+    //      Print a success message.
+    
+    // If the second argument is "set":
+    //      Ensure that argc is exactly 4, otherwise print an example use case and return.
+    //      Convert the third argument to an integer pin number using atoi.
+    //      Check if the pin number is valid (0-47), otherwise print an error and return.
+    //      Check if the pin has been initialized as a GPIO output, if not, return.
+    //      Convert the fourth argument to an integer value (0 or 1) using atoi.
+    //      Check if the value is valid (0 or 1), otherwise print an error and return.
+    //      Set the pin to the specified value using gpio_put.
+    //      Print a success message.
+    
+    // Else, print an unknown command error.
 }
 ```
 
@@ -505,9 +497,11 @@ Unknown command: where's
 
 If it works, congratulations on making your first command shell!  You can now use this to configure *any* peripheral on the RP2350, and you can extend it to add more commands as needed.  
 
+It doesn't have to be just GPIO pins.  Use this concept to quickly set up an SPI peripheral to communicate with a display, display some text, or change the text, all without having to recompile your code.  Scale upwards, and you can use the shell to quickly check the status of sensors, read/write files on SD cards, display graphics on the TFT LCD in your kit, etc.  The possibilities are endless.
+
 It also doesn't have to be just peripherals - you can use these to automatically send commands to external devices like LCDs, or read sensors, or read/write to files on an SD card.  Debugging those methods can get quite time-consuming if you just use the debugger, so having a command shell to quickly test things will be very useful.
 
-**And that's a wrap on the embedded labs! Congratulations on making it through!**
+**And that's a wrap on the embedded labs! Congratulations on making it through!**  Don't forget to go through the "project guide" labs on the main Labs repository page to get some ideas on what you can use for your project.
 
 ### Step 6: Confirm your checkoffs before leaving
 
