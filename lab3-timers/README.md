@@ -264,7 +264,7 @@ When you need to use the keypad in future labs, you will be expected to copy in 
 
 ### Step 3: Use the multiplexed display
 
-Now, let's get started on the display.  You should understand by now that to display a value on any of the eight 7-segment displays, we need to push out an 11-bit value to the shift registers, of which:
+Now, let's get started on the display.  You should understand by now that to display a value on any of the eight 7-segment displays, we need to push out an 11-bit value to the display's pins, of which:
 
 1. The top three bits are the select lines for the 74HC138 3-to-8 decoder to select one of the eight digits, and;
 2. The bottom eight bits are the decimal point and seven segments of the chosen digit display.
