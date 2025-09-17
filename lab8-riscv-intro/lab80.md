@@ -29,7 +29,7 @@ Once you've logged in, add the following to the bottom of both your `~/.bashrc` 
 
 ```bash
 case $(hostname) in ecelnx* | eceprog* | indlnx* )
-  module load riscv
+  module load riscv && echo Loaded RISC-V modules.
 esac
 ```
 
