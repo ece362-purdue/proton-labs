@@ -45,7 +45,7 @@ where `-n` ensures you don't accidentally overwrite an existing `.bashrc` (it st
 
 This case structure checks if you're on any of the `eceprog` cluster nodes or any of the lab machines in EE 69, and then loads the RISC-V module, configured for us by ECN.  This ensures we don't accidentally conflict with RISC-V tools that may be installed on other servers.  Once you've added it, close the session and log in again.  You should see a bit of a delay as the tools load, and then type `which riscv64-unknown-elf-gcc`.  If it says "/package/riscv-gnu-toolchain/bin/riscv64-unknown-elf-gcc", that means your shell is now able to find the RISC-V `gcc` compiler, and VScode will find it as well when it logs in remotely.
 
-If you get an error that says "module: command not found" on an ECN machine, **ensure that you are on an `eceprog` cluster node or EE 69 machines first**!  If you are, you may need to add the following **before** the `case` structure above:
+If you get an error that says "module: command not found" on an ECN machine, **ensure that you are on an `eceprog` cluster node or a lab machine first**!  If you are, you may need to add the following **before** the `case` structure above:
 
 ```bash
 module () {
