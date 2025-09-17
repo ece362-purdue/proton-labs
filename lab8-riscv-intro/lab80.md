@@ -28,7 +28,7 @@ SSH to `eceprog.ecn.purdue.edu`, or any one of the lab machines (there are 34 yo
 Once you've logged in, add the following to the bottom of both your `~/.bashrc` and `~/.profile` files (create the latter if it doesn't exist):
 
 ```bash
-case $(hostname) in ecelnx* | eceprog* )
+case $(hostname) in ecelnx* | eceprog* | indlnx* )
   module load riscv
 esac
 ```
