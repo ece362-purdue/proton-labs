@@ -111,7 +111,7 @@ Read [Section 12.6: DMA](https://datasheets.raspberrypi.com/rp2350/rp2350-datash
 > 
 > Therefore, **keep track of the sources you used to find the answers**, and keep in mind that the only acceptable sources are the RP2350 datasheets, SDK functions or documentation, or register manipulations found as a result of diving into those functions.
 
-Use the Hardware APIs documentation (detailed in the Raspberry Pi Pico extension menu) to configure the ADC to **perform a single-shot conversion** on ADC Channel 5.  You'll need to appropriately configure the pin associated with the channel, which can be done with functions in the ADC Hardware API as well, but you will be asked to explain what registers they modify, so keep track of those.
+Use the Hardware APIs documentation (detailed in the Raspberry Pi C/C++ SDK datasheet) to configure the ADC to **perform a single-shot conversion** on ADC Channel 5.  You'll need to appropriately configure the pin associated with the channel, which can be done with functions in the ADC Hardware API as well, but you will be asked to explain what registers they modify, so keep track of those.
 
 Implement the functon `init_adc` in your code file, and call it in `main` to configure the ADC on Channel 5.
 
