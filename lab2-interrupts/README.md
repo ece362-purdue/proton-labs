@@ -366,6 +366,8 @@ If you haven't already, solder pin headers onto your 7-segment display card.  Yo
 
 Make sure to use a breadboard to ensure proper alignment!  Similar to how you soldered your Proton development board, use a breadboard to first hold the pin headers in place, put the 7-segment display card on top, and then solder the pins to the display.  You'll have to place the display card at the top left of your breadboard, so soldering it in place there would be ideal.
 
+You can either use the lab soldering stations to do this, or the ones in the ECE Shop.
+
 ### Step 6: Confirm your checkoffs before leaving
 
 > [!CAUTION]
