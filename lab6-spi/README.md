@@ -213,7 +213,7 @@ When it doesn't work:
 
 In the past two steps, we used a loop to continually push out the bits to the 7-segment displays.  However, we like to ensure that whatever can be offloaded, should be offloaded to the hardware separate from the CPU.  
 
-Thus we revisit the DMA peripheral from lab 4.  You may remember back in lab 4 that you used DMA to move sample data from the ADC to a variable in memory.  We'll now flip that around and use DMA to send data from the `msg` array to the SPI peripheral, which will then send it out to the 7-segment displays.  This frees up the CPU to do other things while the DMA handles 
+Thus we revisit the DMA peripheral from lab 4.  You may remember back in lab 4 that you used DMA to move sample data from the ADC to a variable in memory.  We'll now flip that around and use DMA to send data from the `msg` array to the SPI peripheral, which will then send it out to the 7-segment displays.  This frees up the CPU to do other things while the DMA handles the transmission to the SPI peripheral.
 
 In the function `display_init_dma`, configure a free DMA channel by setting four things, which is generally the case for setting up any DMA transfer:
 1. The source address, which is the address of the `msg` array.
@@ -235,14 +235,14 @@ Set the DMA channel's **control trigger** register to the temporary variable you
 
 If you didn't already enable DREQ signals from the SPI in the previous steps, do that before you configure DMA.
 
-At the top of `main.c` in the username block, specify what DMA channel number you used.  We'll use this for `autotest`.s
-
-Then, assign the temporary register to the DMA channel's `ctrl_trig` register, which will configure and enable the DMA channel with the parameters you just set.
+At the top of `main.c` in the username block, specify what DMA channel number you used.  We'll use this for `autotest`.
 
 > [!NOTE]
 > *Under `dma_hw->ch[CHANNEL]` is a `ctrl` register and a `ctrl_trig` register.  What's the difference?*
 > 
 > The `ctrl` register is used to configure the DMA channel, while the `ctrl_trig` register is used to configure **and** trigger the DMA channel and start the transfer.  This is very helpful if you want to restart the DMA transfer yourself by changing a few bits every time.  You could theoretically even use DMA to start a new DMA transfer, which could also be used to restart the first one!  That process is called "chaining" and can be extremely useful if you want to perform multiple different DMA transfers in a row without having to manually trigger each one.
+> 
+> Each of the four DMA registers have a trigger alias register associated with them.  That way, even if you set the `ctrl` register first with DMA enabled, the transfer will not start until the fourth register is written to via its alias register.  E.g. if you set the Control, Transfer Count and Read Address registers first, only writing to the Write Address alias register will allow the DMA channel to start the transfer.
 > 
 > Read [12.6.3.1 Aliases and Triggers](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_dma_starting_channels) for different options on triggering a DMA channel to start - you can even write the `ctrl` register first and write to an *alias* register for the transfer count, read address or write address registers to do the DMA triggering instead.
 > 
