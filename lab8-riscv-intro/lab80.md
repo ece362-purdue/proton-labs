@@ -357,6 +357,10 @@ You might notice that you cannot just `ctrl + c` in the terminal where you have 
 
 If you wish to close QEMU, you could either start a debug session with VSCode or gdb and close it to let QEMU ends, or you could use the Makefile target `make kill`, which will send a kill signal to QEMU.
 
+### 3.3 Nothing to submit.
+
+Once you're done, move on to lab 8.1  There is nothing to submit for lab8.0, which is just set-up.
+
 ## 4. Troubleshooting
 
 ### 4.1 `make: riscv64-unknown-elf-gcc: No such file or directory`
@@ -385,3 +389,4 @@ Solutions: Just click the `Install cppdbg Extension` button and relaunch debug s
   - In a terminal, run `which riscv64-unknown-elf-gdb`.  This returns the location of the gdb executable.
   - Copy this path, and open `.vscode/launch.json` in your lab folder.
   - Change the value of the key "miDebuggerPath" to the path you just copied.
+
