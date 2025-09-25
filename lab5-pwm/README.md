@@ -73,7 +73,7 @@ Now, wire up the LM324 and the TRRS jack to your Proton board as shown in this s
 > [!CAUTION]
 > Note that the VCC of the LM324 is NOT connected to 3.3V, but it is connected to `5V` pin of your Proton board which is the 5V source from the USB port connected to your Proton.  
 > 
-> **DO NOT MIX THESE UP!**  
+> **DO NOT MIX THESE UP! Shorting 3.3V and 5V may destroy your board.**  
 > 
 > The LM324 needs to operate at 5V!  
 
@@ -289,7 +289,7 @@ Ideally, you should hear a 440 Hz sine wave.  To verify the frequency, connect a
 
 ![sine.png](images/sine.png)
 
-This "thickness" is due to the 20 kHz PWM noise that is always either pushing the capacitor higher or pulling it lower.  If you're still getting a square wave, ensure you have connected the 0.1 uF capacitor between the PWM output and ground.
+This "thickness" is due to the 20 kHz PWM noise that is always either pushing the capacitor higher or pulling it lower.
 
 > [!IMPORTANT]
 > Show your TA the sine wave on the oscilloscope, and demonstrate that you can change the frequency of the sine wave by changing the argument to `set_freq`.  Show them the code you wrote, and that it passes the `audio` test case.
