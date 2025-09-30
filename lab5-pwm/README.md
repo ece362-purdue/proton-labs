@@ -254,7 +254,7 @@ Implement `init_pwm_audio` to do the following:
 1. Configure pin 36 as a PWM output.
 2. Set the corresponding PWM slice's clock divider value to be 150, so we get a 1 MHz clock.
 3. Set the **period** of the PWM signal to be the **frequency of the clock after division above** in Hz divided by the sampling rate `RATE`, which is defined for you in `support.h`, **minus 1**.  This gives you the 20 KHz frequency we discussed earlier.  (Don't forget to subtract 1 - remember that the counter starts at 0!)
-4. Initialize the duty cycle to 0, and enable the PWM channel.
+4. Initialize the duty cycle to 0.
 5. Call `init_wavetable` with no arguments.  This sets up our sine wave in memory.
 6. Similar to what you did in the previous step, enable IRQ in the PWM peripheral.
 7. Set `pwm_audio_handler` as the exclusive handler for when the appropriate slice's counter register wraps around to 0.  You can find the interrupt numbers in the datasheet, hardware API, or in `pwm.h`.
