@@ -48,6 +48,7 @@ In your kit, you should find the following items:
 
 - An RGB LED;
     - Either common cathode or common anode is fine, but we have different instructions for both, so **pay attention**.
+- 1 1k resistor and 1 0.1uF capacitor to form a low-pass filter;
 - 3 47 ohm resistors;
     - If you are missing these, just pick them up from the ECE shop.
 - An LM324 op-amp;
