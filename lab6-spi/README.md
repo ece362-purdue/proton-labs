@@ -224,9 +224,11 @@ In a new temporary 32-bit integer (use `uint32_t`) variable, set the following p
 
 4. The data size of each transfer will be the size of one element of `msg`, or 16 bits.
 5. The read address should increment after every transfer.
-6. The read address should wrap every X bits.  (Figure out what X is.)
+6. The read address should wrap every X bytes.  (Figure out what X is.)
   - When you are in TRIGGER_SELF mode, the DMA will keep incrementing the source address by 16 bits (2 bytes) after each transfer in order to reach the next element of `msg`.  However, DMA doesn't understand that `msg` is only 8 elements long, so we need to tell it to wrap around to the first element's address after it has transferred the first element.  
-  - Therefore, the value of X is the number of bits that the DMA should wrap around after transferring all eight elements of `msg`.
+  - The `msg` array is 8 elements long, and each element is 2 bytes (`uint16_t` or 16 bits) long.  
+  - The value of X should therefore be the number of bits needed to represent the value after which the DMA read address should wrap around back to the start of the `msg` array.
+  - Do not forget that you can try multiple values of X to see what works.  
 7. Select SPI1 TX as the Data Request (DREQ) source.
     - When SPI finishes transmitting data, or has only just been configured, the data register will be empty, i.e. have a value of zero.  This is used to tell other peripherals, including DMA and IRQ, that the SPI transmit (TX) FIFO is empty, and ready to receive new data.  For DMA, that triggers a data request.
 8. Finally, enable the DMA channel.
