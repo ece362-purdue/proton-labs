@@ -563,8 +563,8 @@ To use DMA with the PIO state machine, you'll need to configure a DMA channel to
 4. Configure the control register as follows before enabling the DMA channel:
     - The data size of each transfer is 16 bits.
     - Increment the read address after each transfer.
-    - Wrap the read address every X bits, so that it wraps around at the end of the `msg` array.
-      - This is the same X bits you found in Step 4.
+    - Wrap the read address every X bytes, so that it wraps around at the end of the `msg` array.
+      - This is the same X bytes you found in Step 4.
       - This ensures DMA starts reading from the beginning of the `msg` array after it has transferred all eight elements.
     - We noticed that we didn't have to do the casting that we did earlier, so our guess is that the DMA performs a 16-bit write for us already with each transfer.
     - Specify PIO0 TX as the Data Request (DREQ) source, so that the DMA channel will be triggered when the PIO state machine's TX FIFO is empty and ready to receive new data.
