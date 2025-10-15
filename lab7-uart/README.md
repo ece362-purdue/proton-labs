@@ -232,7 +232,7 @@ Upload and monitor again, and you should now be able to type into the Serial Mon
 
 Right now, we're seeing the characters we type echoed back, but only because we're piping the output of `getchar()` directly to `putchar()`.  This doesn't help us when we need to be able to type a longer string and edit it.
 
-In the `_read` syscall, add a line that prints out the character to the UART that was just read.  This solves our echo issue.  (If you run this right now, you'll see the characters double up when you type one at a time.  Not a problem.  We'll fix that later.)
+In the `_read` syscall, add a line that prints out the character to the UART that was just read.  This removes the need to pipe `getchar()` into `putchar()`.  However, if you run this right now with both `putchar/getchar`, and the `_read` syscall printing out each character, you'll see the characters double up when you type one at a time.  Not a problem.  We'll fix that in step 3.4 by removing the `putchar/getchar` code in `main`, so only the `_read` syscall will print characters when receiving them.)
 
 With the echo working from earlier, you might want to try more special keys, the simplest being Backspace.  You'll see that the cursor moves backward one space, but the character you typed is still there!  *Spooky!*
 
