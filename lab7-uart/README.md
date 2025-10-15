@@ -56,8 +56,8 @@ We'll continue to use the same connections, but with this lab, we'll recreate th
 When we type a key, say "A", into the Serial Monitor in PlatformIO, that key is sent as an ASCII-encoded byte (8 bits) across the wire.  It travels through the USB cable into the Debug Probe, which converts it into a UART data packet, and pushes it out through the TX pin of the Debug Probe, which reaches GP1 (UART0 RX) on the Proton board.  That transmission will look something like this:
 
 ```
-Idle Bit | Start Bit | 8 Data Bits (MSB first)        | Stop Bit
-    1    |     0     | 0 1 0 0 0 0 0 1 (0x41 = 'A')   |   1
+Idle Bit | Start Bit | 8 Data Bits (LSB first)        | Stop Bit
+    1    |     0     | 1 0 0 0 0 0 1 0 (0x41 = 'A')   |   1
 ```
 
 The UART on your Proton will detect this transmission when the start bit arrives, shift the bits into its internal shift register, and when the stop bit arrives, it will make the data available to your program via a "data register", not unlike the one used by SPI.
