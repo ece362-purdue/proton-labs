@@ -21,7 +21,7 @@
 
 \* - This lab is actually worth points - it is not a "free" lab!  Completion before lab 1 is required.  
   
-\*\* - These steps are provided to show you the order of the lab and do not have associated points.  To earn full credit for this lab, you must submit your work to Gradescope and have soldered pin headers to your development board **before the beginning of your lab section for lab 1**.
+\*\* - These steps are provided to show you the order of the lab and do not have associated points.  To earn full credit for this lab, you must submit your work to Gradescope and have soldered pin headers to your keypad **before the beginning of your lab section for lab 1**.
 
 ## Instructional Objectives
 - To become familiar with the BHEE 162 laboratory, policies, lab stations, and equipment.
@@ -33,7 +33,7 @@
 >   
 > This is an example of a note designed to get your attention. If you see this, read it carefully.  
 >   
-> This lab is intended to get you set up with the software you will use for the board, on both your home PC and your lab machine.  To reduce your time wasted on logistical issues, **start this lab at home, as soon as possible**.  Ignore the parts about the board and just get set up with the software as much as you can.
+> This lab is intended to get you set up with the software you will use for the board, on both your home PC and your lab machine.  To reduce your time wasted on logistical issues, **start this lab at home, as soon as possible**.  At home, start at step 3 to set up PlatformIO on your own computer, and bring it with you to lab if possible to confirm that you can program your board with it.  While you are in lab, you will set up PlatformIO on the lab machines as well.
 > 
 > When you come into the lab, you'll be given the lab kit you purchased, including the Proton development board we'll use throughout this course which comes without pin headers.  You'll use the lab time to solder pin headers to your board, and while waiting for a soldering station to open up, work on the software setup on your lab machine.  
 > 
@@ -116,17 +116,17 @@ If you are on Windows, it is possible to use PowerShell to do this.  If you are 
 > [!IMPORTANT]
 > Create a new file called hello.txt in your repository, and add some text to it.  Commit and push this change to your repository.  Use a descriptive commit message, eg. "Step 0 commit".
 
-## Step 1: Solder pin headers to your development board
+## Step 1: Solder pin headers to your keypad
 
 **Soldering!?  In ECE 36200?  What is this, ECE 20008?**
 
-No, this isn't a typo.  In ECE 36200, you will be using a development board that has no pin headers soldered to it.  One of our two reasons is to eliminate the labor cost associated in soldering the pin headers to your board.  
+No, this isn't a typo.  In ECE 36200, you will have multiple components in your kit that have no pin headers added.  One of our two reasons is to eliminate the labor cost associated in soldering those pin headers.  
 
 The other reason is to start teaching you how to solder **before** you go into senior design.  When you are working with a microcontroller, there are numerous components that you will need to solder to your board, and forming the skillset necessary to soldering and desoldering components is a critical skill to have.  
 
 In this lab, we are starting out with the most common component that you will need to solder - pin headers.  When you start doing projects, and you need to use external components that come on PCBs without headers, you will need to add them on before you can attach them to your breadboard, for both ECE 36200 and your senior design project.
 
-Open [this page](soldering.md) in a new tab and follow the instructions.  
+<!-- Open [this page](soldering.md) in a new tab and follow the instructions.   -->
 
 > [!CAUTION]
 > 
@@ -175,6 +175,9 @@ You may also see a green LED in the middle of the board start flashing, in which
 > For every lab, ensure that you have received your checkoffs by checking this page: https://engineering.purdue.edu/ece362/checkoff/
 
 ## Step 3: Install VScode and PlatformIO
+
+> [!WARNING]
+> Complete this step on both your personal machine and your lab computer!
 
 The way microcontrollers work is by writing a C program, compiling it into a binary file to be run by the specific CPU core on the microcontroller, and then flashing/uploading that binary file into the **flash memory** on the microcontroller.  Every time your microcontroller powers on, whether by USB or through the 5V pins, it loads that program from flash memory.
 
