@@ -86,7 +86,7 @@ To familiarize yourselves with git, keep this [cheat sheet](https://training.git
 - Clone an existing repository to your computer;
 - Add changes, commit them to your local repository, and push them to the remote repository;
 
-Work for this class can be quite time-consuming, and so you need to **start your labs at home, finish as much as you can, and bring your work in to be checked off in lab**.  If you attempt to do the labs entirely in lab, you will have a very hard time completing them.  **Start early, and from home.**
+Work for this class can be quite time-consuming, and so you need to **start your labs at home, finish them or as much of them as you can, and bring your work in to be checked off in lab**.  If you attempt to do the labs entirely in lab, you will have a very hard time completing them.  **Start early, and from home.**
 
 Regardless of whether you are working on your own Windows/macOS/Linux computer or on a lab machine, you will be able to **clone** this repository to your own computer.  Make sure to do this on **all computers** on which you will be doing your lab.  
 
@@ -126,20 +126,50 @@ The other reason is to start teaching you how to solder **before** you go into s
 
 In this lab, we are starting out with the most common component that you will need to solder - pin headers.  When you start doing projects, and you need to use external components that come on PCBs without headers, you will need to add them on before you can attach them to your breadboard, for both ECE 36200 and your senior design project.
 
-<!-- Open [this page](soldering.md) in a new tab and follow the instructions.   -->
-
+<!-- Open [this page](soldering.md) in a new tab and follow the instructions.   -->  
+   
 > [!CAUTION]
-> 
-> **Soldering is a skill that takes time to learn.  If you have never soldered before, please ask a TA for help.  If you have soldered before, please still ask a TA for help.  We want to make sure that you are doing it correctly.**
+> Soldering is a skill that takes time to learn.  If you have never soldered before, please ask a TA for help.  If you have soldered before, please still ask a TA for help.  We want to make sure that you are doing it correctly.
 
-If you want to solder your headers outside of lab, you may do so, but make sure to get it done as soon as possible.  You will need to have your board in place on your breadboard, wired up, and running some test code before you start lab 1.
+If you want to skip this step and solder your headers outside of lab because you have prior experience, you may do so, but make sure to get it done as soon as possible.  You will need to have your board in place on your breadboard, wired up, and running some test code before you start lab 1.
+
+Your lab kit should contain your unsoldered keypad, which should look like this:
+
+<div class="center">
+    <img src="images/keypad.png" style="margin: 1em 0; width: 45vw; max-width: 500px">
+</div>
+
+You'll be soldering 8 pins to the middle 8 pads (leaving one pad on both sides of the keypad).  When your TA directs you to your soldering station either in the lab, or in the ECE shop, make sure that you see the following at your bench:
+
+1. Small breadboard for placing your keypad on.
+1. Fume hood.
+1. Soldering iron.
+1. Solder.
+1. Flux pen.
+1. Isopropyl alcohol.
+1. Nylon brush.
+1. Pin headers in a container.
+
+Start by turning on your fume hood first.  **This is critical.**  
+
+Turn on your soldering iron and let it heat up.  You'll know it's ready when the light starts blinking.
+
+Take any one of the pin headers, and break off exactly 8 pins.  Do not dispose of headers if you make a mistake - we can always reuse those.  Simply throw those back in the container.
+
+Place the **longer** side of those headers down into a breadboard, in the position indicated below.  The headers should sit firmly in the breadboard.
+
+Place the keypad's pads on the shorter side of the headers, which should be facing upwards.
+
+Take the solder wire in one hand, and your soldering iron in the other.  Touch the soldering iron **first** to the first pad, and then move the wire to where the tip makes contact with the metal of the pad.  Wait until the iron melts the solder, then remove the solder wire while keeping the iron in place.  Wait until the melted solder pools around the pad, filling the gap between the pin header and the pad.  Then, pull the iron back and let it cool.  Inspect the joint to ensure there are no issues.
+
+Repeat this process for the other 7 pads, confirming each joint.  Once you're done, you can move on to the next step.
 
 ## Step 2: Place the Development Board on a Breadboard
 
 > [!NOTE]
 > If you're waiting to solder, you obviously don't have to put your Proton on the breadboard just yet.  Continue following from step 3 to set up your environment.
 
-At this point, you should have soldered headers and placed the shorting plugs on your Proton development board.  Before we put the Proton board back on the breadboard, we're going to connect two wires on the breadboard from **GP0** and **GP1** to the **RX** and **TX** pins respectively on the Proton board.  The way we'll do this is by routing it **under** the board, since you won't need to move those wires once they're in place.  This will make future wiring much easier.
+At this point, you should have pulled out your Proton development board from your lab kit.  Before we put the Proton board on the breadboard, we're going to connect two wires on the breadboard from **GP0** and **GP1** to the **RX** and **TX** pins respectively on the Proton board.  The way we'll do this is by routing the wires **under** the board, since you won't need to move those wires once they're in place.  This will make future wiring much easier.
 
 <div class="center">
     <img src="images/uart-pinout.png" style="margin: 1em 0; width: 45vw; max-width: 500px">
@@ -181,7 +211,7 @@ You may also see a green LED in the middle of the board start flashing, in which
 
 The way microcontrollers work is by writing a C program, compiling it into a binary file to be run by the specific CPU core on the microcontroller, and then flashing/uploading that binary file into the **flash memory** on the microcontroller.  Every time your microcontroller powers on, whether by USB or through the 5V pins, it loads that program from flash memory.
 
-The method of flashing can be different, however.  A newly fabricated board will obviously have no data in flash memory, which the microcontroller can detect.  If there's no data, the microcontroller will enter **boot mode**, allowing you to upload a new program.  However, to upload a new program, it can be tedious to put the microcontroller into boot mode and then upload a new program over and over again.
+The method of flashing can be different, however.  A newly fabricated board will obviously have no data in flash memory, which the microcontroller can detect.  If there's no data, the microcontroller will enter **bootloader mode**, allowing you to upload a new program.  However, to upload a new program, it can be tedious to put the microcontroller into boot mode and then upload a new program over and over again.
 
 Therefore, we have the second part of your Proton board - the debugger.  The debugger is actually **another microcontroller** that is connected to the Proton board, electrically and digitally separate from the Proton.  The debugger allows us to tap into the microcontroller's **debug interface**, which gives us the option to flash a new program to the microcontroller without having to put it into boot mode.  This is done by connecting the debugger to the Proton board using the SWD and SWCLK pins, which you already connected using the shunt jumpers on the top of your board.  The debugger can also be used to step through code, inspect variables, and set breakpoints in your code.
 
