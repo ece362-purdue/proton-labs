@@ -146,9 +146,9 @@ You'll be soldering 8 pins to the middle 8 pads (leaving one pad on both sides o
 1. Soldering iron.
 1. Solder.
 1. Flux pen.
-1. Isopropyl alcohol.
-1. Nylon brush.
 1. Pin headers in a container.
+
+![soldering](images/soldering.jpg)
 
 Start by turning on your fume hood first.  **This is critical.**  
 
@@ -158,18 +158,35 @@ Take any one of the pin headers, and break off exactly 8 pins.  Do not dispose o
 
 Place the **longer** side of those headers down into a breadboard, in the position indicated below.  The headers should sit firmly in the breadboard.
 
+![into-breadboard](images/into-breadboard.png)
+
+Take the flux pen, open it, and dab the tip on the keypad's metal pads.  Make sure to recap the pen.
+
 Place the keypad's pads on the shorter side of the headers, which should be facing upwards.
 
-Take the solder wire in one hand, and your soldering iron in the other.  Touch the soldering iron **first** to the first pad, and then move the wire to where the tip makes contact with the metal of the pad.  Wait until the iron melts the solder, then remove the solder wire while keeping the iron in place.  Wait until the melted solder pools around the pad, filling the gap between the pin header and the pad.  Then, pull the iron back and let it cool.  Inspect the joint to ensure there are no issues.
+![add-keypad](images/add-keypad.png)
 
-Repeat this process for the other 7 pads, confirming each joint.  Once you're done, you can move on to the next step.
+Take the solder wire in one hand, and your soldering iron in the other.  Touch the soldering iron **first** to the first pad, and then move the wire to where the tip makes contact with the metal of the pad.  
+
+![solder first](images/solder-first.png)
+
+![solder second](images/solder-second.png)
+
+Wait until the iron melts the solder, then remove the solder wire while keeping the iron in place.  Wait until the melted solder pools around the pad, filling the gap between the pin header and the pad.  Then, pull the iron back and let it cool.  Inspect the joint to ensure there are no issues.
+
+![inspect-joint](images/inspect-joint.png)
+
+Repeat this process for the other 7 pads, confirming each joint.  Once you're done, **ask a TA to confirm that your keypad looks fine**, and then you can move on to the next step.
 
 ## Step 2: Place the Development Board on a Breadboard
 
-> [!NOTE]
-> If you're waiting to solder, you obviously don't have to put your Proton on the breadboard just yet.  Continue following from step 3 to set up your environment.
+At this point, you should have also pulled out your Proton development board from your lab kit.  If they have not already been added, obtain three "shorting plugs" (shunt jumpers) from a TA, and place them on the headers separating the Proton board and the debugger, in order to hold the board together as shown below (the yellow/black/yellow plastic pieces in the image below):
 
-At this point, you should have pulled out your Proton development board from your lab kit.  Before we put the Proton board on the breadboard, we're going to connect two wires on the breadboard from **GP0** and **GP1** to the **RX** and **TX** pins respectively on the Proton board.  The way we'll do this is by routing the wires **under** the board, since you won't need to move those wires once they're in place.  This will make future wiring much easier.
+<div class="center">
+    <img src="images/debugger.jpg" style="margin: 1em 0; width: 500px">
+</div>
+
+Before we put this joined Proton board on the breadboard, we're going to connect two wires on the breadboard from **GP0** and **GP1** to the **RX** and **TX** pins respectively on the Proton board.  The way we'll do this is by routing the wires **under** the board, since you won't need to move those wires once they're in place.  This will make future wiring much easier.
 
 <div class="center">
     <img src="images/uart-pinout.png" style="margin: 1em 0; width: 45vw; max-width: 500px">
@@ -181,7 +198,7 @@ Then, place the board over the wires, and press it down into the breadboard, tak
     <img src="images/bb-layout.jpg" style="margin: 1em 0; width: 45vw; max-width: 500px">
 </div>
 
-Typically, boards like this will be a little hard to get into (and out of) a breadboard, but you should not have to remove it once it's in there for the rest of the course.  When reinserting your Proton board, be careful to push down on the buttons, and not delicate components on the board.  For the debugger, you may need to push down on the edges.  Be careful not to push down on the portion with no pins, as there is no support there and it may snap off the Proton board.
+Typically, boards like this will be a little hard to get into (and out of) a breadboard, but you should not have to remove it once it's in there for the rest of the course.  When reinserting your Proton board, be careful to push down on the buttons, and not the other delicate components on the board.  For the debugger, you may need to push down on the edges.  Be careful not to push down on the portion with no pins, as there is no support there and it may snap off the Proton board.
 
 Next, connect two wires: one from each of the 3V3 pins to the power rails, and one from each of the GND pins to the ground rails of your breadboard, as well as the PGND pins on the debugger.  Use the labels on the pins, but if they're too small for you to read, you can also use this [pinout diagram](https://ece362-purdue.github.io/proton-labs/assets/Proton%20Pinout%20Diagram.pdf).
 
@@ -255,6 +272,16 @@ monitor_speed = 115200
 Save it, and then open your folder in VScode.  The PlatformIO extension will see the configuration file you created, and automatically start setting up your tools for you.  Once all the different dialogs close and you see "Project initialized successfully".  
 
 Create a new folder called `src` in the root of your project.  Inside that folder, create a new file called `main.c`.  This is where you will write your C code for the microcontroller.  When you create additional C files in this folder, they get automatically compiled with your project.
+
+The flow of writing a program for your microcontroller will work as follows:
+
+1. You write your code, including a `main` function, in C files within the `src` folder.
+
+2. When you click Build/Upload, PlatformIO compiles your code into individual object files under `.pio/build/proton` using a compiler toolchain intended for your microcontroller.  In this first lab, we are using the ARM CPU core on the RP2350, so we'll use `arm-none-eabi-gcc`, instead of the regular `gcc` compiler you may be used to on your computer that may be familiar to you from ECE 264.
+
+3. The compiled object files are then "linked" together into a single binary file at `.pio/build/proton/firmware.elf` that can be uploaded to the flash memory on your Proton board - this is separate from the actual RP2350 microcontroller.  The flash memory holds up to 16 MB (megabytes) of program data.
+
+4. If you already clicked Upload/When you click Upload, PlatformIO uses a program called `openocd` to initiate a connection with the Debug Probe on your debugger, and pushes out the ELF file.  The shunt jumpers you added earlier connect the debug probe to the RP2350 microcontroller on the Proton board, allowing the ELF file to get sent to the microcontroller, which saves it in the flash memory chip.  The microcontroller restarts after the upload is complete, and starts running your uploaded program.
 
 > [!IMPORTANT]
 > Commit the newly created project and push it to your repository now.  Use a descriptive commit message, eg. Step 4 new project.
@@ -376,7 +403,7 @@ A critical function to any microcontroller development environment is to be able
 
 ![reset button to run](images/run.png)
 
-Try holding the Reset button - you'll see that the micro doesn't run code until you let go of the button.  You might recall this behavior from ECE 270, where you had `rst`/reset ports in your submodules.  It's the exact same concept here!
+Try holding the Reset button - you'll see that the microcontroller doesn't run code until you let go of the button.  You might recall this behavior from ECE 270, where you had `rst`/reset ports in your submodules.  It's the exact same concept here!
 
 Now, we're going to learn how to debug by **stepping through** our code, line by line, similar to how you debugged C in ECE 264.  Set a breakpoint on the `gpio_init_mask` line by clicking in the left margin of the editor window - you'll see a red dot appear.  Then, in the PlatformIO menu, move your cursor down to Quick Access and click Start Debugging.  Alternatively, you can press F5 (or Fn+F5, depending on your keyboard) to start debugging.  
 
