@@ -7,7 +7,7 @@
 | Step | Description | Points |
 |------|-------------|--------|
 | 0 | Initialize your git repository for your lab at home | ** |
-| 1 | Solder pin headers to your development board | ** |
+| 1 | Solder pin headers to your keypad | ** |
 | 2 | Place the Development Board on a Breadboard | ** |
 | 3 | Install VScode and PlatformIO | ** |
 | 4 | Create a PlatformIO project | ** |
@@ -35,7 +35,7 @@
 >   
 > This lab is intended to get you set up with the software you will use for the board, on both your home PC and your lab machine.  To reduce your time wasted on logistical issues, **start this lab at home, as soon as possible**.  At home, start at step 3 to set up PlatformIO on your own computer, and bring it with you to lab if possible to confirm that you can program your board with it.  While you are in lab, you will set up PlatformIO on the lab machines as well.
 > 
-> When you come into the lab, you'll be given the lab kit you purchased, including the Proton development board we'll use throughout this course which comes without pin headers.  You'll use the lab time to solder pin headers to your board, and while waiting for a soldering station to open up, work on the software setup on your lab machine.  
+> When you come into the lab, you'll be given the lab kit you purchased, including the Proton development board we'll use throughout this course.  You'll use the lab time to solder pin headers to your board, and while waiting for a soldering station to open up, work on the software setup on your lab machine.  
 > 
 > This may seem like a lot of work, but it helps you achieve two things:
 > 
