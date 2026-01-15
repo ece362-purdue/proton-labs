@@ -47,7 +47,7 @@ Therefore, when we want to understand the internals of the microcontroller we wi
 
 ## General Purpose Input/Output (GPIO)
 
-Your microcontroller ~~can be~~ is considered a fully functioning computer, much unlike the machine you happen to be reading this on.  A key difference is how your microcontroller interacts with the outside world.  Your laptop has a keyboard, mouse, and screen that allow you to interact with it.  Your microcontroller, however, has **GPIO pins** that allow it to interact with the outside world.  
+Your microcontroller ~~can be~~ is considered a fully functioning computer, not unlike the machine you happen to be reading this on.  A key difference between a microcontroller and this computer, however, is how your microcontroller interacts with the outside world.  Your laptop has a keyboard, mouse, and screen that allow you to interact with it.  Your microcontroller, however, has **GPIO pins** that allow it to interact with the outside world.  
 
 In this experiment, you will learn how to connect and configure simple input devices (push buttons and keypad) and output devices (LEDs) to your Proton development board's GPIO pins. 
 
@@ -79,17 +79,19 @@ where each bit of the register corresponds to a different GPIO pin.  The GPIO pi
 > *Why not just have one register for all 48 GPIO pins?*  
 > OR *What does it mean to say that the RP2350 is a 32-bit microcontroller?*
 > 
-> The RP2350 CPU cores are **32-bit**, which means the largest register they can operate on in a single "cycle" is 32 bits.  You may see functions that imply they can change 64 bits of data at a time, but if you dive into it, it's just writing to two 32-bit registers, e.g. `gpio_put_all64`.
+> The RP2350 CPU cores are **32-bit**, which means the largest register they can operate on in a single "cycle" is 32 bits.  You may see functions that imply they can change 64 bits of data at a time, but if you dive into it, it's just writing to two separate 32-bit registers, e.g. `gpio_put_all64`.
 
 Nearly all of you are coming from ECE 270, where you wrote Verilog to implement hardware.  This course is a continuation of that, in that your microcontroller is the overall **top module** that instantiates the various peripherals as **submodules**.  Changing register values is just changing the values connected to the submodules' **ports** or **internal `logic` registers**.
 
-When you flash your microcontroller with a program, the instructions executed by the CPU/top module in that program can be used to change the values of the registers in those peripherals/submodules.  This is how we will implement an **embedded system**.
+When you flash your microcontroller with a program, the instructions executed by the CPU/top module in that program can be used to change the values of the registers in those peripherals/submodules.  This is how we will implement an **embedded system** - a combination of multiple independent systems that handle their own functionality, initially configured by the CPU executing the program you upload to it.
 
 Modifying all these registers directly can get tedious, so Raspberry Pi (in this case) provides a **Software Development Kit** (SDK) that provides functions that can be used to modify these registers.  
 
-However, any good embedded systems engineer should understand how the SDK functions work at the register level, because the registers are the only effective way to debug our code when it doesn't work as expected - we saw this in lab 0 when looking at the `gpio_out` register, for example.  Therefore, for each lab, you can **look through** the SDK functions for the new peripheral you're learning about, but you must **dive** into the functions to see what registers they are modifying, and explain that to your TAs.
+> *So why don't we just use those functions in the first place?*
 
-Back to GPIO - to configure a pin to act as an output to drive current to some external component like an LED, you will need to dive into those SDK functions, and write code that modifies specific registers in memory to do so.  
+Any good embedded systems engineer should understand how the SDK functions work at the register level, because the registers are the only effective way to debug our code when it doesn't work as expected - we saw this in lab 0 when looking at the `gpio_out` register, for example.  This is not any different from when you used `gdb` to debug your C programs in a prior programming course - in fact, you'll use a variant of `gdb` to debug your code while it's running on the microcontroller.  Therefore, for each lab, you should **look through** the SDK functions for the new peripheral you're learning about, but you must **dive** into the functions to see what registers they are modifying, and explain that to your TAs.
+
+To give you an example within the context of GPIO: in order to configure a GPIO pin to act as an **output** to drive current to some external component like an LED, you will need to **dive into the SDK functions** that deal with changing pins to outputs, identify those GPIO-specific registers, and write code that modifies those registers within your own program without using the SDK function directly.  
 
 ## Step 0.1: Set up your environment
 
@@ -102,7 +104,7 @@ Make sure to clone the code repository from GitHub Classroom.  Keep in mind to a
 > 
 > **Please do not assume a data catastrophe will not happen to you, because it absolutely can.  Commit and push often.**
 
-In addition, a precompiled autotest object has been included in your template folder.  You can utilize it to test the subroutines (another word for functions).  To run the autotest, uncomment the `autotest()` call in the `main` function and click "Upload and Monitor".  Make sure that your debugger is connected via USB, that the shunt jumpers connecting the debugger to your Proton board are in place, and the the Proton board is also connected via USB.
+In addition, a precompiled autotest object has been included in your template folder.  You will utilize it to test the functions you need to implement.  To run the autotest, uncomment the `autotest()` call in the `main` function and click "Upload and Monitor".  Make sure that your debugger is connected via USB, that the shunt jumpers connecting the debugger to your Proton board are in place, and the the Proton board is also connected via USB.
 
 We recommend leaving `autotest()` commented out until you actually need it - it adds about 20 KB of code to your program, which can take a long time to upload.  Uncomment it when you need to test a step, or need to generate a confirmation code to get checked off.
 
@@ -114,7 +116,7 @@ If you get a message asking you to **select** a serial port because there are mu
 
 If you don't see anything after the serial port connection is established, press the Reset pushbutton to see the introductory text from `autotest` - the text won't appear because VScode/PlatformIO wasn't ready when the text was printed from your Proton board.  Try typing something, and you should see the characters appear.  That should confirm the connection is working as intended.
 
-Once you press the Reset button after the monitor appears, you should see a prompt similar to the following:
+When you see "Terminal: " appear after the upload process, press the Reset button on your microcontroller, and you should see a prompt similar to the following:
 
 ```text
 GPIO Lab Test Suite
@@ -126,7 +128,7 @@ Type 'help' to learn commands.
 You can then type `help` to learn what commands you can use to test a certain subroutine.  You will use this to demo your implementation and wiring to the TAs.
 
 > [!TIP]
-> If you're getting tired of having to click through menus to click "Upload and Monitor", start getting used to **keyboard shortcuts**.  After you type it the first time, it's easier to press Ctrl-Shift-P and Enter to quickly rerun your last command.
+> If you're getting tired of having to click through menus to click "Upload and Monitor", start getting used to **keyboard shortcuts**.  After you type it the first time, it's easier to press Ctrl-Shift-P and Enter to quickly rerun your last command. 
 > 
 > You can also set up keyboard shortcuts to quickly run "Upload and Monitor" (usually Ctrl-Alt-U) or "Start Debugging" (usually F5).
 > 
@@ -143,15 +145,13 @@ In ECE 36200, unlike prior courses, you will build on the **same** circuit in ea
 
 At this point, you should have only the Proton development board on your breadboard.  In this lab, we'll add the keypad in the row above the Proton board, making space for wiring.  See the diagram below.  
 
-![lab1-schem.png](images/lab1_schem.png)
+![lab1-schem-2.png](images/lab1-schem-2.png)
 
-![lab1-image.png](images/lab1_image.png)
+![lab1-image.png](images/lab1_image_2.jpg)
 
-There are two sets of resistors in the schematic.  The 8 1k ohm resistors are used to limit the current through the keypad, so you don't accidentally damage the keypad.  
+The 8 1k ohm resistors are used to limit the current through the keypad, so you don't accidentally damage the keypad.  Use the pin numbers on your Proton board to determine which pins to connect the resistors to.  
 
-The 4 10k ohm resistors are implemented with the 5-pin yellow **resistor comb**, which allows us to easily add a resistor at every point on the breadboard, except for pin 1, which is connected to ground.  These are very useful for implementing a lot of **pull-down resistors** at once, which is a fix needed for a bug in the RP2350 that causes the ROW GPIO pins, configured as inputs, to float when they are not connected to anything.  Your resistor comb's pin 1 is identified by a black dot on the side of the comb.  
-
-Use the pin numbers on your Proton board to determine which pins to connect the resistors to.  The picture above shows how best to connect the 5-pin resistor comb to your Proton board.  If you prefer another method, that's up to you.
+<!-- The 4 10k ohm resistors are implemented with the 5-pin yellow **resistor comb**, which allows us to easily add a resistor at every point on the breadboard, except for pin 1, which is connected to ground.  These are very useful for implementing a lot of **pull-down resistors** at once, which is a fix needed for a bug in the RP2350 that causes the ROW GPIO pins, configured as inputs, to float when they are not connected to anything.  Your resistor comb's pin 1 is identified by a black dot on the side of the comb.   -->
 
 ## Step 1: Read the Datasheet
 
@@ -165,7 +165,7 @@ You can gain a basic introduction to your RP2350 microcontroller by reading [Cha
 
 Next, read [Chapter 9: GPIO](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_gpio) as well as [Chapter 3.1.3: GPIO Control](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#proc_gpio) under SIO.
 
-Under the Programmer's Model sections, identify functions that the Pico SDK provides, e.g. `gpio_init`.  Type `gpio_init(21);` into VScode inside the `init_inputs` function, and note how the editor highlights the function.  Now, if we were hobbyists, we would copy in the functions from the datasheet and call it a day.  But as learners in a 300-level computer engineering course, we do things a little differently.  If you want to be **effective** as an embedded systems engineer, you need to understand the register level at which your microcontroller operates.  In a nutshell - every function changes some hardware register in the microcontroller, causing a change in the behavior of either the CPU or the peripherals.  Understanding how those functions work is key to being able to debug your code at the register level when it doesn't work as expected.
+Under the Programmer's Model sections, identify functions that the Pico SDK provides, e.g. `gpio_init`.  Type `gpio_init(21);` into VScode inside the `init_inputs` function, and note how the editor highlights the function.  Now, if we were hobbyists, we would copy in the functions from the datasheet and call it a day.  But as learners in a 300-level computer engineering course, we do things a little differently.  If you want to be an **effective** embedded systems engineer, you need to understand the register level at which your microcontroller operates.  In a nutshell - every function changes some hardware register in the microcontroller, causing a change in the behavior of either the CPU or the peripherals.  Understanding how those functions work is key to being able to debug your code at the register level when it doesn't work as expected.
 
 So, what we're going to do is **dive** into what this function does.  When you hover your cursor over the function and VScode highlights it, that means that you can access the definition for it.  Hold down either the Ctrl/Cmd/Alt button and click on `gpio_init` to see where it is defined (you'll determine the right button if your cursor changes to the one you see when you click a hyperlink).  This takes you to the `gpio.c` file, where you'll see the code for `gpio_init`, and how it configures a pin to be an input, initializes the pin to a logic 0 (which is redundant for an input), and sets the function for the pin to be SIO.
 
