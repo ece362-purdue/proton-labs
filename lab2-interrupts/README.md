@@ -322,7 +322,7 @@ The "Secure/Non-Secure SIO" refers to the ability to have secure and non-secure 
 2. Which function is used to send a message to the second core?
 3. Which function is used to receive a message from the second core?
 
-Make sure to comment out the `#define STEP1` and `#define STEP2` lines at the top of `main.c`, and uncomment the `#define STEP3` line. 
+Make sure to comment out the `#define STEP1` and `#define STEP2` lines at the top of `main.c`, and uncomment the `#define STEP3` line.  **This is important for autotest!**
 
 In `keypad_isr`, add the following stanza to replace the `printf` statement that prints the key value:
 
