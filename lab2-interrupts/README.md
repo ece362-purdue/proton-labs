@@ -257,7 +257,10 @@ In the function `init_keypad_irq`:
 
 1. Add the `keypad_isr` function as the ISR to execute when an interrupt occurs on GPIO pins 2 through 5.  This way, when a particular column pin is driven and a button is pressed, the row pin will be pulled high, calling this ISR.  You'll want to use the `gpio_add_raw_irq_handler_masked` function to do it for all four pins at once.
 
-2. Enable the interrupt for GPIO pins 2 through 5 using `gpio_set_irq_enabled` on a rising edge trigger.  Unfortunately, there's no "mask" function (that we could find) to enable all four pins at once, so you might want to utilize a loop or just call the function four times.
+2. Acknowledge **spurious interrupts** by reading the interrupt status register for the row pins and clearing any pending interrupts.  Find the function that does this for specific GPIO pins, dive into it to identify the register being modified, and modify the register yourself within the `init_keypad_irq` function.
+
+3. Enable the interrupt for GPIO pins 2 through 5 using `gpio_set_irq_enabled` on a rising edge trigger, but **do not use this function directly**.  You'll need to dive into it to understand how it works, and then copy the register-level code.  We strongly encourage you to use a loop, with the counter variable indexing into the various registers.
+    - A hint for the next step: take note of, and add, the code that chooses a register based on what processor core you are using.  This is important for ensuring the correct processor core is notified when an interrupt occurs!
 
 To implement the ISR, we need to keep in mind that `keypad_isr` could get called for any button press (and row pin going high), so we need to know two things to figure out what button was just pressed:
 
@@ -358,9 +361,9 @@ Congratulations on writing and running your first dual-core interruptible embedd
 
 > [!NOTE]
 > This step is just to prepare for lab 3.  You don't have to do anything with the 7-segment display card for lab 2.
-> If you already soldered the pin headers on, you can skip this step.
+> If you already soldered the pin headers on or it already came soldered on, you can skip this step.
 
-If you haven't already, solder pin headers onto your 7-segment display card.  You can use the same technique as you did for the Proton board in lab 0.  Make sure to use the single-sided pin headers, with the long end going into your breadboard.
+If you haven't already, solder pin headers onto your 7-segment display card.  You can use the same technique as you did for the keypad in lab 0.  Make sure to use the single-sided pin headers, with the long end going into your breadboard.
 
 ![soldering-7seg](images/soldering.png)
 
