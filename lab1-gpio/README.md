@@ -24,7 +24,7 @@
 - To learn how to trigger code execution when an external event occurs.
 
 > [!CAUTION]
-> If you have not already soldered pin headers to your Proton board, please do it ASAP.  There is a step in this lab that requires you to put your Proton down on a breadboard.
+> If you have not already soldered pin headers to your keypad, please do it ASAP.  There is a step in this lab that requires you to put your Proton down on a breadboard.
 > 
 > Your breadboard should have been signed with a silver sharpie with your username and the signature of the TA.  If you have not yet done this, please notify a TA and get it signed as soon as possible.  **Failure to do so by lab 2 will result in a zero for the lab currently running in that week.**
 > 
