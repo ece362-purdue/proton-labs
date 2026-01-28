@@ -283,7 +283,7 @@ The keypad is your most important key-entry mechanism that you'll likely encount
 
 **Double-check your keypad wiring from Step 0.2!**
 
-![lab1-schem.png](images/lab1_schem.png)
+![lab1-schem-2.png](images/lab1-schem-2.png)
 
 Configure the following pins as follows in the function `init_keypad`:
 - GP2, GP3, GP4, GP5 as inputs to the rows
