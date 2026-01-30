@@ -137,6 +137,8 @@ Note that for the ADC values to print out to the console, we're only using a car
 > [!IMPORTANT]
 > Show your TA that turning the potentiometer varies the value printed to your Serial Monitor within the range 0-4095.  (If it's a bit lower than 4095, that's okay - the potentiometer or breadboard connections may not be perfect.)
 > 
+> If the values aren't changing, use the debugger to determine if your code is hanging somewhere.  Ensure that you are getting a non-zero value out of the relevant ADC register when you turn the potentiometer. 
+>
 > In `autotest`, show that your functions pass the `singleshot` test case.
 > 
 > Also show your TA the answers to the questions asked above.  You don't have to have correct answers, but you should be able to have a good discussion with your TA about the code you wrote.
@@ -159,6 +161,8 @@ Once it works, based on your code and the function implementations, answer the f
 
 > [!IMPORTANT]
 > Show your TA that turning the potentiometer varies the value printed to your Serial Monitor within the range 0-4095.  
+> 
+> If the values aren't changing, use the debugger to determine if your code is hanging somewhere.  Ensure that you are getting a non-zero value out of the relevant ADC register when you turn the potentiometer. 
 > 
 > In `autotest`, show that your function passes the `freerun` test case.
 > 
@@ -227,6 +231,8 @@ If it doesn't work:
 
 > [!IMPORTANT]
 > Show your TA that turning the potentiometer varies the value displayed on the seven segment display within the range 0.000000 to 3.300000.  It may be lower than 3.3 and higher than 0.0, which is fine.  Show them the code you wrote, and that it passes the `adc_dma` test case.
+> 
+> If the values aren't changing, use the debugger to determine if your code is hanging somewhere.  Ensure that you are getting a non-zero value out of the relevant ADC register when you turn the potentiometer. 
 > 
 > Also show your TA the answers to the questions asked above.  You don't have to have correct answers, but you should be able to have a good discussion with your TA about the code you wrote.
 > 
