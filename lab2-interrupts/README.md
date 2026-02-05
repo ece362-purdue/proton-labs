@@ -154,7 +154,7 @@ You'll notice that there's not any information about **configuring** or **enabli
 
 9. (3 points) The best use case for interrupts is to wake the CPU from a low power state when an event occurs, to minimize power consumption.  As explained in that section, the DORMANT power state of the RP2350 turns off nearly everything on the microcontroller (by turning off one critical component) until an external interrupt occurs.  What register should you write to in order to enter the DORMANT state, and what value should we write?  
     - Hint: We are using the crystal oscillator for the clock source.
-    - Hint: The function `_go_dormant` described in [6.5.6.2. DORMANT](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#power-dormant-example) of the datasheet calls a function that writes to this register.  Find that code for that function by trying to call it in your code template, diving into the function, and seeing what register it writes to and what value is written, before entering a `while` loop that ensures the crystal oscillator, and therefore your clock frequency, are stable before returning to your code.
+    - Hint: The function `_go_dormant` described in [6.5.6.2. DORMANT](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#power-dormant-example) of the datasheet calls a function that writes to this register.  Find that code for that function (the one within, **not** `_go_dormant` itself) by trying to call it in your code template, diving into the function, and seeing what register it writes to and what value is written.  That line of code is just before it enters a `while` loop that ensures the crystal oscillator, and therefore your clock frequency, are stable before returning to your code.
 10. (3 points) To enable waking from the DORMANT state by a **specific** GPIO pin interrupt, what register do you need to write to?  
 
 > [!NOTE]
@@ -203,7 +203,8 @@ In summary, you should implement the following functions:
 2. `gpio_isr` - This single ISR will handle interrupts from both GP21 and GP26. It should:
     - Identify which pin triggered the interrupt (check the pending events register)
     - If GP21: acknowledge the interrupt, turn off all user LEDs GP22-GP25, and enter DORMANT state
-    - If GP26: acknowledge both the DORMANT wake event and the rising edge interrupt, then turn on GP22-GP25
+    - If GP26: acknowledge the rising edge interrupt, then turn on GP22-GP25
+        - A previous version of this document said to acknowledge both the DORMANT wake event and rising edge interrupt, but upon further inspection and debugging, it appears they achieve the same thing.
 
 > [!TIP]
 > If you're unsure what functions to use, use the [C/C++ SDK functions](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf).  Search for GPIO and/or IRQ functions.
@@ -216,6 +217,11 @@ In summary, you should implement the following functions:
 > If you notice that **uploading code to your microcontroller suddenly stops working** while you are working on this step, it may be that the microcontroller is in the DORMANT state.  If this happens, force the Proton board into BOOTSEL mode by holding down BOOTSEL, pressing RESET, and then letting go of BOOTSEL.  This puts the RP2350 into bootloader mode, allowing you to upload a new program again.
 >
 > These errors are usually indicated by OpenOCD failures while running Upload and Monitor, e.g. `openocd init failed` or `openocd: Failed to connect to target`.  If you see this, try the above steps to get back into BOOTSEL mode.
+
+> [!IMPORTANT]
+> In Spring 2026, we discovered that more Proton boards than usual had trouble waking up from DORMANT mode.  [This page](dormant.md) details the issue and provides a fix that you may need to add to your `gpio_isr`.
+> 
+> Even if you were not having issues properly waking from DORMANT with the instructions above, you may want to add the suggested lines in so that you can use it for future projects that utilize DORMANT sleep on the RP2350.  If you're able to perform step 1 without these lines, you do not need this code to complete the lab.
 
 After the `init_gpio_irq` call in `main` underneath the `#ifdef STEP1` stanza, you'll see an infinite loop that prints out "Hello world" every second.  This is an example of some "work" that the CPU is normally doing while it's not in the DORMANT state.
 
