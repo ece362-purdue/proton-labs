@@ -62,7 +62,7 @@ Here is where the components on your breadboard should be placed by now:
 
 In this lab, we're going to add the 7-segment parallel driver card PCB that is in your kit.  This "card" was designed for you by your instructor to help alleviate wiring issues in the past from when students wired this up themselves on the breadboard, and to create space for new components in the future.  The schematic for this card is shown below, but **do not wire this up!**  We have a lot of background to get through first as to how this works:
 
-![7seg](images/7seg.png)
+![7seg](images/7seg-2025-4.png)
 
 The eight TDCR1050M seven-segment displays should be familiar to you from ECE 270 - you had these on the FPGA board that you used.  However, unlike 270, you will not directly drive each individual pin on the display - that would require 64 I/O pins that we do not have!  
 
