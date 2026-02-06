@@ -87,7 +87,7 @@ Connect D8-D1 to GP17-GP10, respectively.  These are the eight data pins of the 
 ![7seg-card](images/7seg-explanation.png)
 
 > [!IMPORTANT]
-> Run `check_wiring` in the autotest console to check your wiring.  If you have any issues, carefully check your wiring and identify missing power/ground connections, or miswired connections.
+> Run `check_wiring` in the autotest console to check your wiring - you should see "01234567" appear on the display.  If you have any issues, carefully check your wiring and identify missing power/ground connections, or miswired connections.
 > 
 > Use a DMM to ensure continuity between any two points that should be connected - this may be a common issue with bad breadboards.  Do the same for power and ground connections if the display is not turning on at all.
 
