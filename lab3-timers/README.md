@@ -207,12 +207,12 @@ This function initializes the GPIO pins for the keypad.  It should set GP6-GP9 a
 
 #### 2.2. `keypad_init_timer`  
 
-In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `keypad_drive_column`, and enable that interrupt.  Then, initialize TIMER0 to fire alarm 1 after 1.10 seconds to call `keypad_isr`, and enable that interrupt as well.  
+In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `keypad_drive_column`, and enable that interrupt.  Then, initialize TIMER0 to fire alarm 1 after 1.01 seconds to call `keypad_isr`, and enable that interrupt as well.  
 - One hard requirement that we have for how you set the handler is that you set it as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.  You may use the SDK function to do so, since the process is fairly complicated and requires access to variables that are not in the global scope.
 - Look for the Programmer's Model section and/or the C/C++ SDK if you need help figuring out how to do this.
 
 > [!NOTE]
-> *Why 1.10 seconds?*
+> *Why 1.01 seconds?*
 > 
 > Notice that we're no longer using a sleep function when we do it this way.  Instead of one loop that drives the column, sleeps, and reads rows, we're having the timer trigger two alarms 0.1 seconds apart - one alarm responsible for driving the column, and the other for reading the rows.  This creates a "space" of 100 ms where the CPU can work on something else instead of sleeping (as one ought to make it do when working with embedded systems...)!
 
