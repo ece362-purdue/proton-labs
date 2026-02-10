@@ -52,7 +52,7 @@ In your kit, you should find the following items:
 - 3 47 ohm resistors;
     - If you are missing these, just pick them up from the ECE shop.
 - An LM324 op-amp;
-- A 10uF capacitor, and;
+- A 10uF capacitor to form a high-pass filter to adjust the audio signal's DC offset, and;
 - A 3.5mm TRRS audio jack for plugging in headphones into your breadboard.
 
 Start with the RGB LED.  You can wire the RGB LED up by placing it just underneath the Proton board as shown below, to the left of the potentiometer from lab 4, with the **longer** anode pin connected to the 3.3V power rail, and the **shorter** cathode pins connected via the 47 ohm resistors to GP37, GP38 and GP39.  The order of colors does not matter as long as you remember which pin is which color (which you'll find out in step 2).  
@@ -108,7 +108,7 @@ To understand how this wave is created, read **Overview**, **Programmer's Model*
 ### Step 2: Implement a static duty cycle PWM signal
 
 > [!CAUTION]
-> Copy in both `display.c` from lab 4 and `keypad.c` from lab 3.  We'll use the keypad to control the duty cycle of the PWM signal in this lab, and the display to show the current duty cycle value.  
+> Copy in both `display.c` from lab 4 and `keypad.c` from lab 3.  We'll use the keypad to control the duty cycle of the PWM signal in this lab, and the display to show the current duty cycle value.   
 
 In this step, you will implement a static duty cycle PWM signal, which means we'll generate a PWM signal that maintains a constant voltage, corresponding to the unchanged duty cycle value.  So if our duty cycle is 50%, the PWM signal will remain high for 50% of the time and low for the other 50%.
 
@@ -176,7 +176,7 @@ Implement `init_pwm_irq` to do the following.  You can assume the pins and gener
 
 1. Within the PWM peripheral registers, enable interrupts for the PWM slice associated with GP37, associated with the **first** PWM wrap interrupt (there are two - pick the one that says "WRAP0", so that we can check it with the autotest).  We'll update both slices from the same handler, so there is no need to enable it for the different slice associated with GP38 and GP39.
 
-2. Set `pwm_breathing` as the exclusive handler when the PWM slice associated with GP37's counter wraps around to 0.  You can find the numbers associated with the PWM interrupt in the datasheet, `hardware_irq` in the Hardware API, or by looking at the `pwm.h` header file.
+2. Set `pwm_breathing` as the exclusive handler when the PWM slice associated with GP37's counter wraps around to 0.  You can find the numbers associated with the PWM interrupt in the datasheet, `hardware_irq` in the Hardware API, or by looking at the `pwm.h` header file.  You may use the appropriate SDK function to do this.
 
 3. Enable interrupts for the aforementioned PWM the PWM slice associated with GP37 interrupt.
 
@@ -286,27 +286,48 @@ In `main`, we have done the following for you:
 2. Call `set_freq` with the float value 440.00, to set up a frequency of 440.00 Hz.
 3. Implement a frequency entry loop that waits for you to type in a new frequency, and calls `set_freq` with that value.  Pressing 'A' will set the Channel 1 frequency, and pressing 'B' will set the Channel 2 frequency.  You can also type in floating point numbers like 418.512 Hz, with the asterisk as the decimal point.
 
-Ideally, you should hear a 440 Hz sine wave.  To verify the frequency, connect an oscilloscope to GP36 and measure the frequency on the scope, and the waveform should look like this.  
+Ideally, you should hear a 440 Hz sine wave.  To verify the frequency, connect an oscilloscope to GP36 and measure the frequency on the scope, and the waveform should look like this.
 
 ![sine.png](images/sine.png)
 
-This "thickness" is due to the 20 kHz PWM noise that is always either pushing the capacitor higher or pulling it lower.
+This "thickness" is due to the 20 kHz PWM noise that is always either pushing the capacitor higher or pulling it lower.  If you're still getting a square wave, ensure you have connected the 0.1 uF capacitor between the PWM output and ground from Step 0.2.
+
+If you would like to listen to it, plug in a pair of headphones into the TRRS jack, or connect a speaker.  If you don't have a pair, or if the volume is too low, you could also connect an aux cord back into a microphone input on your computer if possible and "monitor" this microphone. (on [Windows](https://www.supportyourtech.com/tech/how-to-turn-on-mic-monitoring-in-windows-11-a-step-by-step-guide/), [macOS](https://www.guidingtech.com/55703/ive-monitor-mic-input-mac/)).
+
+On the lab machines, you should be able to plug in an 3.5mm aux cord between your breadboard and the PC (borrow one from a TA or the ECE Shop), select "Microphone" when the dialog appears on your lab machine, and run `~ece362/bin/play-sound` in a terminal to hear the microphone audio echoed back to the speaker. 
 
 > [!IMPORTANT]
 > Show your TA the sine wave on the oscilloscope, and demonstrate that you can change the frequency of the sine wave by changing the argument to `set_freq`.  Show them the code you wrote, and that it passes the `audio` test case.
 >
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
-<!-- ### Step 5: (Optional) Play with a drum machine
+### Step 5: (Optional) Play with a drum machine
 
-Call the function `drum_machine` with no arguments in `main` to try it out!
+Comment out all the `STEP` defines and uncomment the `DRUM_MACHINE` define.  This, very simply, calls the `drum_machine` function in `main`.  (The code for this function is hidden because we want you to be able to write code at this complexity level for the project, and we can't just give it away!)  This function requires that you have working keypad and display functions from lab 3, and won't depend on the code you wrote in this lab.
 
-A = kick
-B = snare
-C = hi-hat
-D = snare
+Once uploaded, use the following buttons to try out the following sounds:
 
-Pressing a button will play the corresponding sound.  You can also press multiple buttons at once to play multiple sounds at once.  -->
+A = kick  
+B = snare  
+C = hi-hat  
+D = snare  
+
+Pressing a button will play the corresponding sound.  You can also press multiple buttons at once to play multiple sounds at once. 
+
+In this lab thus far, we've given you the code for a very simple 8-bit audio application.  This drum machine, however, implements a radically different architecture that shows you the possibilities of high-quality audio synthesis without having to purchase too many external components.  The audio that you're hearing is at a 44100 Hz sample rate, 64KB bitrate, 16-bit depth, and was encoded as MP3 files to save space on the flash memory (with some loss of quality).
+
+Making such a large jump in audio quality requires that we outsource as much as possible.  The following is helpful to consider:
+
+1. DMA is your friend when it comes to transferring large amounts of data between memory regions and/or peripherals without having to execute code on the CPU.  As you saw in `pwm_audio_handler`, all you really need to do to play audio is transfer samples from an array to the PWM CC register.  That process can be automated with DMA if you properly set up the buffers with audio samples beforehand.
+    - In the drum machine example, we pre-allocate memory for PWM samples for each of the four sounds, allowing us to easily switch between them without having to re-read the saved MP3 data from flash over and over again (which can be slow compared to reading it from RAM).
+
+2. You have a second core available for offloading any repetitive tasks that do require CPU processing and need to be handled in an infinite loop.  Consider that currently, we are using an ISR to directly update the PWM CC register.  This is fine for simple audio like a sine wave at a fixed frequency, but in this drum machine, high-quality audio takes a lot more time to be processed, particularly the conversion of samples from MP3 to PCM, and the mixing of audio samples, and restarting the DMA channels to transfer the mixed samples to the PWM register.  Not to mention, we're also polling the keypad watching for key presses, and try to handle them as soon as possible to ensure low latency between when a key is pressed and when its corresponding sound is heard.  
+    - In our implementation, core 0 is responsible for polling the keypad.  This ensures that the key handling ISR does not conflict with audio mixing and synthesis.  Delays can cause little "burps" in the audio that gets sent out, as the DMA buffers may fail to refill in time.
+    - Core 1 is responsible for refilling the buffers as they empty, and restarting the DMA transfers for buffers that are ready to be transferred to PWM.
+
+This block diagram showcases the flow of operations when you call `drum_machine`.
+
+![drum-machine](images/drum_machine_map.png)
 
 ### Step 5: Confirm your checkoffs before leaving
 
