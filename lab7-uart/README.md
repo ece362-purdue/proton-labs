@@ -68,17 +68,15 @@ UART typically has two other pins - RTS and CTS - which are used for hardware fl
 
 Go over [12.1 UART](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_uart) as well as the relevant [SDK functions](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf#group_hardware_uart) for UART, and answer the following questions:
 
-1. (4 points) In the code example under "hardware_uart" in the [C/C++ SDK datasheet](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf), the function for GPIO is set using the macro "UART_FUNCSEL_NUM(uart0, N)" and not, as one would expect, "GPIO_FUNC_UART".  What does this macro do?  
+1. (5 points) In the code example under "hardware_uart" in the [C/C++ SDK datasheet](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf), the function for GPIO is set using the macro "UART_FUNCSEL_NUM(uart0, N)" and not, as one would expect, "GPIO_FUNC_UART".  What does this macro do?  
 
-2. (4 points) With the macro above, what would be the GPIO function selected for GP0 and GP1 (and by extension, any TX/RX pins) be?  What would be the GPIO function selected for GP2 and GP3 (and by extension, any RTS/CTS pins) be?  
+2. (5 points) With the macro above, what would be the GPIO function selected for GP0 and GP1 (and by extension, any TX/RX pins) be?  What would be the GPIO function selected for GP2 and GP3 (and by extension, any RTS/CTS pins) be?  
 
-3. (4 points) Which register holds parameters like word length, number of stop bits, parity, etc.?
+3. (5 points) Which register holds parameters like word length, number of stop bits, parity, etc.?
 
-4. (4 points) Identify what the frequency of the clock to the baud rate generator is, and calculate the value of the Baud Rate Divisor register for a baud rate of 115200 bps.  
+4. (5 points) Identify what the frequency of the clock to the baud rate generator is, and calculate the values for the Baud Rate Divisor registers for a baud rate of 115200 bps.  
 - Hints: try out the SDK function that sets the baud rate in your `main.c` file.  The input clock to the baud rate generator is `clk_peri`.
 - Even if you find the value for the register in the datasheet, you need to show the formula and how it's used.
-
-5. (4 points) Identify the interrupt numbers associated with when the UART receives a character, and when it transmits a character.
 
 > [!IMPORTANT]
 > Show your answers for the questions asked above to your TA.  You must have **correct** answers to earn points for this step.  
