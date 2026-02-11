@@ -180,7 +180,7 @@ From lab 2, copy in the functions `drive_column` and `keypad_isr`.  Rename `driv
 
 When you move on to a new lab, you'll be expected to include those files from the previous lab in your project yourself, so take care to implement this properly!
 
-We're also going to significantly change how we read the keypad, moving away from the loop with sleep that we had in the last lab.  Instead, we'll implement two timer alarms that will fire every 25 milliseconds, offset from each other by 100 milliseconds.  
+We're also going to significantly change how we read the keypad, moving away from the loop with sleep that we had in the last lab.  Instead, we'll implement two timer alarms that will fire every 25 milliseconds, offset from each other by 10 milliseconds.  
 
 The offset implements the "delay" we had last lab, but now we can use that delay to do other things in the meantime, such as triggering another interrupt to update a display or read sensors.
 
@@ -207,14 +207,16 @@ This function initializes the GPIO pins for the keypad.  It should set GP6-GP9 a
 
 #### 2.2. `keypad_init_timer`  
 
-In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `keypad_drive_column`, and enable that interrupt.  Then, initialize TIMER0 to fire alarm 1 after 1.01 seconds to call `keypad_isr`, and enable that interrupt as well.  
+In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `keypad_drive_column`, and enable that interrupt.  Then, initialize TIMER0 to fire alarm 1 after 1.01 seconds (see note below) to call `keypad_isr`, and enable that interrupt as well.  
 - One hard requirement that we have for how you set the handler is that you set it as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.  You may use the SDK function to do so, since the process is fairly complicated and requires access to variables that are not in the global scope.
 - Look for the Programmer's Model section and/or the C/C++ SDK if you need help figuring out how to do this.
 
 > [!NOTE]
 > *Why 1.01 seconds?*
 > 
-> Notice that we're no longer using a sleep function when we do it this way.  Instead of one loop that drives the column, sleeps, and reads rows, we're having the timer trigger two alarms 0.1 seconds apart - one alarm responsible for driving the column, and the other for reading the rows.  This creates a "space" of 100 ms where the CPU can work on something else instead of sleeping (as one ought to make it do when working with embedded systems...)!
+> Notice that we're no longer using a sleep function when we do it this way.  Instead of one loop that drives the column, sleeps, and reads rows, we're having the timer trigger two alarms 0.01 seconds apart - one alarm responsible for driving the column, and the other for reading the rows.  This creates a "space" of 10 ms where the CPU can work on something else instead of sleeping (as one ought to make it do when working with embedded systems...)!
+>
+> However, this really depends on your particular situation.  For some of you, 1.1 seconds works better.  This might be because of different stray capacitances across breadboards.
 
 #### 2.3. `keypad_read_rows`  
 
