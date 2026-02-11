@@ -18,8 +18,8 @@
 | &nbsp; | Total: | 100 |
 <br>
 
-\* - You must get your whole lab checked off before the end of your lab section to avoid a late penalty of 20%.
-\*\* - This is an optional step that introduces you to a very versatile peripheral that you can use with devices that do not typically interface with well-known peripherals.  E.g. your 7-segment displays, or a WS2812 LED strip.
+\* - You must get your whole lab checked off before the end of your lab section to avoid a late penalty of 20%.  
+\*\* - This is an optional step that introduces you to a very versatile peripheral that you can use with devices that do not typically interface with well-known peripherals.  E.g. your 7-segment displays, or a WS2812 LED strip.  
 
 ### Instructional Objectives
 
@@ -125,6 +125,9 @@ const int SPI_DISP_TX = 0; // Replace with your TX pin number for the LCD/OLED d
 > [!WARNING]
 > When you are choosing pins, make sure that you do not use pins that are already being used for some purpose.  So far, you are using GP2-9 for the keypad, GP21-GP26 for the pushbuttons and onboard LEDs, GP36-39 for PWM, GP45 for the ADC.  Use pins on both sides of the board so that you can easily connect them to the SPI pins on the Proton board side facing each of them.
 
+> [!IMPORTANT]
+> Ensure the wiring is correct and that the necessary variables at the top of `main.c` are set appropriately, so you can run `check_wiring` in autotest to test your wiring to ensure everything looks correct.  You may have to wait about 5-10 seconds after uploading to let our autotest do some work first (necessary for generating confirmation codes) before it can run `check_wiring`.
+
 ### Step 1: Read the datasheet
 
 SPI stands for Serial Peripheral Interface, and it is by far one of the simplest and most widely used protocols for communicating with external devices.  It is a synchronous protocol, meaning that it uses a clock signal (SCK) to synchronize the transmission of data (TX to RX) between your Proton board TX and an external device's RX.  Conversely, UART, which we'll cover next lab, is an asynchronous protocol, meaning that it does not use a clock signal and instead relies on the timing of the data bits to determine when to read or write data.
@@ -183,7 +186,7 @@ When it doesn't work:
 
 Now, it's time for the real thing!
 
-In `display.c`, implement `display_init_spi` to initialize the three GPIO pins to be used by the SPI peripheral associated with them.  **This means you have to set the function for the pin accordingly, and it is no longer GPIO output.**  It must also initialize the associated SPI peripheral with the following parameters:
+In `display.c`, implement `display_init_spi` to initialize the three GPIO pins to be used by the SPI peripheral associated with them.  **This means you have to set the function for the pin accordingly, as it is no longer a GPIO output.**  It must also initialize the associated SPI peripheral with the following parameters:
 - The clock frequency should be set to 125 KHz.
     - Start with 125, but you can experiment and see what frequency works.  We generally recommend a lower one to let the data bits propagate through the shift registers into the 7-segment displays.  Autotest will expect 125 KHz.
 - The data format should be set to 16 bits.
