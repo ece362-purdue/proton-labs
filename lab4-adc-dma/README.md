@@ -191,7 +191,7 @@ In the function `init_adc_dma`, do the following:
 4. Configure the ADC to send out a DREQ signal whenever a new sample is ready in the FIFO.  The DREQ signal will tell the DMA that the data is ready to be copied.
 
 > [!NOTE]
-> For this step, it is **much** easier to set up DMA using the registers, as you have better control over the individual parameters for DMA transfers.
+> For the instructions that follow, it is **much** easier to set up DMA using the registers, as you have better control over the individual parameters for DMA transfers.
 >
 > If you use SDK functions for this step, you will be asked to rewrite them into registers.
 
