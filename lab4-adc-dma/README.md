@@ -190,7 +190,12 @@ In the function `init_adc_dma`, do the following:
 3. Enable the ADC FIFO to store the generated samples.
 4. Configure the ADC to send out a DREQ signal whenever a new sample is ready in the FIFO.  The DREQ signal will tell the DMA that the data is ready to be copied.
 
-Next, in the function `init_dma`, do the following:
+> [!NOTE]
+> For this step, it is **much** easier to set up DMA using the registers, as you have better control over the individual parameters for DMA transfers.
+>
+> If you use SDK functions for this step, you will be asked to rewrite them into registers.
+
+Next, in the function `init_dma`, do the following (without SDK functions):
 
 1. Configure DMA Channel 0 to read from the ADC FIFO and write to the variable `adc_fifo_out`.  You'll need to pass the addresses of both these variables to the `read_addr` and `write_addr` fields of the DMA channel 0 configuration.
 
