@@ -221,6 +221,9 @@ Hopefully, you should now have a very simple voltmeter on your breadboard!
 
 ![voltmeter.gif](images/voltmeter.gif)
 
+> [!NOTE]
+> The GIF above shows the decimal point merged with one of the digits.  You may not have this in your own code, where it might show the decimal point on its own display ("ss6", or the 2nd 7-segment display from the left).  Your template code will have an older version of `display_char_print` that doesn't implement this "merge".  We welcome you to change the function to implement merging the decimal point as part of the first number on "ss7"/1st 7-segment display from the left.  
+
 Answer the following questions with regards to your code:
 
 1. What register bits did you have to write to to enable the ADC FIFO?  
