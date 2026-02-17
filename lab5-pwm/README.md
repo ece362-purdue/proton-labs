@@ -55,6 +55,9 @@ In your kit, you should find the following items:
 - A 10uF capacitor to form a high-pass filter to adjust the audio signal's DC offset, and;
 - A 3.5mm TRRS audio jack for plugging in headphones into your breadboard.
 
+> [!IMPORTANT]
+> Your 3.5mm TRRS jack may have come without pin headers.  Make sure to solder them on with "single-sided" (one side much shorter than the other) headers, and ensure that the longer side goes down into your breadboard.
+
 Start with the RGB LED.  You can wire the RGB LED up by placing it just underneath the Proton board as shown below, to the left of the potentiometer from lab 4, with the **longer** anode pin connected to the 3.3V power rail, and the **shorter** cathode pins connected via the 47 ohm resistors to GP37, GP38 and GP39.  The order of colors does not matter as long as you remember which pin is which color (which you'll find out in step 2).  
 
 > [!CAUTION]
