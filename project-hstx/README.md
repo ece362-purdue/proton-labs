@@ -76,6 +76,6 @@ The DMA and HSTX subsystems are fully configured in `src/main.c`. To change the 
 
 ### How to expand on this
 
-Video output is just a matter of changing the framebuffer to a new frame, but you may find yourself capped to a low frame rate.  Explore optimizations to the image conversion pipeline, or consider writing a custom asset generator that produces delta frames instead of full frames (so you're only proces).  You can also experiment with different resolutions and timings by modifying the hstx.h timing macros and the image conversion script.
+Video output is just a matter of changing the framebuffer to a new frame, but you may find yourself capped to a low frame rate.  Explore optimizations to the image conversion pipeline, or consider writing a custom asset generator that produces delta frames instead of full frames (so you're processing less data to update fewer pixels).  You can also experiment with different resolutions and timings by modifying the hstx.h timing macros and the image conversion script.
 
 This project heavily derived from the [Pico SDK example](https://github.com/raspberrypi/pico-examples/blob/master/hstx/dvi_out_hstx_encoder/dvi_out_hstx_encoder.c) that shows how to implement the DVI/HDMI output, so you may want to see other examples in that folder for more ideas on how to use the HSTX peripheral.  The RP2350 datasheet also has more details on the HSTX peripheral and its capabilities.
