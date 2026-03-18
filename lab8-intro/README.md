@@ -33,11 +33,12 @@ In Spring 2026, we switched to Docker, away from the `eceprog` computing cluster
 - Containerization is very common in modern software development.
 - Given rising student enrollments, `eceprog` has often proved to be slow and often inaccessible at peak periods during the semester.  
 - Docker allows you to run the compilers and other tools needed directly on your own machine.  This eliminates the need to rely on a remote server that could become inaccessible, and gives you more control over the tools.  
-- The way we implemented the Docker infrastructure was done through VScode using a feature called **Dev Containers**.  This allows you to do the assembly labs in two ways:
-    - You can clone the lab repository and open it in a Dev Container on your own machine.  This requires that you install Docker alongside VScode, but do not fret - you do not have to do much configuration beyond the initial install.  **This is the preferred method for you to do your RISC-V labs.**  Continue to Step 0.1.1.
-    - OR, you can start a GitHub Codespace for your repository that lets you run VScode entirely within your browser, with the tools running on a cloud VM on GitHub servers.  While this offers the convenience of a one-click solution, it is prone to the same problems of latency and potential disconnection that using eceprog faces.  
-        - GitHub Codespaces has a limit of 120 hours/month.  While we do not anticipate you hitting that limit, you should be aware that it may start charging you if you spend more than 120 hours in a codespace in a month.
-        - If you choose to use GitHub Codespaces, you can skip Step 0.1.1 and go straight to Step 1, as the Codespace will already have the necessary tools installed for you.  When you accept the GitHub assignment, click the green Code button, click Codespaces, and click "Start codespace on main".
+
+The way we implemented the Docker infrastructure was done through VScode using a feature called **Dev Containers**.  This allows you to do the assembly labs in two ways:
+- You can clone the lab repository and open it in a Dev Container on your own machine.  This requires that you install Docker alongside VScode, but do not fret - you do not have to do much configuration beyond the initial install.  **This is the preferred method for you to do your RISC-V labs.**  Continue to Step 0.1.1.
+- OR, you can start a GitHub Codespace for your repository that lets you run VScode entirely within your browser, with the tools running on a cloud VM on GitHub servers.  While this offers the convenience of a one-click solution, it is prone to the same problems of latency and potential disconnection that using eceprog faces.  
+    - GitHub Codespaces has a limit of 120 hours/month.  While we do not anticipate you hitting that limit, you should be aware that it may start charging you if you spend more than 120 hours in a codespace in a month.
+    - If you choose to use GitHub Codespaces, you can skip Step 0.1.1 and go straight to Step 1, as the Codespace will already have the necessary tools installed for you.  When you accept the GitHub assignment, click the green Code button, click Codespaces, and click "Start codespace on main".
 
 #### Step 0.1.1: Setting up Docker with VScode
 
