@@ -1,4 +1,4 @@
-# Lab 8
+# Lab 9
 ## Control Flow RISC-V Assembly
 
 ### Table of Contents
@@ -16,6 +16,13 @@
 > Similar to your prior lab, you will accept the GitHub Classroom link from Piazza, complete your work, commit and push, and submit the repository to Gradescope.  There are no checkoffs, but you must ensure you submit by the end of your lab section for the week of this lab.
 > 
 > For a review of the infrastructure used in this lab, revisit [lab 8](../lab8-intro).
+> 
+> When you spin up the container again, it might be that you have to reinstall some crucial extensions.  Run this in a new terminal after the container is fully set up:
+
+```
+code --install-extension /opt/riscv/riscv-debug.vsix
+code --install-extension ms-vscode.cpptools
+```
 
 ## Introduction
 
