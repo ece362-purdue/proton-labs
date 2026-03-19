@@ -15,7 +15,7 @@
 > [!IMPORTANT]
 > Similar to your prior lab, you will accept the GitHub Classroom link from Piazza, complete your work, commit and push, and submit the repository to Gradescope.  There are no checkoffs, but you must ensure you submit by the end of your lab section for the week of this lab.
 > 
-> For a review of the infrastructure used in this lab, revisit [lab 8](../lab8-intro).
+> Remember that you will either work on the lab inside a VScode Dev Container on your own computer, or on GitHub Codespaces - it will NOT run natively on Windows or macOS.  For a review of the infrastructure used in this lab, revisit [lab 8](../lab8-intro).  
 > 
 > When you spin up the container again, it might be that you have to reinstall some crucial extensions.  Run this in a new terminal after the container is fully set up:
 
