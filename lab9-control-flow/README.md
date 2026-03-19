@@ -7,20 +7,15 @@
 | Step | Description                           | Points  |
 |------|---------------------------------------|---------|
 | 0    | Background Information                |         |
-| 1    |`asm_strlen`                           |   30    |
-| 2    |`asm_fib`                              |   35    |
-| 3    |`asm_toUppercase`                      |   35    |
-| &nbsp; | Total: | 100 |
-<br>  
+| 1    |`asm_strlen`                           |         |
+| 2    |`asm_fib`                              |         |
+| 3    |`asm_toUppercase`                      |         |
+| &nbsp; | Total: | 100 |  
 
-# Lab 9: Control Flow
-
-| Step | Description     | Points  |
-|------|-----------------|---------|
-| 1    |`asm_strlen`     | 30      |
-| 2    |`asm_fib`        | 35      |
-| 3    |`asm_toUppercase`| 35      |
-|      | Total           | 100     |
+> [!IMPORTANT]
+> Similar to your prior lab, you will accept the GitHub Classroom link from Piazza, complete your work, commit and push, and submit the repository to Gradescope.  There are no checkoffs, but you must ensure you submit by the end of your lab section for the week of this lab.
+> 
+> For a review of the infrastructure used in this lab, revisit [lab 8](../lab8-intro).
 
 ## Introduction
 
@@ -294,7 +289,7 @@ code after for_loop...
 Let's give this a try by having **you** manually compile some C code into assembly.
 
 > [!Note]
-> Partial credits are available for all of the problems in this section. Each problem will have 31 test cases and the partial credit is determined by `pass_count / 31 * PROBLEM_POINTS`. Some of the test cases can be passed even with an empty solution, which is normal, but this might change as you code up your own solution.
+> Partial credits are available for all of the problems in this section.  Some of the test cases can be passed even with an empty solution, which is normal, but this might change as you code up your own solution.
 
 In this problem, you will implement the `uint32_t asm_strlen(char *str)` function, which will take in a pointer to a string and return its length up to the null terminating character `\0`:
 
@@ -337,7 +332,7 @@ You will implement the function in `lab.S` under the label `asm_strlen`.  Simila
 > In order to implement the multiple `return` statements in the C program, use the `ret` instruction in the RISCV32 ISA.  `ret` will pop the return address from the stack (intiially saved by `main` to the `x1/ra` register when it calls your function) and jump to it.
 
 > [!Tip]
-> `lw` will load a 32-bit value from memory. However, we are using `char` this time, which is just 8-bit!
+> `lw` will load a 32-bit value from memory. However, we are using `char` this time, which is just 8-bit, so don't use `lw`!
 
 ### Step 2: Fibonacci with loop (`asm_fib`)
 
