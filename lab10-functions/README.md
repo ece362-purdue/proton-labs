@@ -2,26 +2,32 @@
 
 | Step | Description                         | Points |
 |------|-------------------------------------|--------|
-| 1    | What is a calling convention?       |        | 
+| 1.1  | What is a calling convention?       |        | 
+| 1.2  | Utilizing the stack                 |        |
 | 2    | ASM with C                          |        |
-| 2.1  | `asm_sort_int` and helper functions | 25     |
-| 2.2  | `asm_strconcat`                     | 25     |
+| 2.1  | `asm_sort_int` and helper functions |        |
+| 2.2  | `asm_strconcat`                     |        |
 | 3    | Recursion                           |        |
-| 3.1  | `asm_fib`                           | 25     |
-| 3.2  | `asm_bsearch`                       | 25     |
+| 3.1  | `asm_fib`                           |        |
+| 3.2  | `asm_bsearch`                       |        |
 |      | Total                               | 100    | 
+
+> [!IMPORTANT]
+> When you spin up the container again, it might be that you have to reinstall some crucial extensions.  Run this in a new terminal after the container is fully set up:
+
+```
+code --install-extension /opt/riscv/riscv-debug.vsix
+code --install-extension zhwu95.riscv
+code --install-extension ms-vscode.cpptools
+```
 
 ## Introduction
 
-In this lab we will first discuss the RISCV32 calling convention, or ABI (application binary interface), which allows us to write functions that properly invoke each other at the machine code level. We will also discuss aspects of the stack.
+In this lab, we'll go over the ABI (Application Binary Interface) for RISC-V, which defines how functions should be called and how arguments should be passed, giving us a **calling convention**. 
 
-We'll follow that up with writing assembly code to call standard C library functions like `malloc` and `qsort` to practice the calling convention.
+We'll also see how to call standard C functions like `malloc` and `strlen` from assembly, amd implement some recursive functions.
 
-Speaking of functions, we won't forget recursion! You will also write up some recursive assembly functions to compute (once again) a Fibonacci series, and implement a recursive binary search. 
-
-The points will be evenly distributed among the 4 questions with each problem having 30 testcases. So for each question, your score will be `PASS_COUNT/30 * 25` rounded to the 100ths place.
-
-## 1. What is a calling convention?
+### Step 1.1: What is a calling convention?
 
 Suppose your friends Alice and Bob (why [Alice and Bob](https://en.wikipedia.org/wiki/Alice_and_Bob)?) wrote two assembly functions `foo(a, b)` and `bar(c)` respectively. 
 
@@ -29,13 +35,13 @@ Now suppose you want to write a third assembly function `baz` that will call the
 
 We first might want to know how we should pass the arguments into `foo(a, b)` and `bar(c)`. Do we put `a` in register `x10` or `x11`? What about argument `b`? How can we make sure all our registers' values stay the same after calling `foo` and `bar`?  Also, where is the return value for each of these functions?
 
-### 1.1 Calling convention to the rescue!
+#### Calling Conventions from the RISC-V ABI
 
 To make our lives (and the compiler's) easier, we would want to define a uniform way to pass function arguments, preserve register values, and get the function's return value, all of which is laid out in our **calling convention**.
 
-You have already encountered the RISC-V calling convention in the previous two labs, where you were asked specifically to get function arguments from registers `x10` and `x11`, and we put our return value in register `x10`. You can learn more about the various type of registers RISC-V provides from your data card. A brief list of the registers is provided below:
+You can see the full RISC-V ABI specification [here](https://docs.riscv.org/reference/application-software/abi/_attachments/riscv-abi.pdf).
 
-<!-- Here is a brief list of each register's type in ARMv8 calling convention (you can find a more detail description [here](https://developer.arm.com/documentation/den0024/a/The-ABI-for-ARM-64-bit-Architecture/Register-use-in-the-AArch64-Procedure-Call-Standard/Parameters-in-general-purpose-registers)): -->
+You have already encountered the RISC-V calling convention in the previous two labs, where you were asked specifically to get function arguments from registers `x10` and `x11`, and we put our return value in register `x10`. You can learn more about the various type of registers RISC-V provides from your data card. A brief list of the registers is provided below:
 
 1. Argument registers (`x10-x17`/`a0-a7`)
    1. Used for passing function arguments and function value returns.
@@ -60,9 +66,7 @@ You have already encountered the RISC-V calling convention in the previous two l
 
 As you can see, a unified calling convention for our ISA allows all programs to speak the same "language" so that they can interact with each other while making safe assumptions about what registers they can use, and how to use them.
 
-### 1.2 Calling functions and returning in RISCV32 ISA
-
-#### 1.2.1 Calling a function
+#### Calling a function
 
 Suppose we have a function `int add_one(int a)` and we would like to call it in RISC-V assembly. How should we do this?  There are 5 steps to keep in mind:
 
@@ -77,7 +81,7 @@ Step 2 and 5 can be optional if you do not use the caller-saved registers, which
 
 Ignoring step 2 and 5, the assembly code to call this function looks like this:
 
-```assembly
+```asm
 // Suppose we call the above function `int add_one(int a)` with `a = 1`
 
 // Prepare arguments. Only need `x10`, since the function has a single argument
@@ -98,22 +102,24 @@ sw x10, 0(x7)
 
 The key instruction here is the `jal x1, label`. What it does is that it will change the `PC` value to the address at `label` and save the `PC + 4` (the instruction immediately after the `bl`) value into register `x1` or `ra` link register. Thus the CPU will know where to go back when returning from a function call.
 
-#### 1.2.2 Entering in a function and returning from it
+#### Returning from a function
 
-Now suppose we have the reversed situation here: we have an assembly function `int sub_two(int a)`.  How should we prepare for when this function is called?  How should we return from it?
+Now suppose we have the reversed situation here: we have an assembly function `int sub_two(int a)` that someone else will call.  What are the first and last things this function should do to folllow calling conventions?
 
 Similar to calling a function, this has 6 steps:
 
-1. Save link register
+1. Save link register (if you need to call other functions only)
 2. Save callee-saved registers
 3. The actual function content
 4. Restore the callee-saved registers
 5. Restore the link register
 6. Return to address in link register
 
-If your function does not call other functions, you do not need to save and restore the link register. This is because when calling another function, the value within the link register will be overwritten.  If we do not save it properly, we lose our ability to return to the caller, and we will end up with an infinite loop in the program:
+If your function does not call other functions, you do not need to save and restore the link register. This is because when calling another function, the value within the link register will be overwritten, and you won't be able to return to the caller.  
 
-```assembly
+If we do not save it *properly*, we lose our ability to return to the caller, and we will end up with an infinite loop in the program:
+
+```asm
 inf_loop_func:
    // Some assembly code without saving register `ra`
    jal x1, some_func
@@ -129,15 +135,15 @@ inf_loop_func:
 // Thus forming an infinite loop.
 ```
 
-If your function does not modify the callee-saved registers `s2-s11`, you do not need to save and restore them.
+If your function does not modify the callee-saved registers `s2-s11`/`x12-x17`, you do not need to save and restore them.
 
-The returning of function is accomplished by `ret`. It will return to the address in the register, which is default to `ra`.
+The returning of function is accomplished by `ret`. It will return to the address in the register, which is default to `ra`/`x1`.
 
-### 1.3 Utilizing the stack
+### Step 1.2: Utilizing the stack
 
 In this section, we will briefly discuss what the stack is and how to use it to save and restore registers' value to and from memory.
 
-#### 1.3.1 Stack 101
+##### Stack 101
 
 > [!Note]
 > The stack we are discussing here is not the software-based data structure, but rather an implementation of it in hardware!
@@ -190,7 +196,7 @@ The above code block shows a typical memory arrangement for a program.
 
 Here is what the stack will look like if `Func_1` called `Func_2`, and then `Func_2` called `Func_3`.
 
-#### 1.3.2 Using the stack in RISCV32 ISA
+#### Using the stack as per the RISCV32 ISA
 
 In the RISC-V ISA, there does not exist a `pop` or `push` instruction for removing or adding items from/to the stack.  Instead, you will need to manually manage the stack space for each function call.  To do so, we will need to subtract the stack pointer `sp` as we enter a function call.  (Look back at the diagram if you're wondering why we're decrementing - we're moving backward!)  Then, we save registers onto the newly allocated space. At the end, just before we return, we will need to restore the registers based on the store sequence and add to the stack pointer so that it moves up.  This is probably best demonstrated with the following assembly code snippet:
 
@@ -261,21 +267,29 @@ Keep in mind that the stack pointer has to be **4-byte aligned**, which is why w
 
 Since this alignment requirement is maintained at hardware level, if you do not follow this rule, you program will not proceed after the faulty instruction. Again, you will need to follow the LIFO rule of stack to load back the registers properly.
 
-## 2. ASM with C
+### Step 2: ASM with C
 
-In this section, you will be writing an assembly program that relies on standard C library functions.
+For lab, you will be writing an assembly program that relies on standard C library functions.
 
-### 2.0 Autograder update
+> [!WARNING]
+> For this lab, tests will be far more comprehensive, which may result in a **lot** of text printed out all at once.  If you're only testing one of the four test problems and want to see output only for that, you can run different make targets for each problem:
+>
+> - `make quicksort`
+> - `make strconcat`
+> - `make fib`
+> - `make bsearch`
+> 
+> Running `make` alone will run all tests.  
+> 
+> If the output is still too long to read, you can redirect the output to a file and read it with a text editor: `make > output.txt`, then open `output.txt` with your favorite text editor.  
+> 
+> `make | less` will also work if you want to read the output in the terminal itself and have it start from the top.  Just press Q to exit the `less` view.
+> 
+> For debugging specific steps, we've added four more targets that correspond to each of these subtests.  You can select the one you want from the dropdown menu in the Run and Debug sidebar.  Don't forget to set a breakpoint in the assembly code to stop at the right place first!
+> 
+> <img src="images/debug.png" width="400">
 
-Since the recursion functions might be hard to debug, the autograder now will print the full inputs as well as the expected outputs for problem 2.2, 3.1, and 3.2.
-
-However, as there are more texts to print, the target console might respond a bit slower (takes ~10 seconds to dump the strings to the console, but the actual code execution will finish in an instant) and it may be a bit difficult to locate the error test cases. Therefore you could now specify which problem you want to test with by substituting the `TEST_ALL` symbol under `test:` label with the predefined ones in the `lab3.S` template. ORing these test flags are supported so you could run any combination of the tests (e.g. `TEST_FIB | TEST_BSEARCH` will just run the last two problem tests).
-
-Be sure to replace the test variable back to `TEST_ALL` when you finishes debugging each problem individually or else a warning will be printed at the end of test output stating not all test cases are run.
-
-> If you run `TEST_ALL`, there will be a total of 120 test cases or 30 per problem.
-
-### 2.1 Better call quicksort
+#### 2.1 Better call quicksort
 
 In this problem you will write a function named `void asm_sort_int(int32_t* arr, uint32_t n)` that relies on `qsort` in C standard library to sort in ascending order. The C equivalent implementation is as follows:
 
@@ -301,16 +315,15 @@ int asm_cmp(const void *a, const void *b) {
 }
 ```
 
-> [!Note]
-> the function signature for `qsort` is:
+> [!TIP]
+> The function signature for `qsort` is:
 > ```
 > void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*))
 > ```
-
-> [!TIP]
+> 
 > You might want to consider the pseudo-assembly `la xn, LABEL` to load a label address into a register. 
 
-### 2.2 String concatenation
+#### 2.2 String concatenation
 
 This problem will ask you to write a function named `char* asm_strconcat(char * str1, char * str2)`. This function will first allocate memory space with `malloc`, concatenating `str1` and `str2`, and return the resulted string. The C equivalent implementation is as follows:
 
@@ -338,7 +351,7 @@ char * asm_strconcat(char *str1, char *str2) {
 > [!Note]
 > `strlen`, `malloc`, and `memcpy` are all standard C library functions. You should check out their function signatures online to determine what arguments you need to set up for each of them.
 
-## 3. Recursion
+### Step 3: Recursion
 
 > Recursion: *noun.*  
 > Definition:  
@@ -349,7 +362,7 @@ Recursion involves dividing a given problem into subproblems, solving them, and 
 
 When coding a recursion function in assembly, be aware that your function will become both the caller and the callee. Thus, you will need to consider saving registers of both types when entering a function, and when calling a function.
 
-### 3.1 Fibonacci revisited
+#### 3.1 Fibonacci revisited
 
 Let's redo what we have in the previous lab with Fibonacci, but this time with recursion! You will implement the function `uint32_t asm_fib(uint32_t n)` which will accept an index term `n` and return the $F_n$ fibonacci term (in particular: $F_0 = 0$, $F_1 = 1$). The C equivalent implementation is:
 
@@ -373,7 +386,7 @@ uint32_t asm_fib(uint32_t n) {
 }
 ```
 
-### 3.2 Binary search in assembly
+#### 3.2 Binary search in assembly
 
 In this problem, you will implement a binary search algorithm in assembly. The binary search will search for an element in a sorted array with time complexity $O(\lg{n})$. It will compare the middle element with the search key, and decide which subarray in which to continue the search. When the algorithm terminates, the program should either return the index of the first discovered element, or `-1` if the key cannot be found. A C implementation is provided below:
 

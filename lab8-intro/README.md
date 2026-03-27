@@ -69,6 +69,7 @@ At this stage, whether you are working locally or using GitHub Codespaces, you s
 > Before doing anything, we need to install an extension - this could not be done as part of the container setup.  In the terminal that says `vscode -> /workspaces/...`, run the following commands:
 > ```bash
 > code --install-extension ms-vscode.cpptools
+> code --install-extension zhwu95.riscv
 > code --install-extension /opt/riscv/riscv-debug.vsix
 > ```
 > Once it's successfully installed, restart VScode by pressing Ctrl-Shift-P and typing "Reload Window".  This extension will allow us to debug RISC-V assembly code using VScode's default interface.

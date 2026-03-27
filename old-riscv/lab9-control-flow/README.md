@@ -2,9 +2,9 @@
 
 | Step | Description     | Points  |
 |------|-----------------|---------|
-| 1    |`asm_strlen`     | 30      |
-| 2    |`asm_fib`        | 35      |
-| 3    |`asm_toUppercase`| 35      |
+| 1    |`asm_strlen`     |         |
+| 2    |`asm_fib`        |         |
+| 3    |`asm_toUppercase`|         |
 |      | Total           | 100     |
 
 ## Introduction
