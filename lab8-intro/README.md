@@ -53,9 +53,9 @@ Follow the official Docker installation guide for your operating system:
    - [Docker Engine for Linux](https://docs.docker.com/engine/install/)
         - You don't necessarily have to use Docker for the labs while on Linux.  You can build and install the tools yourself by using the [Dockerfile](https://gist.github.com/norandomtechie/06a32cba6e762ae4e019fbfe793be324) we created to make the Docker image for this lab.  Just make sure to run the shell commands directly, and don't try to build it into a Docker image.
 
-Once Docker (and WSL+Ubuntu if necessary) have been properly installed, accept the repository link on Piazza for lab 8, clone it to your own machine, and open it in VScode.
+Once Docker (and WSL+Ubuntu if necessary) have been properly installed, accept the repository link on Piazza for lab 8, clone it to your own machine, and open it in VScode.  
 
-You should see a dialog asking you to open it in a Dev Container, but if you don't see it, press Ctrl-Shift-P, and type "Dev Containers: Reopen in Container". (Do NOT pick the option that says Rebuild!)
+Within VScode, go to Extensions (Ctrl/Cmd+Shift+X), install the Microsoft Dev Containers extension.  Once it's installed, you should see a dialog asking you to open it in a Dev Container, but if you don't see it, press Ctrl-Shift-P, and type "Dev Containers: Reopen in Container". Do NOT pick the option that says Rebuild!
 
 VScode will then refresh, download and set up the container, and you will be ready to start working on the lab.  Building the container can take a very long time, so give it a while.  If you have any issues with the container, ask course staff for help.
 
