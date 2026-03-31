@@ -164,8 +164,7 @@ riscv64-unknown-elf-gcc -march=rv32im -mabi=ilp32 HelloWorld.o -o HelloWorld
 
 # The resulting HelloWorld executable is now in machine code, and can be run on a RISC-V CPU
 # But since we don't have a RISC-V CPU, we can run it on a RISC-V emulator like QEMU.
-# (We don't explicitly have to invoke QEMU.)
-./HelloWorld
+qemu-riscv32-static HelloWorld
 ```
 
 > [!NOTE]
