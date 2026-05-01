@@ -45,7 +45,7 @@ RISC-V:
 [Project Guides - Video Graphics Array (VGA)](project-vga/README.md)  
 [Project Guides - High Speed Serial Transmit (HSTX)](project-hstx/README.md)  
 [Project Guides - WS2812 LED Strip with PIO](project-ws2812/README.md)  
-[Project Guides - OV7670 Camera with PIO, UVC and CDC over USB, and a Fruit Classifier](https://github.com/norandomtechie/proton-fruit-classifier/README.md)
+[Project Guides - OV7670 Camera with PIO, UVC and CDC over USB, and a Fruit Classifier](https://github.com/norandomtechie/proton-fruit-classifier/blob/main/README.md)
    - This was for a personal project that ended up being fairly well implemented by a Claude Opus 4.6 agentic model in May 2026.  Opus generated the "known" parts of the project, and used to help create automated debugging scripts when things didn't work as expected.
    - It is worth noting that no model, even the most advanced one available, is able to "look" at your breadboard and figure out what went wrong (of course, this was in 2026, and maybe it exists now).  Solid human-oriented debugging techniques, such as identifying connections amidst your mess of wiring, and ensuring proper power and ground connections, are still required.
 
