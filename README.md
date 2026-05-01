@@ -38,15 +38,20 @@ RISC-V:
 
 *Not for credit*  
 [Lab - I2C](lab-i2c/README.md)  
-[Project Guides - MSP2202 TFT LCD Display](project-lcd/README.md)  
-[Project Guides - ILI9341 TFT LCD Display's SD Card Reader](project-sdcard/README.md)  
-[Project Guides - USB and Networking](project-usb/README.md)  
-[Project Guides - Adafruit NeoTrellis](project-neotrellis/README.md)  
-[Project Guides - Video Graphics Array (VGA)](project-vga/README.md)  
-[Project Guides - High Speed Serial Transmit (HSTX)](project-hstx/README.md)  
-[Project Guides - WS2812 LED Strip with PIO](project-ws2812/README.md)  
-[Project Guides - OV7670 Camera with PIO, UVC and CDC over USB, and a Fruit Classifier](https://github.com/norandomtechie/proton-fruit-classifier/blob/main/README.md)
-   - This was for a personal project that ended up being fairly well implemented by a Claude Opus 4.6 agentic model in May 2026.  Opus generated the "known" parts of the project, and used to help create automated debugging scripts when things didn't work as expected.
+
+Project Guides:
+[MSP2202 TFT LCD Display](project-lcd/README.md)  
+[ILI9341 TFT LCD Display's SD Card Reader](project-sdcard/README.md)  
+[USB and Networking](project-usb/README.md)  
+[Adafruit NeoTrellis](project-neotrellis/README.md)  
+[Video Graphics Array (VGA)](project-vga/README.md)  
+[High Speed Serial Transmit (HSTX)](project-hstx/README.md)  
+[WS2812 LED Strip with PIO](project-ws2812/README.md)  
+
+Some particularly complex projects:
+
+[OV7670 Camera with PIO, UVC and CDC over USB, and a Fruit Classifier](https://github.com/norandomtechie/proton-fruit-classifier/blob/main/README.md)
+   - This was for a personal project that ended up being fairly well implemented by a Claude Opus 4.6 agentic model in April 2026.  Opus generated the "known" parts of the project, and used to help create automated debugging scripts when things didn't work as expected.
    - It is worth noting that no model, even the most advanced one available, is able to "look" at your breadboard and figure out what went wrong (of course, this was in 2026, and maybe it exists now).  Solid human-oriented debugging techniques, such as identifying connections amidst your mess of wiring, and ensuring proper power and ground connections, are still required.
 
 ECE 36200 Lab Experiments (Purdue Proton) © 2025 by Purdue University, Niraj Menon is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
