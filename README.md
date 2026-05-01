@@ -39,7 +39,7 @@ RISC-V:
 *Not for credit*  
 [Lab - I2C](lab-i2c/README.md)  
 
-Project Guides:
+Project Guides:  
 [MSP2202 TFT LCD Display](project-lcd/README.md)  
 [ILI9341 TFT LCD Display's SD Card Reader](project-sdcard/README.md)  
 [USB and Networking](project-usb/README.md)  
