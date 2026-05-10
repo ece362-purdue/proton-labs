@@ -58,4 +58,4 @@ Some particularly complex projects:
 
 <hr>
 
-ECE 36200 Lab Experiments (Purdue Proton) © 2025 by Purdue University, Niraj Menon is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+ECE 36200 Lab Experiments (Purdue Proton) © 2026 by Purdue University, Niraj Menon is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
