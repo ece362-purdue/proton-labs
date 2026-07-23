@@ -3,7 +3,7 @@
 !!! hint
     To open a page in a new tab, hold Ctrl/Cmd and click on the link!
 
-## Purdue Proton Datasheets
+## Proton Dev Board Datasheets
 
 [Proton User Guide](assets/Proton%20User%20Guide.pdf)    
 [Proton Pinout Diagram](assets/Proton%20Pinout%20Diagram.pdf)

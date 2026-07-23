@@ -1,4 +1,4 @@
-site_name: Purdue Proton Docs
+site_name: Proton Development Board Docs
 theme:
   name: material
   logo: assets/favicon362.png
@@ -26,4 +26,4 @@ markdown_extensions:
   - admonition
 extra_css:
   - stylesheets/extra.css
-copyright: Purdue Proton Docs &copy; 2025 by Purdue University, Niraj Menon is licensed under CC Attribution-NonCommercial-ShareAlike 4.0 International.  All external materials belong to their respective authors.
+copyright: Proton Development Board Docs &copy; 2025 by Purdue University, Niraj Menon is licensed under CC Attribution-NonCommercial-ShareAlike 4.0 International.  All external materials belong to their respective authors.
