@@ -1,9 +1,9 @@
-# Proton Dev Board
+# Proton Development Board
 
 <!-- !!! warning
     **This page is a work in progress.** -->
 
-Proton Dev Board is an educational RP2350B devboard with a detachable debug probe intended for use in embedded systems labs. 
+The Proton Development Board is an educational RP2350B devboard with a detachable debug probe intended for use in embedded systems labs. 
 
 ![front board](assets/front.png)
 ![back board](assets/back.png)
