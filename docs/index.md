@@ -8,6 +8,12 @@ The Proton Development Board is an educational RP2350B devboard with a detachabl
 ![front board](assets/front.png)
 ![back board](assets/back2.png)
 
+<style>
+[alt="back board"] {
+  max-width: 98%;
+}
+</style>
+
 ## Features
 
 - RP2350B microcontroller
