@@ -25,7 +25,7 @@
 
 ## Instructional Objectives
 - To become familiar with the BHEE 162 laboratory, policies, lab stations, and equipment.
-- To configure your GitHub account for use with GitHub Classroom and add SSH keys for easy access.
+- To configure your GitHub account and set up VScode to easily clone lab repositories.
 - To get hands-on experience with the Proton development board, its accompanying components, and PlatformIO IDE in VScode that you will use all semester.
 
 > [!CAUTION]
@@ -51,17 +51,21 @@ Computers and measurement equipment are provided in the course laboratory facili
 
 ## Introduction
 
-Lab 0 will have you set up your brand new Proton development board that you should have received at the beginning of lab.  If you have not yet received it, please ask a TA or lab coordinator.
+Lab 0 will have you set up your brand new Proton development board that you should have received with your lab kit in your lab section.  If you have not yet received it, please ask your lab GTA.
 
-If you are in-person in lab and at any point you need help, you can add yourself to the lab queue via [QueUp](https://engineering.purdue.edu/~menon18/queup/?room=36200).  TAs in lab monitor this queue and will come to the station number you provide.
+If you are in-person in lab and at any point you need help, you can add yourself to the lab queue.
+- [West Lafayette QueUp](https://engineering.purdue.edu/~menon18/queup/?room=36200)
+- [Indianapolis QueUp](https://engineering.purdue.edu/~menon18/queup/?room=362IN)
+
+TAs in lab monitor this queue and will come to the station number you provide.
 
 > [!IMPORTANT]
-> In ECE 36200, labs are designed to be started **at home**, when the lab is released online.  This means that you must set up **both** your lab machine, and your personal computer, to do the labs.
+> In ECE 36200, labs are designed to be started **at home** as soon as the lab is released online.  This means that you must set up **both** your lab machine, and your personal computer, to do the labs.
 
 ## Lab Policies
 
 > [!CAUTION]
-> Please keep in mind the food-and-liquids policy of the lab, which is to bring absolutely no food or liquid with you to your lab sessions.  **Failure to follow this rule will result in a penalty for the lab currently running in that week.**  
+> Please keep in mind the food-and-liquids policy of the lab, which is to bring absolutely no food or liquid with you to your lab sessions.  **Failure to follow this rule will result in a Lab Penalty for the lab currently running in that week.**  
 >   
 > This rule applies no matter what is happening in lab, be it your lab session or an open lab session.  If you must bring a bottle or other such container, please place it in the designated safe area for the lab.  If you must have food or drink, please step outside the lab to consume it.  **This rule is in place to protect the very expensive equipment in lab, and to ensure that the lab remains a safe and clean environment for everyone.**
 
@@ -72,13 +76,18 @@ If you are in-person in lab and at any point you need help, you can add yourself
 
 ## Step 0: Initialize your git repository for your lab at home
 
-In this course, you are required to use `git` to keep track of your code.  When you start work on a lab, you will **accept** a GitHub Classroom (abbreviated GHC) assignment that will give you your own private GitHub repository to work in.  You should work on each lab by backing up your work to this repository, allowing you to access it from either your personal machine or a lab machine.  In general, you'll follow these steps:
+In this course, you are required to use `git` to keep track of your code.  When you start work on a lab, you will **fork** a private GitHub template repository that will give you your own private GitHub to work in.  You should work on each lab by **committing and pushing** your work to this repository, allowing you to access it from either your personal machine or a lab machine.  For lab 0, you'll follow these steps:
 
-1. Starting at home, clone the newly created GHC repository to your local computer (which may be blank). 
-2. Inside the cloned repository folder, create a project for your Proton board using the relevant VScode extension.
+1. Create your GitHub repository via [Iris](https://engineering.purdue.edu/ece362/iris/).  This requires you to log in with your Purdue username and password.
+2. Once the repository has been made visible to you, open VScode, and [follow these instructions](https://code.visualstudio.com/docs/sourcecontrol/github#_setting-up-a-repository) to clone your newly created lab0 GitHub repository to your computer.  Make sure to select the correct repository - it will have the format `ece362-purdue/ece362-...username`.
+
+![vscode-git](https://code.visualstudio.com/assets/docs/sourcecontrol/github/github-repo-dropdown.png)
+
+3. Inside the cloned repository folder, which will be empty, create a project for your Proton board using the relevant VScode extension.  The rest of this lab document will explain how to do this for lab 0.  For the remaining labs, we will give you the project files.
+
 3. For each step, follow the lab instructions to write code and test it on your Proton board, and then add, commit and push your code to your repository.  The message must contain the step number you worked on.
-    - Commits are how we will determine your effort on each lab assignment.  **You must commit your code for each lab to your respective git repository at each step of the lab, and not just one big commit at the end of the lab.** 
-4. When you are done with the whole lab, submit your repository to Gradescope.  **You must submit your work to Gradescope before the beginning of your lab section next week.**
+    - Commits are part of how we will determine your effort on each lab assignment.  **You must commit your code for each lab to your respective git repository at each step of the lab, and not just one big commit at the end of the lab.** 
+4. When you are done with the whole lab, submit your repository to Gradescope.  **For lab 0, you must submit your work to Gradescope before the beginning of your lab section next week.**
 5. When you come to your lab section to get your work checked off, you can bring your personal machine, or you can clone your repository to a lab machine and show your work there.  **You must always show your work to a TA in lab or office hours to get credit for the lab**, unless you have been instructed otherwise.
 
 To familiarize yourselves with git, keep this [cheat sheet](https://training.github.com/downloads/github-git-cheat-sheet.pdf) bookmarked.  After reading that, you should know how to:
@@ -90,28 +99,16 @@ Work for this class can be quite time-consuming, and so you need to **start your
 
 Regardless of whether you are working on your own Windows/macOS/Linux computer or on a lab machine, you will be able to **clone** this repository to your own computer.  Make sure to do this on **all computers** on which you will be doing your lab.  
 
-> [!TIP]
-For speed and ease of use, we recommend learning to use SSH and public/private keys.  Generate your keys by following [this guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).  Once you have your key, read [this](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) to learn how to add keys to your account.
-> 
-> Another option is authenticating the GitHub Extension with VScode with your account, allowing you to clone private repositories.  This will allow you to clone repositories without needing to enter your username and password each time.  You can do this by following the instructions [here](https://code.visualstudio.com/docs/editor/github).
+> [!IMPORTANT]
+> If you haven't already, create your Lab 0 GitHub repo on Iris, and clone the repository to your computer in VScode.  You should see a README.md file in the repository.  If you don't, you may have cloned the wrong repository.  Make sure to clone the repository that has the ece362-SEM-lab0-username format.
 
-If you haven't already, accept the Lab 0 GitHub Classroom assignment, and clone the repository to your computer.  You should see a README.md file in the repository.  If you don't, you may have cloned the wrong repository.  Make sure to clone the repository that has the lab-0-intro-username format.
+By default, the ece362-SEM-lab0-username repository should only have a README.  Create a new file called `hello.txt` in your repository, and add some text to it.  Then, use [VScode's Source Control interface](https://code.visualstudio.com/docs/sourcecontrol/overview#_common-workflows) to review the change, stage it (equivalent to `git add`), commit it by providing a descriptive commit message (equivalent to `git commit -m "message here"`), and push it to your Lab 0 repository (equivalent to `git push`).  Make sure to use a descriptive commit message, eg. "Step 0 commit".
 
-> [!TIP]
-> The link to each lab is posted on Piazza along with the link to a corresponding GitHub Classroom assignment.  You should accept that assignment, and clone the repository to your computer/lab machine.  Your repository will be located at some URL that looks like https://github.com/ece362-purdue/lab-0-intro-username, where `username` is your GitHub username.  You will be committing your code to this repository for this lab.  Each lab will have their own repositories and lab manuals that will be posted ahead of time.
-> 
-> By default, the lab-0 repository should only have a README.  Make a change like adding your name to it or creating a new file, and then add, commit and push the change to your lab-0-intro-username repository.
+(The pictures below are the standard examples from the VScode tutorial page - you will have different files and contents, but the process is the same.)
 
-For each step that follows, **always remember to commit and push before you stop working and need to head to lab.**  The most basic commands to do this are:
-
-```bash
-# make a simple change, like creating a file first.  And then run:
-git add .
-git commit -m "A descriptive commit message"
-git push
-```
-
-If you are on Windows, it is possible to use PowerShell to do this.  If you are on macOS or Linux, you can use a terminal.  `cd` (change directory) to the downloaded folder, and run these commands.  Make sure to change the commit message to include the step number, and a brief description of what you did in that step.   Our intention here is to get you used to the command line and git.
+![stage](https://code.visualstudio.com/assets/docs/sourcecontrol/overview/stage-changes.png)
+![commit](https://code.visualstudio.com/assets/docs/sourcecontrol/overview/copilot-generate-commit-message.png)
+![push](https://code.visualstudio.com/assets/docs/sourcecontrol/overview/incoming-outgoing-changes.png)
 
 > [!IMPORTANT]
 > Create a new file called hello.txt in your repository, and add some text to it.  Commit and push this change to your repository.  Use a descriptive commit message, eg. "Step 0 commit".
@@ -252,11 +249,11 @@ If it shows the sidebar, it should be good to go!  If it doesn't, you may need t
 
 ## Step 4: Create a PlatformIO project
 
-As of April 2025, PlatformIO does not incorporate support for our specific microcontroller.  Instead, we've created our own plugin that you can use with PlatformIO.  We'll set that up in this step.
+By default, PlatformIO does not incorporate support for our Proton board, since we made it custom for ECE 36200.  Instead, we've created our own plugin that you can use with PlatformIO.  We'll set that up in this step.
 
 The purpose of using PlatformIO is to make it much easier to compile, upload and debug code on your microcontroller.  Since it is oriented towards embedded systems, it's got support for various other microcontrollers that you can use it for after 362.  It also integrates a few other tools, including a serial monitor that allows you to send and receive data from your microcontroller, and a debugger that allows you to step through your code and inspect variables as the program runs on the microcontroller.
 
-Clone the `lab-0-intro-username` repository you created in Step 0 to your local machine.  In it, you should only have a README file that doesn't say anything particularly useful.  Create a new file called `platformio.ini`, and add the following to it:
+Clone the `ece362-SEM-lab0-username` repository you created in Step 0 to your local machine.  In it, you should only have a README file that doesn't say anything particularly useful.  Create a new file called `platformio.ini`, and add the following to it:
 
 ```ini
 [env:proton]
