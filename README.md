@@ -1,21 +1,18 @@
-# ECE 36200 Lab Experiments (Purdue Proton)
-
-<!-- > [!CAUTION]
-> **Work in progress.  Contents of these lab experiments may change closer to the start of the semester.** -->
+# ECE 36200 Lab Experiments (Proton Development Board)
 
 Each link below takes you to the README.md file for each lab, so you don't have to click through the folders to find the page.
 
-If you're looking for the code template associated with each lab, it (necessarily) changes every semester.  Look for the associated Piazza post made for each lab, which should be pinned, to get the corresponding GitHub Classroom link.  
+To obtain code templates for each lab, use [Iris](https://engineering.purdue.edu/ece362/iris/), our replacement for GitHub Classroom.  You will need to log in with your Purdue username and password.
 
-If you are not currently enrolled in ECE 36200 but wish to access the code templates for academic purposes (e.g. senior design courses), contact [the lab coordinator](mailto:niraj@purdue.edu) in charge.
+If you are not at Purdue University, contact [the lab coordinator](mailto:niraj@purdue.edu) in charge for access to the code templates.  However, for most people not following the ECE 36200 curriculum, the standard code template below works well enough.
 
-Resources for the Purdue Proton, and other parts used in the kit, can be found [here](https://bit.ly/purdue-proton).
+Resources for the Proton board, and other parts used in the kit, can be found [here](https://ece362-purdue.github.io/proton-labs/).
 
 ## Code Template
 
 If you need a fresh template to start writing your code in for your project, use [this](template.zip).
 
-**For lab experiments below**, you will receive a GitHub Classroom link - do not use the template.
+**For lab experiments below**, obtain access to the code templates via [Iris](https://engineering.purdue.edu/ece362/iris/) - do not use the template above.
 
 ## Lab Experiments
 
@@ -58,4 +55,4 @@ Some particularly complex projects:
 
 <hr>
 
-ECE 36200 Lab Experiments (Purdue Proton) © 2026 by Purdue University, Niraj Menon is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+ECE 36200 Lab Experiments (Proton Development Board) © 2026 by Purdue University, Niraj Menon is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
