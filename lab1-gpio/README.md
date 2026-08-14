@@ -171,7 +171,7 @@ So, what we're going to do is **dive** into what this function does.  When you h
 
 The animation below shows how you can *nest-dive* into the functions that make up `gpio_init` as well, down to the register level.  
 
-https://github.com/user-attachments/assets/6f192603-474a-4cf1-8203-0e0a1cde9cbc
+https://github.com/user-attachments/assets/d3e16557-fb1d-44ed-b131-7aba14c1bfcf
 
 See the animation above, and use that technique to dive into the three constituent functions of `gpio_init` to determine what registers are being modified, and note them down.  A register takes the form `peripheral->registername`, for example `sio_hw->gpio_in`.  Here, the peripheral that controls the GPIO pins is `sio_hw`, and `gpio_in` is the register that returns the high/low state of the GPIO pins, with each bit of the register indicating a different pin.
 
