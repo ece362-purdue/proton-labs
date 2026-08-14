@@ -1,7 +1,7 @@
 # Soldering pin headers to your Proton board
 
 ## Tools and materials needed
-- Your brand new Purdue Proton board
+- Your brand new Proton board
 - Two double-sided pin headers (both sides are almost the same in length)
 - One single-sided pin header
 - Your breadboard
