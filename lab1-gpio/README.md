@@ -33,7 +33,7 @@
 > ECE 362 labs should be started at home, and checked off in lab.  **Do not wait to start your lab in your lab section, or you will not finish.**  You must be checked off for all steps in lab to receive full credit.
 
 > [!NOTE]
-If at any point you need to get checked off, or need to get help, you can add yourself to the [lab queue](https://engineering.purdue.edu/~menon18/queup/?room=36200).  **Bookmark this link in your lab machine browser.**
+If at any point you need to get checked off, or need to get help, you can add yourself to the lab queue ([WL](https://engineering.purdue.edu/~menon18/queup/?room=36200), [Indy](https://engineering.purdue.edu/~menon18/queup/?room=362IN)).  **Bookmark this link in your browser.**
 
 ## How does your RP2350 microcontroller on the Proton board work?
 
@@ -47,7 +47,7 @@ Therefore, when we want to understand the internals of the microcontroller we wi
 
 ## General Purpose Input/Output (GPIO)
 
-Your microcontroller ~~can be~~ is considered a fully functioning computer, not unlike the machine you happen to be reading this on.  A key difference between a microcontroller and this computer, however, is how your microcontroller interacts with the outside world.  Your laptop has a keyboard, mouse, and screen that allow you to interact with it.  Your microcontroller, however, has **GPIO pins** that allow it to interact with the outside world.  
+Your microcontroller ~~can be~~ is considered a fully functioning computer, not unlike the machine you happen to be reading this on.  A key difference between a microcontroller and this computer, however, is how your microcontroller interacts with the outside world.  Your laptop has a keyboard, mouse, and screen that allow you to interact with it.  Your microcontroller, however, has **general-purpose input/output(GPIO) pins** that allow it to interact with the outside world.  
 
 In this experiment, you will learn how to connect and configure simple input devices (push buttons and keypad) and output devices (LEDs) to your Proton development board's GPIO pins. 
 
@@ -57,7 +57,7 @@ GPIO pins on any microcontroller can take on one of three functionalities:
 
 2. The pin can be configured as an **output** that can **drive** or output a voltage level to an external component.  This is useful for turning on an LED in series with a resistor, or engaging an actuator.
 
-3. Or, the pin can be used for by another peripheral on your microcontroller entirely.  This is useful for allowing other peripherals on the microcontroller, such as UART, SPI, ADC/DAC, etc. to use the pin for their own purposes.
+3. Or, the pin can be used for by another peripheral on your microcontroller entirely.  This is useful for allowing other peripherals on the microcontroller, such as UART, SPI, ADC/DAC, etc. to use the pin for their own purposes, such as producing an analog voltage, a clock signal, etc.  Think of it as configuring the pin for an **alternate function** for the pin (a term used by other microcontrollers, such as the STM32 series).
 
 This lab will be the first time that you will write code that *configures* a peripheral.  The way setting up a microcontroller works is by writing some code that configures the **hardware registers** - sections of memory that control the behavior of the microcontroller's CPU core and/or its peripherals.  The RP2350 microcontroller on your Proton board has a set of hardware registers that control the behavior of the GPIO pins, and you will write code that configures these registers to control the behavior of the pins.
 
