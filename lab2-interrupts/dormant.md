@@ -1,12 +1,12 @@
 # *Properly* entering and exiting the DORMANT state
 
-In Spring 2026, we discovered that more Proton boards than usual had trouble waking up from DORMANT mode.  **You do not need to have had this issue yourself to read this document and add the relevant lines of code - you should still do it regardless.**
+In Spring 2026, we discovered that more Proton boards than usual had trouble waking up from DORMANT mode.  **Even if you never encountered this issue, it is worth your while to read this document.**
 
 The issue was simply a matter of us not reading the datasheet carefully - and so we have written this document to emphasize the importance of re-reading the datasheet every now and then (!), explain the background behind the issue, and to give you the code that properly enters and exits DORMANT mode.
 
-## What were we doing in Step 1?
+## What were we doing in Step 2?
 
-The purpose of Step 1 was to configure GP21 to put the RP2350 into an extreme low-power state called DORMANT mode.  In this mode, all clocks to the microcontroller's cores and peripherals were disabled by turning off the clock source, which is the crystal oscillator in the case of our Proton board.
+The purpose of Step 2 was to configure GP21 to put the RP2350 into an extreme low-power state called DORMANT mode.  In this mode, all clocks to the microcontroller's cores and peripherals were disabled by turning off the clock source, which is the crystal oscillator in the case of our Proton board.
 
 ![xosc](images/xosc.png)
 

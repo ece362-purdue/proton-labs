@@ -178,6 +178,30 @@ You'll notice that there's not any information about **configuring** or **enabli
 > [!NOTE]
 > At this stage, make sure your Debug Probe is connected to the debug and UART pins of your Proton board, which you should already have in place from lab 1.  If wired and configured correctly, and you have autotest uncommented, you should see text appear in the Serial Monitor when you click "Upload and Monitor".  If the text doesn't appear, press the Reset button and check again.
 
+> [!TIP]
+> You are permitted to call these SDK functions directly:
+> 
+> ```c
+> gpio_add_raw_irq_handler_masked
+> gpio_set_dormant_irq_enabled
+> clock_configure
+> runtime_init_clocks
+> stdio_uart_init
+> ```
+> 
+> Examples of functions you can NOT call directly are as follows (use this as a hint to know which functions you need to dive into):
+> ```c
+> gpio_get_irq_event_mask
+> gpio_acknowledge_irq
+> gpio_set_irq_enabled
+> irq_set_enabled
+> gpio_set_dormant_irq_enabled
+> ```
+> 
+> You may find other SDK functions not mentioned in this list, but they are likely very short (or can be made very short), and for those functions, we expect you to go through them and adapt their code for use in the functions you are expected to implement.  **You must not call the functions directly.**  This is a measure we take to ensure your understanding of crucial underlying functions by re-implementing them as part of your solution.
+> 
+> This is NOT to say that you should never use SDK functions!  On the contrary - using them is so important that we need you to understand how they work at the register level first before you use them in later labs and the project.
+
 In this step, you will configure an external interrupt on your Proton board that will wake our microcontroller from the DORMANT state.  We'll configure it so that when you press GP21, the microcontroller will enter the DORMANT state, and pressing GP26 will wake it up from that state.
 We'll also configure the interrupt to toggle the green LED on GP25 on and off.
 
@@ -202,12 +226,38 @@ In summary, you should implement the following functions:
 1. `init_gpio_irq` - configure GP21 and GP26 as described above and turn GP22-GP25 on.
 2. `gpio_isr` - This single ISR will handle interrupts from both GP21 and GP26. It should:
     - Identify which pin triggered the interrupt (check the pending events register)
-    - If GP21: acknowledge the interrupt, turn off all user LEDs GP22-GP25, and enter DORMANT state
-    - If GP26: acknowledge the rising edge interrupt, then turn on GP22-GP25
+    - If GP21: acknowledge the interrupt, turn off all user LEDs GP22-GP25, and enter the DORMANT state.  Read the text below to see how to do this **properly**.
+    - If GP26: acknowledge the rising edge interrupt, then turn on GP22-GP25.
         - A previous version of this document said to acknowledge both the DORMANT wake event and rising edge interrupt, but upon further inspection and debugging, it appears they achieve the same thing.
 
+To enter DORMANT mode when GP21 is pressed, we need to follow a series of steps to ensure the microcontroller will sleep and wake properly.  DORMANT mode involves disabling the crystal oscillator, which means that if we don't do this carefully, **the clock signal to the entire chip will stop working.**  In the part of the ISR that executes when GP21 is pressed, add the following (more details [here](dormant.md)):
+
+1. Change the system clock source from the System Phase-Locked Loop (PLL) to the crystal oscillator.  This is because, by default, the System PLL takes the crystal oscillator's 12 MHz signal, increases it to 150 MHz, and provides that as the system clock.  If we turn off the oscillator *before* the PLL, the PLL will fail to work when we eventually turn the oscillator back on.  Do this with:
+
+```c
+clock_configure(clk_sys,
+    CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLK_REF,  // Clock source is the crystal oscillator, no PLLs
+    0,                                      // Using glitchless mux (see 8.1.3.2 Multiplexers)
+    XOSC_HZ,                                // What is the frequency of new clock source?   
+    XOSC_HZ                                 // What frequency do we want clk_sys to be?
+);
+```
+
+2. From your findings in Step 1, enter DORMANT mode.
+
+3. At this stage, your microcontroller will be in DORMANT sleep, and the only to wake it up will be to press GP26.  When you do this, execution will continue at the line *after* you enter DORMANT, which is this step: reset the Sleep Enable register so all peripherals on the microcontroller can be used:
+
+```c
+clocks_hw->sleep_en0 |= ~(0u);  // Set to all ones
+clocks_hw->sleep_en1 |= ~(0u);  // Set to all ones
+```
+
+4. Call the function `runtime_init_clocks` to re-initialize the PLL so that the microcontroller can return to the normal 150 MHz clock signal it generates.  (Note the order of operations: PLL sleeps -> XOSC sleeps -> XOSC wakes -> PLL wakes).
+
+5. Call the function `stdio_uart_init` to tell our UART peripheral to recognize the updated clock speed, and to recalculate the speed at which it should transmit and receive characters.  This is crucial for `printf` to keep working when the microcontroller wakes.  
+
 > [!TIP]
-> If you're unsure what functions to use, use the [C/C++ SDK functions](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf).  Search for GPIO and/or IRQ functions.
+> If you're unsure what functions to use, see the Tip at the beginning of Step 2, and/or use the [C/C++ SDK function datasheet](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf).  Search for GPIO and/or IRQ functions.
 > 
 > Entering DORMANT mode is a bit tricky.  If you haven't figured that out already, go back to question 9 to see what function you need to do this.  It's one function call that puts your crystal oscillator into DORMANT mode.
 
@@ -217,11 +267,6 @@ In summary, you should implement the following functions:
 > If you notice that **uploading code to your microcontroller suddenly stops working** while you are working on this step, it may be that the microcontroller is in the DORMANT state.  If this happens, force the Proton board into BOOTSEL mode by holding down BOOTSEL, pressing RESET, and then letting go of BOOTSEL.  This puts the RP2350 into bootloader mode, allowing you to upload a new program again.
 >
 > These errors are usually indicated by OpenOCD failures while running Upload and Monitor, e.g. `openocd init failed` or `openocd: Failed to connect to target`.  If you see this, try the above steps to get back into BOOTSEL mode.
-
-> [!IMPORTANT]
-> In Spring 2026, we discovered that more Proton boards than usual had trouble waking up from DORMANT mode.  [This page](dormant.md) details the issue and provides a fix that you may need to add to your `gpio_isr`.
-> 
-> Even if you were not having issues properly waking from DORMANT with the instructions above, you may want to add the suggested lines in so that you can use it for future projects that utilize DORMANT sleep on the RP2350.  If you're able to perform step 1 without these lines, you do not need this code to complete the lab.
 
 After the `init_gpio_irq` call in `main` underneath the `#ifdef STEP1` stanza, you'll see an infinite loop that prints out "Hello world" every second.  This is an example of some "work" that the CPU is normally doing while it's not in the DORMANT state.
 
@@ -306,7 +351,9 @@ Now for the fun part!  We're going to offload the column pin driving to poll the
 
 Your Proton's RP2350 microcontroller has a total of four cores, two ARM-based, and two RISC-V-based.  ARM and RISC-V are examples of **instruction set architectures**, or different formats of machine code.  That means that ARM cores can't execute RISC-V programs, and vice-versa.  
 
-> At the time of writing (May 2025), we have not yet built in support for compiling to RISC-V in PlatformIO.  If you really need this for some reason, like the project, you can use the [Pico SDK](https://github.com/raspberrypi/pico-sdk) directly from Raspberry Pi.
+> At the time of writing (May 2025), we have not yet built in support for compiling to RISC-V in PlatformIO.  If you really need this for some reason, like the project, you can use the [Pico SDK](https://github.com/raspberrypi/pico-sdk) directly from Raspberry Pi. 
+> 
+> You do not need to do this for the regular lab assignments as we'll stick to the ARM cores.
 
 On the Proton specifically, the ARM cores carry a lot more functionality like floating-point computations and security features at the cost of having to license the instruction set from ARM, while the RISC-V cores are free and open source (you can even see the Verilog used to make them [here](https://github.com/Wren6991/Hazard3)) and are meant more for academic experimentation.  For the embedded labs, we'll just use the default ARM cores to simplify things.
 
