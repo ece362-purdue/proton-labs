@@ -115,6 +115,9 @@ By default, the ece362-SEM-lab0-username repository should only have a README.  
 
 ## Step 1: Solder pin headers to your keypad
 
+> [!NOTE]
+> If you are waiting on a soldering station to free up, continue from Step 2.
+
 **Soldering!?  In ECE 36200?  What is this, ECE 20008?**
 
 No, this isn't a typo.  In ECE 36200, you will have multiple components in your kit that have no pin headers added.  One of our two reasons is to eliminate the labor cost associated in soldering those pin headers.  
@@ -177,7 +180,10 @@ Repeat this process for the other 7 pads, confirming each joint.  Once you're do
 
 ## Step 2: Place the Development Board on a Breadboard
 
-At this point, you should have also pulled out your Proton development board from your lab kit.  If they have not already been added, obtain three "shorting plugs" (shunt jumpers) from a TA, and place them on the headers separating the Proton board and the debugger, in order to hold the board together as shown below (the yellow/black/yellow plastic pieces in the image below):
+> [!NOTE]
+> If you are waiting on a soldering station to free up, continue from this step.
+
+At this point, pull out your Proton development board from your lab kit (pictured below).  If they have not already been added, obtain three "shorting plugs" (shunt jumpers) from a TA, and place them on the headers separating the Proton board and the debugger, in order to hold the board together as shown below (the yellow/black/yellow plastic pieces in the image below):
 
 <div class="center">
     <img src="images/debugger.jpg" style="margin: 1em 0; width: 500px">
