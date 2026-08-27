@@ -205,7 +205,7 @@ Typically, boards like this will be a little hard to get into (and out of) a bre
 
 Next, connect two wires: one from each of the 3V3 pins to the power rails, and one from each of the GND pins to the ground rails of your breadboard, as well as the PGND pins on the debugger.  Use the labels on the pins, but if they're too small for you to read, you can also use this [pinout diagram](https://ece362-purdue.github.io/proton-labs/assets/Proton%20Pinout%20Diagram.pdf).
 
-Plug in a USB-C cable from the **debugger** - not the Proton - to your computer.  If the red LED on it doesn't turn on, there are two possibilities:
+<!-- Plug in a USB-C cable from the **debugger** - not the Proton - to your computer.  If the red LED on it doesn't turn on, there are two possibilities:
 
 - It is a brand new debugger with no program saved in flash, in which case it will appear like a flash drive on your computer labeled "RPI-RP2".  Download the latest **debugprobe.uf2** firmware [here](https://github.com/raspberrypi/debugprobe) from the Releases tab, and drag the file into the drive.  This will flash the firmware to the debugger, and the red LED should turn on indicating it was recognized by your computer.
 
@@ -215,7 +215,13 @@ Once you've flashed the debugger (if applicable) and/or your debugger's red LED 
 
 By default, your Proton should start flashing the LEDs in a Johnson Counter pattern.  If they do not turn on, but you see "RP2350" appear as a flash drive on your computer when it is connected, your board is still fine - it's just in bootloader mode.  You *could* drop in a UF2 file to flash it, but we don't have a compiled program just yet, so there's no need.  
 
-You may also see a green LED in the middle of the board start flashing, in which case your board was already tested and confirmed as working, and you can ignore it.
+You may also see a green LED in the middle of the board start flashing, in which case your board was already tested and confirmed as working, and you can ignore it. -->
+
+Plug in a USB-C cable from the **debugger** - not the Proton - to your computer.  A red LED on it should turn on if it is functioning properly.
+
+After your debugger's red LED turns on, plug in a second USB-C cable into the Proton board - the longer side with the USB port near the edge of the breadboard.  You should always see the 5V red indicator and 3.3V green indicator LEDs on the Proton board turn on.  If they do not, immediately pull out the USB-C cable - **there could be a short with how you connected it to your breadboard, or in your solder joints**.  More likely than not, though, the LEDs are probably just damaged, but ask a TA to confirm.  
+
+By default, your Proton should start flashing four colored LEDs in a Johnson Counter pattern - red, yellow, green and blue should turn on, and then in that order of color, turn off, and repeat infinitely.  Press the button labeled 21 to make it go faster, and the button labeled 26 to make it go slower.  If it is hard to read, use your phone's camera or ask a TA for assistance.  
 
 > [!IMPORTANT]
 > In ECE 36200, you will build upon the existing circuit on the breadboard for each lab, so **do not take parts off your breadboard when you are done with a lab** - including this one!
