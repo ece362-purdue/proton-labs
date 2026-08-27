@@ -11,7 +11,7 @@
 ## KiCAD Schematic and PCB Files
 
 <!-- *will be uploaded once finalized* -->
-[Proton KiCAD 8.0 Project](assets/Proton-KiCAD.zip)
+[Proton KiCAD 8.0 Project](assets/Proton-KiCAD-Rev4.zip)
   
 ## Raspberry Pi Resources
 [RP2350 Datasheet](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf)  
