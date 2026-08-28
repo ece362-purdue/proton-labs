@@ -179,17 +179,16 @@ You'll notice that there's not any information about **configuring** or **enabli
 > At this stage, make sure your Debug Probe is connected to the debug and UART pins of your Proton board, which you should already have in place from lab 1.  If wired and configured correctly, and you have autotest uncommented, you should see text appear in the Serial Monitor when you click "Upload and Monitor".  If the text doesn't appear, press the Reset button and check again.
 
 > [!TIP]
-> You are permitted to call these SDK functions directly:
+> You are permitted to call these SDK functions directly where directed to do so:
 > 
 > ```c
 > gpio_add_raw_irq_handler_masked
-> gpio_set_dormant_irq_enabled
 > clock_configure
 > runtime_init_clocks
 > stdio_uart_init
 > ```
 > 
-> Examples of functions you can NOT call directly are as follows (use this as a hint to know which functions you need to dive into):
+> Examples of functions you can NOT call directly are as follows, and must copy out the register level code for (use this as a hint to know which functions you need to dive into):
 > ```c
 > gpio_get_irq_event_mask
 > gpio_acknowledge_irq
