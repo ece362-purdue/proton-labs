@@ -258,7 +258,7 @@ clocks_hw->sleep_en1 |= ~(0u);  // Set to all ones
 > [!TIP]
 > If you're unsure what functions to use, see the Tip at the beginning of Step 2, and/or use the [C/C++ SDK function datasheet](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf).  Search for GPIO and/or IRQ functions.
 > 
-> Entering DORMANT mode is a bit tricky.  If you haven't figured that out already, go back to question 9 to see what function you need to do this.  It's one function call that puts your crystal oscillator into DORMANT mode.
+> Entering DORMANT mode is a bit tricky.  If you haven't figured that out already, go back to question 9 to see what function you need to look at to do this.  It's one function call that puts your crystal oscillator into DORMANT mode.
 
 > [!CAUTION]
 > We're having you configure a pushbutton to **enter** the DORMANT state so that by default when your microcontroller powers on, it doesn't immediately enter the DORMANT state.  Remember that by entering this state, we're turning off all clocks by turning off the crystal oscillator XOSC, so the microcontroller will not execute any code until the external interrupt occurs!
