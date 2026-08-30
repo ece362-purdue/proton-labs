@@ -187,6 +187,8 @@ You'll notice that there's not any information about **configuring** or **enabli
 > runtime_init_clocks
 > stdio_uart_init
 > ```
+>
+> In addition to any helper functions to set or clear bits, e.g. `hw_set_bits` or other such `hw_`-prefixed functions.
 > 
 > Examples of functions you can NOT call directly are as follows, and must copy out the register level code for (use this as a hint to know which functions you need to dive into):
 > ```c
