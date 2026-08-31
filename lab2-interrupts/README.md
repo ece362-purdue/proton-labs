@@ -49,7 +49,7 @@ There's three types of interrupts we can explore that's common to most microcont
 
 ### Step 0.1: Set up your environment
 
-Make sure to clone the code repository from GitHub Classroom.  Keep in mind to add, commit and push any changes you make so that your work is accessible from a lab machine. 
+Make sure to clone the code repository from Iris.  Keep in mind to add, commit and push any changes you make so that your work is accessible from a lab machine. 
 
 Open the template in VScode and with your Debug Probe connected to your Proton, click "Upload and Monitor".  Open the Serial Monitor to see the output of your program, and press the Reset button so that it prints out again.  You should now see the following:
 

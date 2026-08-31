@@ -95,7 +95,7 @@ To give you an example within the context of GPIO: in order to configure a GPIO 
 
 ## Step 0.1: Set up your environment
 
-Make sure to clone the code repository from GitHub Classroom.  Keep in mind to add, commit and push any changes you make so that your work is accessible from a lab machine. 
+Make sure to clone the code repository from Iris.  Keep in mind to add, commit and push any changes you make so that your work is accessible from a lab machine. 
 
 > [!CAUTION]
 > **If you have not set up VScode with PlatformIO as described in Lab 0 on BOTH your physical machine and your lab machine, please do that now.**  
