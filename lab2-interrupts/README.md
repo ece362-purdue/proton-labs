@@ -345,6 +345,9 @@ Upload and monitor in PlatformIO.  Hopefully, pressing a button on your keypad s
 
 ### Step 4: Configure mailbox FIFO interrupts between processor cores
 
+> [!TIP]
+> You are permitted to call SDK functions starting with `multicore_...` for this step.  Look for the most appropriate functions based on the instructions below.
+
 > [!WARNING]
 > Multi-core programming may not be covered in-depth in lecture, but the process below to get you started should account for that.  If there are any doubts as to how this works, ask your lab instructor to clarify them.
 
