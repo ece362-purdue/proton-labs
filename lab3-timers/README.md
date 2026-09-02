@@ -205,11 +205,23 @@ Now that we have a basic understanding of how to do this, in `keypad.c`, impleme
 
 This function initializes the GPIO pins for the keypad.  It should set GP6-GP9 as outputs (for driving the columns) and GP2-GP5 as inputs (for reading the rows).  It should initialize the column pins to 0.  This should do the same thing as `init_keypad` from labs 1 and 2.
 
+> [!TIP]
+> You are permitted to use SDK functions for initializing GPIO pins and changing their output for this function.
+
 #### 2.2. `keypad_init_timer`  
 
 In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `keypad_drive_column`, and enable that interrupt.  Then, initialize TIMER0 to fire alarm 1 after 1.01 seconds (see note below) to call `keypad_isr`, and enable that interrupt as well.  
 - One hard requirement that we have for how you set the handler is that you set it as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.  You may use the SDK function to do so, since the process is fairly complicated and requires access to variables that are not in the global scope.
 - Look for the Programmer's Model section and/or the C/C++ SDK if you need help figuring out how to do this.
+
+> [!TIP]
+> You are permitted to use the following SDK function: `irq_set_exclusive_handler` and any `hw_` bit-manipulation functions you may need (e.g. `hw_set_bits`).
+> 
+> You are not permitted to use these SDK functions, but dive into them to understand how they work internally and extract the code you need to add to the function above:
+> ```
+> irq_set_enabled
+> ```
+
 
 > [!NOTE]
 > *Why 1.01 seconds?*
@@ -222,6 +234,9 @@ In this function, initialize TIMER0 to fire alarm 0 after 1 second and call `key
 
 This is a one-liner.  Return a single 4-bit value of the current state of GP2-GP5, which are the row pins.  For example, if GP3,GP4 is high but GP2,GP5 are low, then the return value of this function must be 6 (or 4'b0110).
 
+> [!TIP]
+> You may use any GPIO function or `hw_...`-prefixed function for this step.
+
 #### 2.4. `keypad_drive_column`  
 
 We're going to change this a little bit from what we had in lab 2.
@@ -233,6 +248,9 @@ We're going to change this a little bit from what we had in lab 2.
 - With the newly changed value of `col`, drive the selected column GPIO pin high, and drive all others low.
     - You can do this in a single statement with the SIO `gpio_togl` register, which atomically toggles GPIO pins in a single write.  Remember that if statements, for loops, etc. add a lot of unnecessary instruction execution to interrupt handlers, and you want to keep those short n' sweet!  Handlers should do their job quickly and return to the main program as soon as possible.
 - Finally, set the timer's counter to trigger ALARM0 again in 25 milliseconds, implementing a repeating alarm.
+
+> [!TIP]
+> You may use any GPIO function or `hw_...`-prefixed function for this step, but see the tip above about using `sio_hw->gpio_togl`.
 
 #### 2.5. `keypad_isr`  
 
@@ -248,6 +266,9 @@ We're going to change this a lot.  In the last lab, we used interrupts on each r
     - If so, set the corresponding bit in `state` to low.    
     - Push the event into `kev`.  For example, if the key released was "5", then the value pushed into the queue should be `9'b000110101`, which is 5 in ASCII (53) with the "pressed" bit set to 0.  
 - Make sure to reset ALARM1 so that the timer will fire it again in 25 milliseconds, implementing a repeating alarm.
+
+> [!TIP]
+> You shouldn't need any SDK functions except perhaps the `hw...`-prefixed functions for this step.  
 
 Here's the keypad pinout again to help you visualize the connections.  You should have GP9 to GP2 connected to COL1 to ROW4 respectively.
 
@@ -290,8 +311,19 @@ Initialize pins GP10-GP20 as outputs.  GP20-GP18 are connected to the select lin
 
 ![7seg-card](images/7seg-explanation.png)
 
+> [!TIP]
+> You are permitted to use SDK functions for initializing GPIO pins and changing their output for this function.
+
 #### 3.2: `display_init_timer`  
 Initialize TIMER1 to fire ALARM0 after 3 milliseconds, at which point the interrupt will call `display_isr` when triggered.  Make sure to enable the interrupt for ALARM0 on TIMER1.  Again, set `display_isr` as the exclusive handler, not a shared handler.  This is needed for your autotester to properly identify the handler.
+
+> [!TIP]
+> You are permitted to use the following SDK function: `irq_set_exclusive_handler` and any `hw_` bit-manipulation functions you may need (e.g. `hw_set_bits`).
+>
+> You are not permitted to use these SDK functions, but dive into them to understand how they work internally and extract the code you need to add to the function above:
+> ```
+> irq_set_enabled
+> ```
 
 #### 3.3: `display_print`  
 This takes an array of "key-events" from the keypad, transforms them into the seven-segment representation, and stores them in the local `msg` character array.  We'll push the characters out to the display from `msg`, hence the transformation.  
@@ -316,6 +348,9 @@ Then the values in `msg` would be as follows:
 
 You can use the global `font` array to convert ASCII values to the seven-segment representation.
 
+> [!TIP]
+> This function shouldn't need any SDK function calls.
+
 #### 3.4: `display_isr`  
 This is where the magic happens!  In this function, do the following:
 - Acknowledge the interrupt for ALARM0 on TIMER1.
@@ -328,6 +363,9 @@ Now, look back at `main.c`.  Uncomment the `STEP3` define at the top of the file
 Until you press buttons on the keypad, you should see the display cycling through the characters in `msg`, which is initially "01234567".  Press **and hold** a button, and you'll see the display clear, and the pressed button value appear with the decimal point lit up on the rightmost digit.  Let go of the button, and the same digit will appear, but with the decimal point off.  The display will shift left as you press more buttons.
 
 Try holding down multiple buttons (not in the same row) and note how you can see the display reflect exactly the characters pressed, as well as the same release events in the same order that you perform them!
+
+> [!TIP]
+> This function shouldn't need any SDK function calls, except for the `hw_...`-prefixed functions to manipulate timer registers.
 
 > [!IMPORTANT]
 > Show your working keypad and display to your TA to earn points for this step.  You must have the display cycling through the characters in `message`.  Pressing a key will clear the display and show the key with the decimal point lit.  Releasing the kit will add another key to the display with the decimal point turned off.  If you have any issues, ask your TA for help.
