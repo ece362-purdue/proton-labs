@@ -265,7 +265,7 @@ By default, PlatformIO does not incorporate support for our Proton board, since 
 
 The purpose of using PlatformIO is to make it much easier to compile, upload and debug code on your microcontroller.  Since it is oriented towards embedded systems, it's got support for various other microcontrollers that you can use it for after 362.  It also integrates a few other tools, including a serial monitor that allows you to send and receive data from your microcontroller, and a debugger that allows you to step through your code and inspect variables as the program runs on the microcontroller.
 
-Clone the `ece362-SEM-lab0-username` repository you created in Step 0 to your local machine.  In it, you should only have a README file that doesn't say anything particularly useful.  Create a new file called `platformio.ini`, and add the following to it:
+Clone the `ece362-SEM-lab0-username` repository you created in Step 0 to your local machine.  In it, you should only have a README file and txt file that don't say anything particularly useful.  Create a new file called `platformio.ini`, and add the following to it:
 
 ```ini
 [env:proton]
