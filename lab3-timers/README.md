@@ -47,6 +47,8 @@ If the text doesn't appear when you click "Upload and Monitor", ensure that `aut
 
 > [!CAUTION]
 > Please be careful when soldering - we suggest making use of the ECE Shop or office hours so that a TA can assist you if you make mistakes, and that you do not accidentally burn yourself or damage the components.
+> 
+> Be especially careful with the 7-segment display card, as we can only make so many of them per semester, unlike the other components in your kit that will eventually need to be soldered.  If possible, confirm your technique with your TA while soldering one pin before soldering the rest of the pins.  If you have any questions, ask your TA for help.
 
 If you haven't already, solder pin headers onto your 7-segment display card.  You can use the same technique as you did for the Proton board in lab 0.  Make sure to use the single-sided pin headers, with the long end going into your breadboard.
 
