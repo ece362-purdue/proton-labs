@@ -26,6 +26,13 @@
 - To understand the purpose of direct memory access (DMA) and how it works.
 - To utilize DMA to perform analog-to-digital conversions automatically and transfer data to memory.
 
+### SDK Function Note
+
+> [!NOTE]
+> Great work on the labs so far!  From this lab onward, you are permitted to use whatever SDK functions you find.  However, be prepared to cite how you found them - only the datasheet or the SDK source code are acceptable sources.  You must also use continue to dive into functions to understand what registers they modify in case your code doesn't work as expected.  Use the debugger with breakpoints to stop at lines in code and see what registers are being modified.  
+> 
+> As always, do not ask other students or AI/LLMs to write or provide code, or find answers, as these labs are designed to be completed independently, to establish everyone's individual understanding of the material.
+
 ### Step 0.1: Set up your environment
 
 Make sure to clone the code repository from Iris.  Keep in mind to add, commit and push any changes you make so that your work is accessible from a lab machine. 
