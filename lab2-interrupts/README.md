@@ -420,6 +420,11 @@ Congratulations on writing and running your first dual-core interruptible embedd
 > This step is just to prepare for lab 3.  You don't have to do anything with the 7-segment display card for lab 2.
 > If you already soldered the pin headers on or it already came soldered on, you can skip this step.
 
+> [!CAUTION]
+> Be especially careful with the 7-segment display card, as we can only make so many of them per semester, unlike the other components in your kit that will eventually need to be soldered. If possible, confirm your technique with your TA while soldering one pin before soldering the rest of the pins. If you have any questions, ask your TA for help.
+> 
+> If you permanently damage the 7-segment display, you will need to purchase another one [here](https://bit.ly/7seg-362), and show the receipt to your TA who will give you a replacement in lab - **it will not be shipped to you!**.  You will also need to solder it again.
+
 If you haven't already, solder pin headers onto your 7-segment display card.  You can use the same technique as you did for the keypad in lab 0.  Make sure to use the single-sided pin headers, with the long end going into your breadboard.
 
 ![soldering-7seg](images/soldering.png)
