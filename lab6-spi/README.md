@@ -227,7 +227,7 @@ In a new temporary 32-bit integer (use `uint32_t`) variable, set the following p
 
 4. The data size of each transfer will be the size of one element of `msg`, or 16 bits.
 5. The read address should increment after every transfer.
-6. The read address should wrap every X bytes.  (Figure out what X is.)
+6. The read address should wrap every X bits of the address.  (Figure out what X is.)
   - When you are in TRIGGER_SELF mode, the DMA will keep incrementing the source address by 16 bits (2 bytes) after each transfer in order to reach the next element of `msg`.  However, DMA doesn't understand that `msg` is only 8 elements long, so we need to tell it to wrap around to the first element's address after it has transferred the first element.  
   - The `msg` array is 8 elements long, and each element is 2 bytes (`uint16_t` or 16 bits) long.  
   - The value of X should therefore be the number of bits needed to represent the value after which the DMA read address should wrap around back to the start of the `msg` array.
@@ -420,11 +420,11 @@ Then, read this program that we've given you to implement 16-bit SPI with the 7-
 ; MOSI - output pin
 
 .wrap_target
-    set x, 15 side 1      ; side-sets CSn low, SCK high
+    set x, 15 side 1 [1]  ; x is bit count, set to 16;
+                          ; set CSn high, SCK low between words
 loop:
-    out pins, 1 side 2    ; Output one bit to MOSI
-    jmp x-- loop side 0   ; Decrement x, if not zero, jump to loop. 
-                          ; side-set CSn high, SCK low
+    out pins, 1 side 0    ; output one bit to MOSI
+    jmp x-- loop side 2   ; SCK high, goto loop if x>0
 .wrap
 ```
 
@@ -441,7 +441,7 @@ Right below this would be an initialization function that sets up the PIO state 
 
 ```c
 % c-sdk {
-static inline void spi_7seg_program_init(PIO pio, uint sm, uint offset, uint pin_sck, uint pin_csn, uint pin_mosi) {
+static inline void spi7seg_program_init(PIO pio, uint sm, uint offset, uint pin_sck, uint pin_csn, uint pin_mosi) {
     // CSn (13), SCK, TX (15)
     pio_sm_set_enabled(pio, sm, false);
     
@@ -456,23 +456,17 @@ static inline void spi_7seg_program_init(PIO pio, uint sm, uint offset, uint pin
     // Set pin values to CSn high and SCK/MOSI low
     pio_sm_set_pins_with_mask(pio, sm, (1u << pin_csn), (1u << pin_sck) | (1u << pin_csn) | (1u << pin_mosi));
 
-    // Configure state machine and set clock divider
-    pio_sm_config c = spi_7seg_program_get_default_config(offset);
+    // Configure state machine
+    pio_sm_config c = spi7seg_program_get_default_config(offset);
     sm_config_set_clkdiv(&c, 150.0f);
-
-    // Set output pin to MOSI
     sm_config_set_out_pin_base(&c, pin_mosi);
     sm_config_set_out_pin_count(&c, 1);
     sm_config_set_out_pins(&c, pin_mosi, 1);
-
-    // 2 side-set pins - SCK and CSn (in that order)
-    // CSn is at bit 0, SCK at bit 1
     sm_config_set_sideset_pins(&c, pin_csn);
+
+    // 2 bits for SCK and CSn
     sm_config_set_sideset(&c, 2, false, false); 
-
-    // Shift OSR to right, enable auto-pull, and set shift threshold to 16 bits
     sm_config_set_out_shift(&c, false, true, 16);
-
     // Initialize the state machine with the configuration
     pio_sm_init(pio, sm, offset, &c);
     pio_sm_set_enabled(pio, sm, true);
@@ -480,7 +474,7 @@ static inline void spi_7seg_program_init(PIO pio, uint sm, uint offset, uint pin
 %}
 ```
 
-This `init` program should get called by your `main` function to initialize the PIO with the compiled ASM.  Some things to explain about this as well:
+This `init` program should get called by your `main` function to initialize the PIO with the compiled PIO ASM (assembly language).  Some things to explain about this as well:
 
 - The surrounding `% c-sdk { ... %}` is a special syntax that allows us to write C code that will be compiled by the PIO assembler.  
 - The PIO needs to know what pins to use for SCK, CSn and MOSI, so we pass those as parameters to the `spi_7seg_program_init` function, so that it configures them as PIO-specific outputs.
@@ -503,19 +497,17 @@ Then, down in the `main` function, add a new `#ifdef` section called `PIO_TESTIN
 // Use msg from display.c that we used earlier for regular SPI.
 extern uint16_t msg[8];
 
-// Define the 7-segment SPI bitbang pins for PIO.
-// If you change these pins, make sure to change them in the PIO init program as well.
+// Define the 7-segment SPI bitbang pins for PIO
 #define PIO_7SEG_SCK 14
 #define PIO_7SEG_CSn 13
 #define PIO_7SEG_TX 15
 
-// Specify the PIO and state machine we want to use
 PIO pio = pio0;
-uint sm = 0; 
+uint sm = 0;
 
 // Load and configure the PIO program
-uint offset = pio_add_program(pio, &spi_7seg_program);
-spi_7seg_program_init(pio, sm, offset, PIO_7SEG_SCK, PIO_7SEG_CSn, PIO_7SEG_TX);
+uint offset = pio_add_program(pio, &spi7seg_program);
+spi7seg_program_init(pio, sm, offset, PIO_7SEG_SCK, PIO_7SEG_CSn, PIO_7SEG_TX);
 ```
 
 This initializes the PIO state machine to run the `spi_7seg_program` that we defined earlier, and configures it to use the SCK, CSn and TX pins that we specified.  
@@ -556,29 +548,41 @@ When it doesn't work:
 
 #### Automate further with DMA
 
-While the PIO state machine is great for handling SPI communication, you can also use DMA (Direct Memory Access) to automate the process even further. DMA is *very* awesome that way!
+While the PIO state machine is great for implementing a "free" SPI peripheral, you can also use DMA (Direct Memory Access) to automate the process even further. DMA is *very* awesome that way!
 
 To use DMA with the PIO state machine, you'll need to configure a DMA channel to read data from the `msg` array and write it to the PIO state machine's FIFO.  Since you have to use DMA for a prior step, however, we won't provide the code, but it's fairly straightforward:
 
 1. The read address should be the address of the `msg` array.
 2. The write address should be the PIO state machine's TX FIFO register.
-3. The transfer count should be set to 8, and the channel should be set to ENDLESS transfer mode so that it restarts.
+3. The transfer count should be set to 8, and the channel should be set to TRIGGER_SELF transfer mode so that it restarts.
 4. Configure the control register as follows before enabling the DMA channel:
     - The data size of each transfer is 16 bits.
     - Increment the read address after each transfer.
-    - Wrap the read address every X bytes, so that it wraps around at the end of the `msg` array.
-      - This is the same X bytes you found in Step 4.
+    - Wrap the read address every X bits of the address, so that it wraps around at the end of the `msg` array.
+      - This is the same X bits of the address you found in Step 4.
       - This ensures DMA starts reading from the beginning of the `msg` array after it has transferred all eight elements.
     - We noticed that we didn't have to do the casting that we did earlier, so our guess is that the DMA performs a 16-bit write for us already with each transfer.
     - Specify PIO0 TX as the Data Request (DREQ) source, so that the DMA channel will be triggered when the PIO state machine's TX FIFO is empty and ready to receive new data.
     - Enable the DMA channel.
-  
-Set the value in the control trigger register to start the DMA transfer, and you'll now see something odd.  It may vary from person to person, but you may see the 7-segment displays not show all the digits - instead, you'll see some corruption on the displays past 0, 1, and/or 2.
+
+<!-- Set the value in the control trigger register to start the DMA transfer, and you'll now see something odd.  It may vary from person to person, but you may see the 7-segment displays not show all the digits - instead, you'll see some corruption on the displays past 0, 1, and/or 2.
 
 This is due to a hard-to-find bug that prevents the DMA from being able to access the `msg` array properly.  Even though it's defined globally, the DMA channel is not able to access it properly because it is not (we think) in the right memory region.  
 
-What *does* work, is if we create a new array in heap memory and use that instead for the DMA read address source.  Create a 16-bit integer pointer variable called `msg_heap` in `main.c`, and allocate it with `malloc` to the size of `msg` (8 16-bit unsigned int elements).  Then, copy the contents of `msg` into `msg_heap` using `memcpy`.  Use `msg_heap` as the read address for the DMA channel instead of `msg`, and try uploading again - hopefully, you'll see all digits 0-7 on the 7-segment displays!
+What *does* work, is if we create a new array in heap memory and use that instead for the DMA read address source.  Create a 16-bit integer pointer variable called `msg_heap` in `main.c`, and allocate it with `malloc` to the size of `msg` (8 16-bit unsigned int elements).  Then, copy the contents of `msg` into `msg_heap` using `memcpy`.  Use `msg_heap` as the read address for the DMA channel instead of `msg`, and try uploading again - hopefully, you'll see all digits 0-7 on the 7-segment displays! -->
 
-You can configure additional things like a different PIO clock speed to make it slower, the pins to be configured by the PIO, etc. before the PIO state machine starts running.
+Set the value in the control trigger register to start the DMA transfer, and add the following loop:
 
-Using PIO to automate SPI is different from having DMA do it in that PIO can still make small adjustments to the data being sent, such as adding a delay between bits, or changing the data being sent based on some condition.  
+```c
+for(;;) {
+    for (int i = 0; i < 8; ++i) {
+        msg[(i == 0) ? 7 : i - 1] &= ~(1 << 7);
+        msg[i] |= (1 << 7);
+        sleep_ms(250);
+    }
+}
+```
+
+Then, give it a try - hopefully, you'll see all digits 0-7 on the 7-segment displays with the decimal point "travelling" through them!  You can configure additional things like a different PIO clock speed to make it slower, the pins to be configured by the PIO, etc. before the PIO state machine starts running.
+
+Using PIO to automate SPI is different from having DMA do it, since PIO can still make small adjustments to the data being sent, such as adding a delay between bits, or changing the data being sent based on some condition.  This flexibility is achieved with a simple change to the PIO ASM code that implements the SPI transmission.  As an example: you can handle bidirectional data transfers by sending out data, then waiting on data to arrive from the secondary device while toggling the clock.
