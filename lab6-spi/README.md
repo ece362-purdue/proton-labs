@@ -410,7 +410,7 @@ Read over [PIO Programs](https://datasheets.raspberrypi.com/rp2350/rp2350-datash
 Then, read this program that we've given you to implement 16-bit SPI with the 7-segment display:
 
 ```
-.program spi_7seg
+.program spi7seg
 .side_set 2
 
 ; This program reads one 16-bit half-word from FIFO 
@@ -430,7 +430,7 @@ loop:
 
 Some things to explain:
 - Comments start with a semicolon `;` and are ignored by the PIO assembler.
-- The `.program` directive defines the name of the PIO program, which is `spi_7seg` in this case.
+- The `.program` directive defines the name of the PIO program, which is `spi7seg` in this case.
 - The `.side_set` directive specifies that the program will use side-set instructions, which allow you to control GPIO pins in addition to the main instruction.  We specify 2 bits, corresponding to 2 pins that we will specify later.
 - The concept of "side-set" is used to control GPIO pins as part of a given instruction.  So in the line `set x, 15 side 1`, the `side 1` part toggles the SCK pin high and the CSn pin low within the **same clock cycle** that the PIO sets the scratch register X's value to 15, to use it as a loop counter value, hence the term *side* set.  Side-sets can be used in any instruction, and are ideally suited to changing clock pin outputs without wasting an entire instruction on changing it (which can reduce your overall frequency).
 - The `out pins, 1 side 2` instruction outputs one bit to the MOSI pin, and toggles the SCK pin low and CSn high at the same time.
@@ -477,7 +477,7 @@ static inline void spi7seg_program_init(PIO pio, uint sm, uint offset, uint pin_
 This `init` program should get called by your `main` function to initialize the PIO with the compiled PIO ASM (assembly language).  Some things to explain about this as well:
 
 - The surrounding `% c-sdk { ... %}` is a special syntax that allows us to write C code that will be compiled by the PIO assembler.  
-- The PIO needs to know what pins to use for SCK, CSn and MOSI, so we pass those as parameters to the `spi_7seg_program_init` function, so that it configures them as PIO-specific outputs.
+- The PIO needs to know what pins to use for SCK, CSn and MOSI, so we pass those as parameters to the `spi7seg_program_init` function, so that it configures them as PIO-specific outputs.
 - We specify a clock divider of 150.0f, which means that the PIO state machine will run at 1 MHz, or 1 instruction per microsecond.  The effective 16-bit SPI communication was measured to be around 29.412 KHz (500 KHz / (16 data bits + CSn toggling)), with the clock signal frequency being around 500 KHz (a little lower since it turns off when CSn is being toggled).
 - Specifying which pins have to be used is a little interesting.  PIO does not just take all the pin indices to use - instead, it needs to be provided the **mask** of all the pins to use.  See the `pio_sm_set_pins_with_mask/sm_config_set_out_pin_base/sm_config_set_out_pin_count/sm_config_set_sideset_pins/sm_config_set_sideset` function calls.  This is just due to the unique way it works.
 - In the `sm_config_set_out_shift` call, we do three things:
@@ -485,7 +485,7 @@ This `init` program should get called by your `main` function to initialize the 
     - We enable auto-pull, which means that the PIO state machine will automatically pull data from the FIFO when it is ready, to be used for the OUT instruction.  If we don't want to use auto-pull, we can manually specify when to pull data from the FIFO using the `pull` instruction.
     - We set the shift threshold to 16 bits, meaning that the PIO state machine will wait until it has 16 bits of data in the FIFO before it starts shifting them out.  If the PIO doesn't have data for the `out` instruction, it will stall at that instruction until 16 bits of data arrives.
 
-Now, take both the PIO program and the **entire** initialization function, and create a new file called `spi_7seg.pio` in your `src` directory and paste it in.
+Now, take both the PIO program and the **entire** initialization function, and create a new file called `spi7seg.pio` in your `src` directory and paste it in.
 
 That PIO program gets compiled to a **binary format** with a program called `pioasm`, or PIO Assembler, into a binary format.  To make including it in your project easier, we've added code to detect if you have `.pio` files in your `src` directory, and use `pioasm` to compile them into `.pio.h` header files that will get automatically included in your project.  **Don't edit the header files directly!**
 
@@ -510,7 +510,7 @@ uint offset = pio_add_program(pio, &spi7seg_program);
 spi7seg_program_init(pio, sm, offset, PIO_7SEG_SCK, PIO_7SEG_CSn, PIO_7SEG_TX);
 ```
 
-This initializes the PIO state machine to run the `spi_7seg_program` that we defined earlier, and configures it to use the SCK, CSn and TX pins that we specified.  
+This initializes the PIO state machine to run the `spi7seg_program` that we defined earlier, and configures it to use the SCK, CSn and TX pins that we specified.  
 
 For the actual transmission, we're going to create an infinite loop that sends each element of `msg` into the PIO state machine's FIFO.  It's a little interesting how we'll have to do it though:
 
