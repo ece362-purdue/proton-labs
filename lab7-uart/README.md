@@ -27,7 +27,13 @@
 
 ### Step 0.1: Set up your environment
 
-For this lab, there is no autotest.  At this point, you will be expected to debug your code by reading the datasheet, identifying important registers, using the SDK functions to figure out what you need to do, and if something goes wrong, debugging and checking register values for the UART and/or associated peripherals.
+For this lab, there is no autotest the way you had in previous labs.  You will be expected to debug your code by reading the datasheet, identifying important registers, using the SDK functions to figure out what you need to do, and if something goes wrong, debugging and checking register values for the UART and/or associated peripherals.  In your lab session, we will still be asking you to demonstrate how it works in practice.
+
+For this lab in particular, we will give you is a test script that will automatically test your serial output for you.  This is an open file that you can read, but **not modify**, to understand what the test script is doing.  It will be used on Gradescope to test your code programmatically and assign points.  At the end of each step, we will explicitly state what the test will do, so that you can test it yourself if the script isn't working for you.  If you encounter any technical issues, push your code to GitHub, and send an email to/schedule an appointment with your lab coordinator so that they can help debug it.  (Fall 2026 is the first semester that this script is being introduced, so there may be bugs that we need to fix.)
+
+To run this script, go to the PlatformIO sidebar menu, and click on "Custom" > "Test Lab7".
+
+![sidebar menu showing pio test](images/piotest.png)
 
 By the end of the lab, you will have learned how to create your own command shell, in the same style as the one we provided you in previous labs with autotest.
 
@@ -64,7 +70,7 @@ The UART on your Proton will detect this transmission when the start bit arrives
 
 Conversely, when you send a character from your program running on the Proton board, it will be transmitted through the TX pin (GP0) of the Proton board, to the RX pin on your Debug Probe.  The Debug Probe program will convert that into a USB packet and send it to your computer, where you will see it in the Serial Monitor.
 
-UART typically has two other pins - RTS and CTS - which are used for hardware flow control.  These date back to a time when the UART was used to communicate with devices that were much slower than the computer, such as a printer.  The RTS (Request To Send) pin is used by the computer to indicate that it is ready to send data, and the CTS (Clear To Send) pin is used by the device to indicate that it is ready to receive data.  These days, you don't need these pins - you certainly didn't need them when we connected the Debug Probe to the Proton board.
+UART typically has two other pins - RTS and CTS - which are used for hardware flow control.  These date back to a time when the UART was used to communicate with devices that were much slower than the computer, such as a printer.  The sending device looks at CTS to see if it is "Clear to Send" data.  The receiving device asserts RTS to indicate that it is ready to receive data.  These days, the pins are used primarily for much higher-speed transmissions where the receiving device may not be able to keep up with the incoming data, and so it can use RTS to tell the sending device to pause transmission until it is ready again.  This is especially critical if you don't want to lose data in a transmission.  We won't really need them on the Proton and debug probe since we use relatively low transmission speeds, and it's okay if we miss a character or two.
 
 Go over [12.1 UART](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#section_uart) as well as the relevant [SDK functions](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf#group_hardware_uart) for UART, and answer the following questions:
 
@@ -89,12 +95,20 @@ In the function `init_uart`, using the SDK functions or by writing to the regist
 
 In `main`, we've provided code that calls `init_uart`, waits for a character to be received, and then transmits that character back.  
 
-Uncomment STEP2 at the top of the file and upload and monitor.  Try typing characters into the terminal.  Instead of seeing the character you had just pressed, you see "You typed: " followed by the character you typed, instead of seeing the character echo back as soon as you press it.  Weird, right?
+Uncomment STEP2 at the top of the file and upload and monitor.  Try typing characters into the terminal.  Instead of seeing the character you had just pressed, you see "You said: " followed by the character you typed, instead of seeing the character echo back as soon as you press it.  Weird, right?
 
 That's because, by default, **UART does not automatically echo characters back to the terminal**.  You have to write code to do that.  The code in `main` is a good start, but generally terminal emulators have more robust echoing capabilities, such as handling backspace and other control characters, which we'll do next.
 
 > [!IMPORTANT]
-> Show your TA that typing characters into the Serial Monitor does not echo them back directly, but instead shows "You typed: " followed by the character you typed.  Show them the code you wrote.  (Remember that there is no autotest.)
+> When you run "Custom > Test Lab7" under the PlatformIO sidebar menu, it will run your code against the selected test.  The test is selected if you have it defined at the top of `main.c`.  For example, if you have `#define STEP2` uncommented, it will run the test for Step 2.
+> 
+> The test for Step 2 types `A`, then `Q` (no Enter key), and expects exactly:
+> ```
+> You said: A
+> You said: Q
+> ```
+> 
+> When in lab, show your TA that typing characters into the Serial Monitor does not echo them back directly, but instead shows "You said: " followed by the character you typed.  Show them the code you wrote. 
 > 
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
@@ -105,7 +119,9 @@ That's because, by default, **UART does not automatically echo characters back t
 
 In the first step, we directly used UART functions to read and write characters.  However, it can be a bit tedious to use these functions directly, especially when we want to read in strings or formatted data in ways that we're all more familiar with from typical C programs.
 
-The function `stdio_init_all` does quite a bit of heavy lifting for us to allow the C standard I/O (stdio) functions like `putchar()`, `getchar()`, `scanf()`, `printf()`, etc. to work with the UART peripheral.  It sets up the UART peripheral to be used for standard input and output, allowing you to use these functions to read from and write to the UART.  
+The C standard library is one you've used in prior programming courses.  It provides a set of functions that allow you to read and write data in a standardized way, regardless of the underlying hardware.  For example, the `printf` function allows you to print formatted text to the standard output (`stdout`), and the `scanf` function allows you to read formatted input from the standard input (`stdin`).  These functions are implemented in a way that they can work with any hardware device, including UART.
+
+The function `stdio_init_all` does quite a bit of heavy lifting for us to allow these functions, in addition to ones like `putchar()`, `getchar()`, etc. to use with the UART peripheral to read and write text.  It sets up the UART peripheral to be used for standard input and output, allowing you to use these functions to read from and write to the UART.  
 
 If you dive into that function, and go through `stdio_uart_init -> stdio_uart_init_full`, you'll find `stdio_set_driver_enabled`.  At this point, we arrive in the `stdio.c` from the Pico C/C++ SDK.  This file teaches us a lot about how Raspberry Pi's SDK connects the UART peripheral to the C standard library functions, which is by creating a "**driver**" that handles the reading and writing of characters via the UART peripheral when an associated C standard library function, like `printf` or `fgets` or `scanf`, is used.
 
@@ -236,7 +252,7 @@ With the echo working from earlier, you might want to try more special keys, the
 
 ![incorrbs.gif](images/incorrbs.gif)
 
-The Backspace key is actually meant to control the *cursor*.  The "erasure" of the character is added afterward.  It was automatically handled by your Pico's `stdio_init_all` function.  (See how much work that was hiding behind the scenes?)  
+The Backspace key is actually meant to *move the cursor*, not actually erase the character.  The erasure of the character is added afterward.  It was automatically handled by your Pico's `stdio_init_all` function.  (See how much work hides beneath the SDK functions?)  
 
 So, to reiterate, our algorithm is as follows:
 - We type some characters and `getchar()` calls `_read()`, which reads them one at a time.
@@ -295,6 +311,14 @@ A second consideration is that we don't want the CPU to be responsible for watch
 
 We'll use interrupts in the next step to have the UART automatically store incoming characters into the buffer, using an interrupt handler to properly shift characters and account for things like newlines.
 
+> [!IMPORTANT]
+> The test for step 3 waits for `Enter your name and age: `, then types `Person 21` followed by the Enter key, and expects exactly:
+> ```
+> Hello, Person! You are 21 years old.
+> ```
+> 
+> When in lab, show your TA that you can read in a name and age using `scanf`, and that you can edit your input with Backspace.  Show them the code you wrote, and explain how it works.
+
 ### Step 4: Automate your new UART device driver
 
 > [!NOTE]
@@ -343,7 +367,7 @@ Copy the `_read` syscall function definition (not the body) from Step 3, and the
 - Copy the contents of `serbuf` into `buffer`.  The number of characters to copy is `seridx`, which is the number of characters received so far.
     - This is only true as long as `length` is greater than or equal to `seridx`.  If `length` is less than `seridx`, copy only `length` characters.  However, since our `BUFSIZE` is 32, this should not be an issue.
 - Reset `seridx` to 0.
-- Return the passed argument `length`, and **not** `seridx`.  This is because the C standard library functions expect the length of the string to be returned, not the number of characters received.
+- Return `seridx`, not `length`.  This is because the C standard library functions expect the actual length of the string to be returned.
 
 #### 4.5 Test your implementation
 
@@ -377,10 +401,15 @@ There's still limitations to this approach that we can work around as needed:
 
 - `scanf` is still technically a blocking function, and perhaps you don't want the control code to be stuck here while you're waiting on the user to type something in.  That requires a completely different approach to how you will handle incoming characters - you still store characters in a buffer continuously with the UART interrupt, but instead of using `scanf` which blocks flow, just read the buffer manually when you need it.  
 
-A common question that comes up is why we didn't use DMA to handle the UART receive.  DMA is purely a data transfer peripheral - it wouldn't be able to handle things like Backspace and newlines, which would have required CPU time anyway.  DMA is still useful if you're connecting UART to another device, where you know exactly the format of the data being received into the RP2350, and you don't have to do extra processing on the received data.
+A common question that comes up is why we didn't use DMA to handle the UART receive.  DMA is purely a data transfer peripheral - it wouldn't be able to handle things like Backspace and newlines, which would have required CPU time anyway.  DMA is still useful if you're connecting UART to another device where you're not dealing with things like newline and backspace handling, since you know the exact format of the data being received into the RP2350, and you don't have to do extra processing on the received data.
 
 > [!IMPORTANT]
-> Show your TA that you can read in a name and age using `scanf`, and that you can edit your input with Backspace.  Show them the code you wrote, and explain how it works.
+> The test for step 4 runs the name/age exchange twice. First, it types it directly (`Person 21` + Enter). Then it types `Perjx`, presses Backspace twice to remove `x` and `j`, and finishes with `son 21` - landing on the same buffer, `Person 21`. Both rounds must produce exactly:
+> ```
+> Hello, Person! You are 21 years old
+> ```
+> 
+> When in lab, show your TA that you can read your own name and age using `scanf`, and that you can edit your input with Backspace.  Show them the code you wrote, and explain how it works.
 >
 > Commit all your code and push it to your repository now.  Use a descriptive commit message that mentions the step number.
 
@@ -500,6 +529,9 @@ It doesn't have to be just GPIO pins.  Use this concept to quickly set up an SPI
 It also doesn't have to be just peripherals - you can use these to automatically send commands to external devices like LCDs, or read sensors, or read/write to files on an SD card.  Debugging those methods can get quite time-consuming if you just use the debugger, so having a command shell to quickly test things will be very useful.
 
 **And that's a wrap on the embedded labs! Congratulations on making it through!**  Don't forget to go through the "project guide" labs on the main Labs repository page to get some ideas on what you can use for your project.
+
+> [!IMPORTANT]
+> The test for step 5, for every line above, checks it verbatim *except* `where's the bathroom?`.  The check also retypes `gpio out 23` as `gpio out 2x`, Backspace, `3` partway through, to confirm Backspace editing carried over from Step 4 still works in this shell, so don't be surprised if you see that exact typo-correction sequence in the test output.
 
 ### Step 6: Confirm your checkoffs before leaving
 
