@@ -31,7 +31,7 @@ For this lab, there is no autotest the way you had in previous labs.  You will b
 
 For this lab in particular, we will give you is a test script that will automatically test your serial output for you.  This is an open file that you can read, but **not modify**, to understand what the test script is doing.  It will be used on Gradescope to test your code programmatically and assign points.  At the end of each step, we will explicitly state what the test will do, so that you can test it yourself if the script isn't working for you.  If you encounter any technical issues, push your code to GitHub, and send an email to/schedule an appointment with your lab coordinator so that they can help debug it.  (Fall 2026 is the first semester that this script is being introduced, so there may be bugs that we need to fix.)
 
-To run this script, go to the PlatformIO sidebar menu, and click on "Custom" > "Test Lab7".
+To run this script, go to the PlatformIO sidebar menu, and click on "Custom" > "Test Lab7".  To test each step, you should ensure the corresponding `#define` is uncommented in `main.c`.
 
 ![sidebar menu showing pio test](images/piotest.png)
 
