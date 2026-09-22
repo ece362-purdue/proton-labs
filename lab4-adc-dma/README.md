@@ -201,7 +201,7 @@ In the function `init_adc_dma`, do the following:
 > [!NOTE]
 > For the instructions that follow, it is **much** easier to set up DMA using the registers, as you have better control over the individual parameters for DMA transfers.
 >
-> If you use SDK functions for this step, you will be asked to rewrite them into registers.
+> If you use SDK functions for this step, you may find it more difficult to follow, but it is up to you.
 
 Next, in the function `init_dma`, do the following (without SDK functions):
 
