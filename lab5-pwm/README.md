@@ -179,7 +179,7 @@ Implement `init_pwm_irq` to do the following.  You can assume the pins and gener
 
 1. Within the PWM peripheral registers, enable interrupts for the PWM slice associated with GP37, associated with the **first** PWM wrap interrupt (there are two - pick the one that says "WRAP0", so that we can check it with the autotest).  We'll update both slices from the same handler, so there is no need to enable it for the different slice associated with GP38 and GP39.
 
-2. Set `pwm_breathing` as the exclusive handler when the PWM slice associated with GP37's counter wraps around to 0.  You can find the numbers associated with the PWM interrupt in the datasheet, `hardware_irq` in the Hardware API, or by looking at the `pwm.h` header file.  You may use the appropriate SDK function to do this.
+2. Set `pwm_breathing` as the exclusive handler when the PWM slice associated with GP37's counter wraps around to 0.  You can find the numbers/macros associated with the PWM interrupt in the datasheet, `hardware_irq` in the Hardware API, or by looking at the `pwm.h` header file. 
 
 3. Enable interrupts for the aforementioned PWM the PWM slice associated with GP37 interrupt.
 
