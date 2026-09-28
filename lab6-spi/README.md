@@ -96,19 +96,34 @@ Before you proceed, ensure you have identified the type of display you have.  If
 
 For both displays: place your display to the left of your audio jack from lab 5.  At this point, you should have a complete row of components on the bottom row of your breadboard.  Identify a set of three SPIx pins on the opposite side of your Proton board that you can use to connect to the display, but **make sure that you are using the second SPI peripheral**.  That means if you used SPI1 for the 7-segment display, you should use SPI0 for the LCD/OLED display.
 
-#### 0.2.2: (LCD only) Wire up your SMH1602 LCD display
+### Step 0.2.2: (LCD only) Solder headers to your LCD display
+
+> [!CAUTION]
+> Please be careful when soldering - we suggest making use of the ECE Shop or office hours so that a TA can assist you if you make mistakes, and that you do not accidentally burn yourself or damage the components.
+> 
+> Be especially careful with the LCD display, as we can receive a limited number of them per semester, unlike the other components in your kit you needed to solder. If possible, confirm your technique with your TA while soldering one pin before soldering the rest of the pins. If you have any questions, ask your TA for help.
+
+In your lab kit, identify an LCD display with 16 pads without pin headers.  You'll use it in this lab.
+
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/47cdf2bc-43fd-492f-a91c-53c35499efd0" />
+<br>
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/0397b761-447e-44bc-9c9d-09ea0922e8c1" />
+
+Obtain a 16-pin male header from the soldering stations, TAs, or the ECE shop (if you find a longer one, just break off what you need), and solder it to the LCD display with the longer side going down into the breadboard, and the screen on the display facing up.
+
+#### 0.2.3: (LCD only) Wire up your SMH1602 LCD display
 
 Follow this schematic to wire up your **LCD display**:
 
 ![smh1602 wiring](images/smh1602.png)
 
-#### 0.2.2: (OLED only) Wire up your SEH1602 OLED display
+#### 0.2.3: (OLED only) Wire up your SEH1602 OLED display
 
 Follow this schematic to wire up your **OLED display**:
 
 ![smh1602 wiring](images/seh1602.png)
 
-#### 0.2.3: Specify your SPI pins in `main.c`
+#### 0.2.4: Specify your SPI pins in `main.c`
 
 Finally, in your `main.c` file, set the following constants to the pin numbers you used for SPI SCK, CSn and TX for both the 7-segment display and the LCD/OLED display.  You'll find them underneath where you normally put your username:
 
