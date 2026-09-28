@@ -97,7 +97,7 @@ To understand how this wave is created, read **Overview**, **Programmer's Model*
 
 4. (5 points) What is the name of the register that holds the "input value", the value compared against the free-running counter register above?  When the "current value" reaches the "input value", the PWM output is toggled.  See the graphs in 12.5.2.1 in the datasheet to help visualize this.
 
-5. (5 points) What would the values of the two registers in questions 2 and 3 have to be to generate a 50% duty cycle PWM signal?  What about 0% and 100%?
+5. (5 points) What would the values of the two registers in questions 2 and 4 have to be to generate a 50% duty cycle PWM signal?  What about 0% and 100%?
 
 6. (2 points) What is the maximum value that the PWM counter can reach?
 
