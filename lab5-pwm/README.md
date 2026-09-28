@@ -12,7 +12,8 @@
 | 2 | Implement a static duty cycle PWM signal | 25 |
 | 3 | Implement a variable duty cycle PWM signal | 15 |
 | 4 | Convert PWM to an audio signal | 30 |
-| 5 | Confirm your checkoffs before leaving | * |
+| 5 | Solder headers to your LCD display |   |
+| 6 | Confirm your checkoffs before leaving | * |
 | &nbsp; | Total: | 100 |
 <br>
 
@@ -332,7 +333,22 @@ This block diagram showcases the flow of operations when you call `drum_machine`
 
 ![drum-machine](images/drum_machine_map.png)
 
-### Step 5: Confirm your checkoffs before leaving
+### Step 5: Solder headers to your LCD display
+
+> [!CAUTION]
+> Please be careful when soldering - we suggest making use of the ECE Shop or office hours so that a TA can assist you if you make mistakes, and that you do not accidentally burn yourself or damage the components.
+> 
+> Be especially careful with the LCD display, as we can receive a limited number of them per semester, unlike the other components in your kit you needed to solder. If possible, confirm your technique with your TA while soldering one pin before soldering the rest of the pins. If you have any questions, ask your TA for help.
+
+In your lab kit, identify an LCD display with 16 pads without pin headers.  You'll use it in lab 6.
+
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/47cdf2bc-43fd-492f-a91c-53c35499efd0" />
+<br>
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/0397b761-447e-44bc-9c9d-09ea0922e8c1" />
+
+Obtain a 16-pin male header from the soldering stations, TAs, or the ECE shop (if you find a longer one, just break off what you need), and solder it to the LCD display with the longer side going down into the breadboard, and the screen on the display facing up.
+
+### Step 6: Confirm your checkoffs before leaving
 
 > [!CAUTION]
 > Make sure you got checked off here: https://engineering.purdue.edu/ece362/checkoff/
