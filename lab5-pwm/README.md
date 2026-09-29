@@ -290,11 +290,16 @@ In `main`, we have done the following for you:
 2. Call `set_freq` with the float value 440.00, to set up a frequency of 440.00 Hz.
 3. Implement a frequency entry loop that waits for you to type in a new frequency, and calls `set_freq` with that value.  Pressing 'A' will set the Channel 1 frequency, and pressing 'B' will set the Channel 2 frequency.  You can also type in floating point numbers like 418.512 Hz, with the asterisk as the decimal point.
 
-Ideally, you should hear a 440 Hz sine wave.  To verify the frequency, connect an oscilloscope to GP36 and measure the frequency on the scope, and the waveform should look like this.
+Ideally, you should hear a 440 Hz sine wave.  To verify the frequency, connect an oscilloscope to Ring1 on the TRRS jack, and measure the frequency on the scope, and the waveform should look like this.
 
 ![sine.png](images/sine.png)
 
 This "thickness" is due to the 20 kHz PWM noise that is always either pushing the capacitor higher or pulling it lower.  If you're still getting a square wave, ensure you have connected the 0.1 uF capacitor between the PWM output and ground from Step 0.2.
+
+> [!TIP]
+> You may have to play with the oscilloscope settings to get it to display the wave properly. Try Auto Scale, and/or manually changing the scales until you see the wave come up.
+>
+> If you're still seeing a square wave, double check the R/C values you used - they should be a 1k resistor and a 0.1uF capacitor.  If it's still not working, you can use the oscilloscope to set up the low-pass filter instead.  Move the probe to GP36, and on your oscilloscope, identify the Math button and press it.  Then, set the operator to Low Pass Filter, lower the bandwidth to 2000 Hz (2 KHz) so that setting frequencies lower than this will be "smoothed out" to an analog wave, and set the source to the probe that's connected to GP36, and on Display Math, enable the LPF operator so it appears as a new wave on the oscilloscope.  Then, under the list of measurements on the screen, add a frequency measurement for the new Math wave, and you should see the frequency you specified with your Proton.
 
 If you would like to listen to it, plug in a pair of headphones into the TRRS jack, or connect a speaker.  If you don't have a pair, or if the volume is too low, you could also connect an aux cord back into a microphone input on your computer if possible and "monitor" this microphone. (on [Windows](https://www.supportyourtech.com/tech/how-to-turn-on-mic-monitoring-in-windows-11-a-step-by-step-guide/), [macOS](https://www.guidingtech.com/55703/ive-monitor-mic-input-mac/)).
 
