@@ -369,7 +369,7 @@ Copy the `_read` syscall function definition (not the body) from Step 3, and the
 - Copy the contents of `serbuf` into `buffer`.  The number of characters to copy is `seridx`, which is the number of characters received so far.
     - This is only true as long as `length` is greater than or equal to `seridx`.  If `length` is less than `seridx`, copy only `length` characters.  However, since our `BUFSIZE` is 32, this should not be an issue.
 - Reset `seridx` to 0.
-- Return `seridx`, not `length`.  This is because the C standard library functions expect the actual length of the string to be returned.
+- Return `length`.  This is because the C standard library functions expect the actual length of the string to be returned.
 
 #### 4.5 Test your implementation
 
