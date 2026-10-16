@@ -47,22 +47,16 @@ The way we implemented the Docker infrastructure was done through VScode using a
 
 Within VScode, go to Extensions (Ctrl/Cmd+Shift+X), and install the Microsoft Dev Containers extension.  Then, follow the instructions below depending on your OS.
 
-For Windows, [Native WSL Containers](https://endjin.com/blog/trying-out-wsl-containers#using-wslc-with-dev-containers).
-    - Before following the guide, ensure that [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) is installed on Windows, and that it is updated to the latest version (at least WSL 2.9.3).
-    - Ensure that any one distro (e.g. Ubuntu) is installed within WSL, e.g. run `wsl --install Ubuntu` in PowerShell.
-    - After following the guide, your user settings should have changed the "dockerPath" to `wslc`, and "executeInWSL" property to true (by clicking the checkbox).  Search for both properties to confirm.
-
-For macOS and Linux, follow the official Docker installation guide for your operating system:
-   <!-- - [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
+Follow the official Docker installation guide for your operating system:
+   - [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
         - You will also need to have WSL installed for Docker to work with Linux containers.  Follow the instructions to install Ubuntu 24.04 WSL on your Windows computer: https://documentation.ubuntu.com/wsl/latest/howto/install-ubuntu-wsl2/
-        - WSL is required because Linux containers on Windows still need an underlying Linux kernel to interface with Windows in order to run programs or interact with hardware.  It may also be possible to skip our container entirely by setting up the tools yourself by running the commands listed within the Dockerfile under the Linux instructions below. -->
+        - WSL is required because Linux containers on Windows still need an underlying Linux kernel to interface with Windows in order to run programs or interact with hardware.  It may also be possible to skip our container entirely by setting up the tools yourself by running the commands listed within the Dockerfile under the Linux instructions below.
+        - If you use an ARM Windows computer, we recommend scheduling an appointment with your lab coordinator to get the tools installed manually within WSL, as Dev Containers do not appear to work well on ARM Windows machines.
    - [Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
    - [Docker Engine for Linux](https://docs.docker.com/engine/install/)
-        - If you know your way around Linux, you can build and install the tools yourself.  We'll provide you with the [Dockerfile](https://gist.github.com/norandomtechie/06a32cba6e762ae4e019fbfe793be324) we created to make the Docker image for this lab - change the commands in it to fit your particular distro, and just run them yourself.  Then, clone lab 8, and just ignore the dialogs to open the folder inside a Dev Container.
+        - If you know your way around Linux, you can build and install the tools yourself.  We'll provide you with the [Dockerfile](https://gist.github.com/norandomtechie/06a32cba6e762ae4e019fbfe793be324) we created to make the Docker image for this lab - change the commands in it to fit your particular distro, and just run them yourself.  Then, clone lab 8, and just ignore the dialogs to open the folder inside a Dev Container.  If you need help, ask your lab coordinator, who will help you write a build script.
 
-Once WSL or Docker have been properly installed, accept the repository link on Iris for lab 8, clone it to your own machine, and open it in VScode.  
-
-Press  ou should see a dialog asking you to open it in a Dev Container, but if you don't see it, press Ctrl-Shift-P, and type "Dev Containers: Reopen in Container". Do NOT pick the option that says Rebuild!
+Once Docker has been installed, accept the repository link on Iris for lab 8, clone it to your own machine, and open it in VScode.  You should see a dialog asking you to open it in a Dev Container, but if you don't see it, press Ctrl-Shift-P, and type "Dev Containers: Reopen in Container". Do NOT pick the option that says Rebuild!
 
 VScode will then refresh, opening your repository, download and set up the container, and you will be ready to start working on the lab.  Building the container can take a very long time, so give it a while.  If you have any issues with the container, ask course staff for help.
 
