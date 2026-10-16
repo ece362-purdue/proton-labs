@@ -49,7 +49,7 @@ Within VScode, go to Extensions (Ctrl/Cmd+Shift+X), and install the Microsoft De
 
 Follow the official Docker installation guide for your operating system:
    - [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
-        - You will also need to have WSL installed for Docker to work with Linux containers.  Follow the instructions to install Ubuntu 24.04 WSL on your Windows computer: https://documentation.ubuntu.com/wsl/latest/howto/install-ubuntu-wsl2/
+        - You will also need to have WSL installed for Docker to work with Linux containers.  Follow the instructions to install Ubuntu 26.04 WSL on your Windows computer: https://documentation.ubuntu.com/wsl/latest/howto/install-ubuntu-wsl2/
         - WSL is required because Linux containers on Windows still need an underlying Linux kernel to interface with Windows in order to run programs or interact with hardware.  It may also be possible to skip our container entirely by setting up the tools yourself by running the commands listed within the Dockerfile under the Linux instructions below.
         - If you use an ARM Windows computer, we recommend scheduling an appointment with your lab coordinator to get the tools installed manually within WSL, as Dev Containers do not appear to work well on ARM Windows machines.
    - [Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
