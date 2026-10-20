@@ -540,6 +540,6 @@ It also doesn't have to be just peripherals - you can use these to automatically
 > [!CAUTION]
 > Make sure you got checked off here: https://engineering.purdue.edu/ece362/checkoff/
 > 
-> Make sure to upload your confirmation code and verify that it is accepted by Gradescope.  You will know it is accepted if you get the points from Gradescope.
+> Make sure to upload your C code and verify that it is accepted and graded properly by Gradescope.  You will know it is accepted if you get the points from Gradescope.
 > 
 > Before you leave, make sure your station is clean and that you have gathered your belongings, and then call a TA to confirm that you can leave.  Confirm that you have received your checkoffs and that your confirmation code was accepted on Gradescope before logging out and leaving for the day.
