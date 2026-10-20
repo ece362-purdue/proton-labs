@@ -530,7 +530,7 @@ It doesn't have to be just GPIO pins.  Use this concept to quickly set up an SPI
 
 It also doesn't have to be just peripherals - you can use these to automatically send commands to external devices like LCDs, or read sensors, or read/write to files on an SD card.  Debugging those methods can get quite time-consuming if you just use the debugger, so having a command shell to quickly test things will be very useful.
 
-**And that's a wrap on the embedded labs! Congratulations on making it through!**  Don't forget to go through the "project guide" labs on the main Labs repository page to get some ideas on what you can use for your project.
+**And that's a wrap on the embedded labs! Congratulations on making it through!**  Don't forget to go through the "project guides" on the main Labs repository page for guides on various components you may be using in your project, particularly the I2C EEPROM, SPI TFT LCD or the SD card reader.
 
 > [!IMPORTANT]
 > The test for step 5, for every line above, checks it verbatim *except* `where's the bathroom?`.  The check also retypes `gpio out 23` as `gpio out 2x`, Backspace, `3` partway through, to confirm Backspace editing carried over from Step 4 still works in this shell, so don't be surprised if you see that exact typo-correction sequence in the test output.
