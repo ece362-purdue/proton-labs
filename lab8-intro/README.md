@@ -325,7 +325,7 @@ Then, you can compile and run this wrapper with the following commands:
 
 ```bash
 riscv64-unknown-elf-gcc -march=rv32im -mabi=ilp32 q2_test.c lab.S -o q2_test
-./q2_test
+qemu-riscv32-static ./q2_test
 ```
 
 For each function to test, you can write a similar wrapper that calls the function with the appropriate number of arguments.  Just make sure to compile it with the assembly file so that it can link to your function, and that you provide the correct function definition before `main`.
